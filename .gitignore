@@ -24,6 +24,7 @@ playwright-report/
 dist-android/
 .worktrees/
 .superpowers/
+.local-tools/
 *.apk
 *.aab
 *.db

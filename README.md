@@ -41,6 +41,8 @@ On macOS/Linux use `npm` and `npx` without `.cmd`. In PowerShell the `.cmd` form
 
 ## Native development build
 
+The first ARM64 development APK has built successfully on Windows and passed APK signature verification. Installation and runtime checks on the S20 are pending reconnection of the phone. See [build evidence and limits](docs/reviews/2026-09-20-android-build-setup.md).
+
 Expo Go cannot provide SQLCipher. A native build is needed to exercise encrypted persistence. With Java and the Android SDK configured, and an emulator or authorized USB device connected:
 
 ```powershell
@@ -72,6 +74,8 @@ The lockfile includes a scoped `xcode → uuid` override to a patched CommonJS-c
 ## Learn with the project
 
 Start with [Lesson 1: from a tap to a saved moment](docs/learning/01-first-moment.md). Each increment includes an explanation, a runnable result, an exercise and verification evidence.
+
+Continue with [Lesson 2: build for a real Android phone](docs/learning/02-android-device-build.md) for the Samsung S20 setup, USB development, and disk-saving habits.
 
 | Location | Purpose |
 |---|---|
