@@ -31,4 +31,8 @@ dist-android/
 *.db-shm
 *.db-wal
 *.log
+# Graphify machine paths, extraction scratch files and local cache
+graphify-out/.*
+graphify-out/cost.json
+graphify-out/cache/
 /prototype/*preview.png

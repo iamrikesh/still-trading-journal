@@ -1,0 +1,207 @@
+{
+  "mobile/App.tsx": {
+    "mtime": 1789902427.8878884,
+    "ast_hash": "16f48132fa48fde23deef473175c8a5c",
+    "semantic_hash": "16f48132fa48fde23deef473175c8a5c"
+  },
+  "mobile/app.json": {
+    "mtime": 1789911867.5519018,
+    "ast_hash": "44b9dffd05d3a38f01e14805f143410b",
+    "semantic_hash": "44b9dffd05d3a38f01e14805f143410b"
+  },
+  "mobile/e2e/first-moment.spec.ts": {
+    "mtime": 1789902283.6316803,
+    "ast_hash": "d0c1b4bdcb3cea0e4504b2e7f6d6df19",
+    "semantic_hash": "d0c1b4bdcb3cea0e4504b2e7f6d6df19"
+  },
+  "mobile/eas.json": {
+    "mtime": 1789902289.1164849,
+    "ast_hash": "caf1a520eefd1cbe3aad590fb68f7672",
+    "semantic_hash": "caf1a520eefd1cbe3aad590fb68f7672"
+  },
+  "mobile/index.ts": {
+    "mtime": 1789901367.1399932,
+    "ast_hash": "33caa6d28d87fc7e637c033d0d7124b1",
+    "semantic_hash": "33caa6d28d87fc7e637c033d0d7124b1"
+  },
+  "mobile/package.json": {
+    "mtime": 1789910349.3187916,
+    "ast_hash": "5eba0c1eaebaee6835ec6ae55cd1f89a",
+    "semantic_hash": "5eba0c1eaebaee6835ec6ae55cd1f89a"
+  },
+  "mobile/playwright.config.ts": {
+    "mtime": 1789902429.890069,
+    "ast_hash": "0b09576c0401d5dccd22ba92ea548a88",
+    "semantic_hash": "0b09576c0401d5dccd22ba92ea548a88"
+  },
+  "mobile/scripts/serve-preview.mjs": {
+    "mtime": 1789902280.5265665,
+    "ast_hash": "aab09efe7b78300dbbc19cbdf0d9bf29",
+    "semantic_hash": "aab09efe7b78300dbbc19cbdf0d9bf29"
+  },
+  "mobile/scripts/verify-android-apk.mjs": {
+    "mtime": 1789910344.842099,
+    "ast_hash": "add55193642b1d89f31c814adcc9c14e",
+    "semantic_hash": "add55193642b1d89f31c814adcc9c14e"
+  },
+  "mobile/src/journal/controller.ts": {
+    "mtime": 1789902425.7847729,
+    "ast_hash": "29c3258f8ba30a4d92e103be3ceb910e",
+    "semantic_hash": "29c3258f8ba30a4d92e103be3ceb910e"
+  },
+  "mobile/src/journal/emotions.ts": {
+    "mtime": 1789901520.2259343,
+    "ast_hash": "0ec79a141c96bfc4d4c0eb3af2667c41",
+    "semantic_hash": "0ec79a141c96bfc4d4c0eb3af2667c41"
+  },
+  "mobile/src/storage/encryptedJournal.ts": {
+    "mtime": 1789901771.0481446,
+    "ast_hash": "9dc737aec235b740a28af6d44ac0f395",
+    "semantic_hash": "9dc737aec235b740a28af6d44ac0f395"
+  },
+  "mobile/src/storage/memoryJournal.ts": {
+    "mtime": 1789901768.7835095,
+    "ast_hash": "7c1c87a20d3af38fa568bca115b10171",
+    "semantic_hash": "7c1c87a20d3af38fa568bca115b10171"
+  },
+  "mobile/src/storage/openJournal.ts": {
+    "mtime": 1789902400.0026398,
+    "ast_hash": "592f4e5348ed98e44a4347e49cd93072",
+    "semantic_hash": "592f4e5348ed98e44a4347e49cd93072"
+  },
+  "mobile/src/storage/openJournal.web.ts": {
+    "mtime": 1789901848.2419312,
+    "ast_hash": "b3afa84eef85db054dcc5d9fee98ddd2",
+    "semantic_hash": "b3afa84eef85db054dcc5d9fee98ddd2"
+  },
+  "mobile/src/storage/sqlJournal.ts": {
+    "mtime": 1789901610.8613176,
+    "ast_hash": "80dad0b0a746cc33b3a30f1a6ac894b4",
+    "semantic_hash": "80dad0b0a746cc33b3a30f1a6ac894b4"
+  },
+  "mobile/src/storage/sqliteDirectoryUri.ts": {
+    "mtime": 1789902397.3501973,
+    "ast_hash": "cb733c29127faa4457bf523174252c9a",
+    "semantic_hash": "cb733c29127faa4457bf523174252c9a"
+  },
+  "mobile/src/storage/types.ts": {
+    "mtime": 1789901572.4380865,
+    "ast_hash": "560bdef56e95ecaeafc6637619e17a84",
+    "semantic_hash": "560bdef56e95ecaeafc6637619e17a84"
+  },
+  "mobile/src/theme.ts": {
+    "mtime": 1789901954.6411054,
+    "ast_hash": "d4de8f48fa0467588ef8ddf9aafabe49",
+    "semantic_hash": "d4de8f48fa0467588ef8ddf9aafabe49"
+  },
+  "mobile/tests/controller.test.ts": {
+    "mtime": 1789902341.2620034,
+    "ast_hash": "f67bc0772836d9d82184497374b960e6",
+    "semantic_hash": "f67bc0772836d9d82184497374b960e6"
+  },
+  "mobile/tests/storage.test.ts": {
+    "mtime": 1789902366.0185754,
+    "ast_hash": "89f774d6519ace4f678952a6851e630c",
+    "semantic_hash": "89f774d6519ace4f678952a6851e630c"
+  },
+  "mobile/tsconfig.json": {
+    "mtime": 1789902052.6209114,
+    "ast_hash": "4bb392d07c9e7ca6fc315e5ceab2616b",
+    "semantic_hash": "4bb392d07c9e7ca6fc315e5ceab2616b"
+  },
+  "prototype/check-hardening.cjs": {
+    "mtime": 1788784418.3804495,
+    "ast_hash": "4b51d1877210218cc90467671f0465bc",
+    "semantic_hash": "4b51d1877210218cc90467671f0465bc"
+  },
+  "prototype/check-still.cjs": {
+    "mtime": 1788784420.9971495,
+    "ast_hash": "50fe0b8d74b12d8ba9039c68faaba05e",
+    "semantic_hash": "50fe0b8d74b12d8ba9039c68faaba05e"
+  },
+  "AGENTS.md": {
+    "mtime": 1789913872.7022083,
+    "ast_hash": "3a41df8208d942667659f59097b2be7a",
+    "semantic_hash": "3a41df8208d942667659f59097b2be7a"
+  },
+  "MVP-SCOPE.md": {
+    "mtime": 1789913876.7245193,
+    "ast_hash": "e7f5f80ec8c1bbbb4d8027f0baf46b0d",
+    "semantic_hash": "e7f5f80ec8c1bbbb4d8027f0baf46b0d"
+  },
+  "README.md": {
+    "mtime": 1789913880.931155,
+    "ast_hash": "1dd5b98abb4cd34f03c05f056d911b27",
+    "semantic_hash": "1dd5b98abb4cd34f03c05f056d911b27"
+  },
+  "SECURITY-AND-PERFORMANCE.md": {
+    "mtime": 1789913978.4804091,
+    "ast_hash": "07bce5c307f78bf1ca6b7786a7673966",
+    "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
+  },
+  "docs/PROJECT-STATUS.md": {
+    "mtime": 1789913871.4011502,
+    "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
+    "semantic_hash": "65bf65dcc094cf94ab3a75b7c5bf9679"
+  },
+  "docs/ci/checks.yml": {
+    "mtime": 1789903055.7063572,
+    "ast_hash": "0e6f714898283c857a0cf967af0a78da",
+    "semantic_hash": "0e6f714898283c857a0cf967af0a78da"
+  },
+  "docs/learning/01-first-moment.md": {
+    "mtime": 1789902603.7420373,
+    "ast_hash": "e2cbec52875c3852422b6ee7c53953a6",
+    "semantic_hash": "e2cbec52875c3852422b6ee7c53953a6"
+  },
+  "docs/learning/02-android-device-build.md": {
+    "mtime": 1789913005.0488815,
+    "ast_hash": "e009544d932e9e45a042eda8705b32cf",
+    "semantic_hash": "e009544d932e9e45a042eda8705b32cf"
+  },
+  "docs/reviews/2026-09-07-security-memory-review.md": {
+    "mtime": 1788784430.3407004,
+    "ast_hash": "579d31a90470bcc0610717808281d473",
+    "semantic_hash": "579d31a90470bcc0610717808281d473"
+  },
+  "docs/reviews/2026-09-20-android-build-setup.md": {
+    "mtime": 1789913003.6539407,
+    "ast_hash": "7e6e85c109f229ffffb5c6f86fa0fdfd",
+    "semantic_hash": "7e6e85c109f229ffffb5c6f86fa0fdfd"
+  },
+  "docs/reviews/2026-09-20-first-increment.md": {
+    "mtime": 1789913878.1754687,
+    "ast_hash": "959353b98def97168bde65279ac34a84",
+    "semantic_hash": "959353b98def97168bde65279ac34a84"
+  },
+  "docs/reviews/2026-09-20-plan-review.md": {
+    "mtime": 1789901070.5061412,
+    "ast_hash": "ff875bc202f25893a1da005503b94944",
+    "semantic_hash": "ff875bc202f25893a1da005503b94944"
+  },
+  "docs/superpowers/plans/2026-09-20-first-android-increment.md": {
+    "mtime": 1789913879.5327628,
+    "ast_hash": "12a3efb180764d57aeaa5241d9369fd0",
+    "semantic_hash": "12a3efb180764d57aeaa5241d9369fd0"
+  },
+  "mobile/AGENTS.md": {
+    "mtime": 1789901367.1759384,
+    "ast_hash": "963888ec05f17b13375386f058dd621e",
+    "semantic_hash": "963888ec05f17b13375386f058dd621e"
+  },
+  "mobile/CLAUDE.md": {
+    "mtime": 1789901367.1771116,
+    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
+    "semantic_hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "prototype/README.md": {
+    "mtime": 1788784426.103782,
+    "ast_hash": "5eac0f5b28477594986b10dc54b4de8b",
+    "semantic_hash": "5eac0f5b28477594986b10dc54b4de8b"
+  },
+  "prototype/still-mobile-concept.html": {
+    "mtime": 1788784205.3481557,
+    "ast_hash": "c0fef9680415cebdaf512e7a68812199",
+    "semantic_hash": "c0fef9680415cebdaf512e7a68812199"
+  }
+}

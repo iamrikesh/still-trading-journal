@@ -1,6 +1,6 @@
 # Still — working product scope
 
-Updated 2026-09-20. Working name. The repository now includes the first React Native/Expo increment under `mobile/`, alongside the original interactive design prototype. This is not a production release; native installation and physical-device validation remain outstanding.
+Updated 2026-09-20. Working name. The first React Native/Expo increment under `mobile/` is installed on the Samsung S20, with basic save/restart/delete and SQLCipher checks verified. This is not the full MVP or a production release. See [current status and remaining work](docs/PROJECT-STATUS.md).
 
 ## Purpose and influences
 
@@ -22,7 +22,7 @@ First user: Rikesh. Android first, with a planned path to iOS and web. Intended 
 - Reliable offline storage, clear recording state, microphone permission handling, interruption handling, and recoverable errors. Preserve audio in durable app storage rather than cache.
 - Data export/backup and deletion before depending on the app for ongoing personal use.
 - A calm, minimal interface with large controls. Theme presets with light, dark, and system appearance; short icon/tap/screen transitions that respect reduced motion.
-- Security and memory behavior are MVP requirements. Follow [SECURITY-AND-PERFORMANCE.md](SECURITY-AND-PERFORMANCE.md) for private/encrypted persistence, permission handling, lifecycle cleanup, bounded media processing, and physical-device release checks. These requirements are not yet implemented in an Android app.
+- Security and memory behavior are MVP requirements. Follow [SECURITY-AND-PERFORMANCE.md](SECURITY-AND-PERFORMANCE.md) for private/encrypted persistence, permission handling, lifecycle cleanup, bounded media processing, and physical-device release checks. Encrypted text persistence has basic device evidence; media, recovery and wider release checks remain.
 
 ## Design prototype capabilities and limitations
 

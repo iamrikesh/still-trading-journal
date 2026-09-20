@@ -1,6 +1,6 @@
 # Security and memory requirements
 
-Updated 2026-09-20. Engineering requirements for the future Android MVP, informed by the prototype review and product decisions. These are not claims that an Android app, encrypted storage, authentication, or a backend already exists.
+Updated 2026-09-20. Engineering requirements for the Android MVP, informed by the prototype review and product decisions. The first native increment and basic SQLCipher checks now run on the S20; this document specifies the broader controls still required, not a claim that they are all implemented. See [current status](docs/PROJECT-STATUS.md) and [device evidence](docs/reviews/2026-09-20-android-build-setup.md).
 
 ## What we are protecting
 

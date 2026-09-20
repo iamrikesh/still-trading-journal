@@ -1,0 +1,13 @@
+# Architecture and project documentation only; .gitignore is also respected.
+.local-tools/
+.git/
+node_modules/
+mobile/android/
+mobile/ios/
+mobile/assets/
+docs/images/
+graphify-out/
+**/package-lock.json
+private-data/
+recordings/
+exports/

@@ -2,6 +2,8 @@
 
 **A little space between an emotion and the next trade.**
 
+Continuing development? Start with [project status and next steps](docs/PROJECT-STATUS.md).
+
 An Android-first trading reflection app, built with React Native, Expo and TypeScript. Tap what you notice, read a personal reminder, capture your thoughts, and review them later. Built as a learning project with visible decisions, tests, and incremental delivery.
 
 <p><img src="docs/images/first-moment.png" width="280" alt="Still emotion selection screen" /> <img src="docs/images/injecting-logic.png" width="280" alt="FOMO injecting logic and saved moment" /></p>

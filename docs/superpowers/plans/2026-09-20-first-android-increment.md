@@ -30,7 +30,7 @@ Files: `mobile/package.json`, `mobile/App.tsx`, `mobile/src/journal/*`, `mobile/
 - [x] Write repository integration tests against real SQLite: save/reopen/list, parameterized unusual text, idempotent retry, newest-first ordering, bounded results, and deletion.
 - [x] Implement parameterized SQLite persistence and native SQLCipher/SecureStore initialization. Check cipher availability; protect generated keys; do not overwrite history when a key fails.
 - [x] Add a bounded in-memory web/Expo Go demonstration with explicit temporary status and no personal-text entry.
-- [x] Run type checking, meaningful tests, dependency compatibility checks, and Android/web bundle generation. Native prebuild succeeds; native compilation is blocked by missing Java. Device execution remains unverified.
+- [x] Run type checking, meaningful tests, dependency compatibility checks, and Android/web bundle generation. Subsequent native setup and S20 save/restart/delete/SQLCipher checks are complete; see `docs/reviews/2026-09-20-android-build-setup.md` for the later evidence.
 
 ## Task 2: Learning and portfolio delivery
 

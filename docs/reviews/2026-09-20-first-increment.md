@@ -1,5 +1,7 @@
 # First increment: verification and limits
 
+Historical checkpoint before native setup. The later [Android device review](2026-09-20-android-build-setup.md) supersedes the build/installation limitations below; [project status](../PROJECT-STATUS.md) records current remaining work.
+
 ## Implemented
 
 React Native/Expo SDK 57 application with original starter support cards, immediate support, timestamped moments, recent history/deletion and system/light/dark themes. Tap state is independent of asynchronous storage. Save retry retains ID/time; successful saves are distinguished from history-load errors. Pending and failed moment IDs are bounded to 50 without discarding older unsaved drafts.
