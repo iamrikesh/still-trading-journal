@@ -12,6 +12,8 @@ Use the [OWASP Mobile Application Security Verification Standard](https://mas.ow
 
 ## Current state
 
+The new `mobile/` source implements the first emotion/timestamp/history increment and a native SQLCipher/SecureStore initialization path. Web and Expo Go use explicitly temporary in-memory demo storage. Automated SQLite tests validate repository behavior; controlled native-dependency tests validate bootstrap logic, not actual device encryption. Physical-device privacy, backup, app unlock, native memory, media encryption and recovery gates remain open. Use sample moments until those gates are met. The following bullets describe the older browser prototype separately.
+
 - The browser concept has no accounts, backend, real microphone capture, durable storage, or application encryption.
 - It runs inside the preview host; that host is part of its trust boundary. The preview is not a secure vault for real private journals.
 - Attachment selection stays in the preview; the prototype code does not upload it. Closing/reloading discards preview state.

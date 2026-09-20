@@ -1,6 +1,6 @@
 # Still — working product scope
 
-Updated 2026-09-20. Working name; the Android application has not been built or deployed. The current deliverable is an interactive design prototype.
+Updated 2026-09-20. Working name. The repository now includes the first React Native/Expo increment under `mobile/`, alongside the original interactive design prototype. This is not a production release; native installation and physical-device validation remain outstanding.
 
 ## Purpose and influences
 
@@ -44,7 +44,7 @@ The prototype now validates media content and dimensions, uses managed object UR
 
 Provisional stack: React Native, Expo, TypeScript. Keep session data, support cards, media storage, and future analysis behind clear module boundaries. Plan storage and synchronization explicitly; sharing UI code does not remove platform differences.
 
-Work in small demonstrable increments. Explain the problem, core concept, implementation, and verification for each increment. First implementation milestone: a real Android Record / Stop / Play screen, then reopening the app and replaying a persisted recording.
+Work in small demonstrable increments. Explain the problem, core concept, implementation, and verification for each increment. Rikesh has some programming experience and will test on a Samsung S20. On 2026-09-20 he authorized starting from settled decisions and improving iteratively, with a public GitHub portfolio repository and an eventual live Android release. The first increment establishes emotion tap → support → timestamped history and the storage foundation. Real Record / Stop / Play follows, including reopening the app and replaying a persisted recording.
 
 The theme system should use shared semantic design tokens (background, surface, text, accent, border) instead of colors scattered through individual screens. Motion should communicate feedback without delaying access to injecting logic.
 
