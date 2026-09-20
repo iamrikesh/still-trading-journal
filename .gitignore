@@ -1,0 +1,33 @@
+# Local secrets and signing material
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+
+# Private journals and media must never be committed
+/private-data/
+/recordings/
+/exports/
+
+# Future app dependencies, generated output, and local tooling state
+node_modules/
+.expo/
+dist/
+build/
+coverage/
+test-results/
+playwright-report/
+dist-android/
+.worktrees/
+.superpowers/
+*.apk
+*.aab
+*.db
+*.db-shm
+*.db-wal
+*.log
+/prototype/*preview.png
