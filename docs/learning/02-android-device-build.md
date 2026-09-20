@@ -1,6 +1,6 @@
 # Lesson 2: build for a real Android phone
 
-Our next milestone is a development APK running on Rikesh's Samsung S20. An APK build alone does not prove that encrypted storage works on the phone; we check that separately.
+This milestone is a development APK running on Rikesh's Samsung S20. An APK build alone does not prove that encrypted storage works on the phone; we check that separately. The first device checks now pass; see the [verification record](../reviews/2026-09-20-android-build-setup.md).
 
 ## What each tool does
 
@@ -36,18 +36,22 @@ The local tools folder is machine setup, not a committed project dependency. A f
 
 ## Configure one PowerShell terminal
 
-From the repository root, after portable Java has been installed:
+From the repository root, after portable Java has been installed, check `subst` and choose an unused drive letter. This laptop uses `S:` as a short alias for the existing project folder:
 
 ```powershell
-$env:JAVA_HOME = Join-Path (Get-Location) '.local-tools\jdk-17'
+subst S: "C:\Users\Rikesh\Documents\ChatGPT\Trading App"
+Set-Location S:\
+$env:JAVA_HOME = 'S:\.local-tools\jdk-17'
 $env:ANDROID_HOME = Join-Path $env:LOCALAPPDATA 'Android\Sdk'
-$env:GRADLE_USER_HOME = Join-Path (Get-Location) '.local-tools\gradle'
+$env:GRADLE_USER_HOME = 'S:\.local-tools\gradle'
 $env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:Path"
 java -version
 adb devices -l
 ```
 
 These environment variables affect this terminal and its child processes. They do not change Windows settings permanently. Repeat them in a fresh terminal. `JAVA_HOME` locates Java; `ANDROID_HOME` locates Android tooling; `GRADLE_USER_HOME` locates downloaded Gradle dependencies.
+
+`subst` creates a drive alias, not a copy: `S:` and the original project folder contain the same files. Recreate the mapping after reboot; if it already points to this project, skip the `subst` command. Do not replace another drive's mapping. Use the short Gradle cache path consistently: the longer original path caused a Ninja 260-character limit failure and omitted SQLCipher's runtime library from the earlier APK. After all development processes stop, the alias can be removed with `subst S: /d` from a terminal outside `S:`; files remain in the original folder.
 
 Our local `.local-tools\gradle\gradle.properties` contains:
 
@@ -91,10 +95,11 @@ For subsequent JavaScript-only work, in an environment-configured terminal:
 ```powershell
 cd mobile
 adb reverse tcp:8081 tcp:8081
+$env:NODE_OPTIONS = "$env:NODE_OPTIONS --dns-result-order=ipv4first".Trim()
 npx.cmd expo start --dev-client --localhost --max-workers 2
 ```
 
-Open the installed still. development app and connect to `http://localhost:8081` if it does not reconnect automatically. USB port forwarding makes the phone's localhost:8081 reach Metro on the laptop. The forwarding may need repeating after reconnecting USB.
+Open the installed still. development app and connect to `http://127.0.0.1:8081` if it does not reconnect automatically. USB port forwarding makes the phone's port 8081 reach Metro on the laptop. The forwarding may need repeating after reconnecting USB. On this laptop, Node otherwise bound Metro only to IPv6 `::1`, which the USB connection could not reach. The process-only `NODE_OPTIONS` setting makes Metro bind IPv4 instead. A quick health check is `curl.exe http://127.0.0.1:8081/status`; expect `packager-status:running`.
 
 If the APK is already built, install it without rebuilding (from `mobile/`):
 
@@ -115,11 +120,23 @@ Use synthetic moments only:
 4. Delete the moment and reopen again. Confirm it stays deleted.
 5. Change a starter reminder in `mobile/src/journal/emotions.ts`. Observe the update through Metro; compare this with rebuilding the APK.
 
-Persistence alone does not prove encryption. A separate native inspection must confirm SQLCipher, SecureStore key handling, backup exclusion, and failure behavior before personal journals are appropriate.
+Persistence alone does not prove encryption. We separately confirmed SQLCipher's runtime version, protected-key presence and rejection of an unkeyed database read on the S20. Backup/restore, missing-key recovery, app unlock and broader failure behavior still require validation before personal journals are appropriate.
 
 ## A build issue we discovered
 
 The first real Gradle build rejected `rootProject.name = 'still.'`: Gradle project names cannot end with a period. We changed Expo's `name` to `still` and regenerated Android. The launcher/native project use `still`; the app's own text can keep the `still.` brand. Fix the source configuration (`mobile/app.json`), rather than only editing generated files that prebuild can replace.
+
+The first phone run also exposed a packaging failure: the APK omitted `libcrypto.so`, and Android refused to load SQLite. The native build metadata had an empty `runtimeFiles` list. Using the short Gradle cache path restored both `libcrypto.so` and `libfbjni.so` to that list. We initially suspected a dependency declaration, but the build evidence pointed to the local path issue; no dependency patch is needed.
+
+After building, run `npm.cmd run verify:apk` from `mobile/` with `JAVA_HOME` configured. This checks that each packaged SQLite architecture also includes `libcrypto.so`. It catches the original packaging omission but does not prove that encryption works on the phone.
+
+For repeat configuration updates, use:
+
+```powershell
+npx.cmd expo prebuild --platform android --no-install --no-clean
+```
+
+SDK 57 recreates native folders by default. `--no-clean` updates an existing valid folder and retains its build files. A deliberate clean regeneration is still appropriate when required by native changes that cannot be applied repeatedly. Rebuild the APK after native configuration changes.
 
 ## Keep disk use under control
 

@@ -34,6 +34,7 @@
     "demo": "expo start --go",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "verify:apk": "node scripts/verify-android-apk.mjs",
     "export:web": "expo export --platform web",
     "export:android": "expo export --platform android --output-dir dist-android"
   },

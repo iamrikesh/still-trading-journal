@@ -23,11 +23,24 @@ The build targeted only ARM64, used two Gradle workers, disabled parallel Gradle
 
 C: had approximately 18.4 GiB free at the start of setup and approximately 11 GiB at the final check. These are whole-drive observations, including other Windows activity; they are not an exact attribution of every byte to the project. Tool binaries, caches and APKs are ignored by Git.
 
-## Remaining device verification
+## Follow-up device verification
 
-The installation attempt reported `adb.exe: no devices found`; no successful installation or phone launch is claimed. Reconnect and authorize the S20, install the existing APK, forward port 8081, and connect it to Metro as described in Lesson 2.
+After reconnection, the APK installed on the S20 and opened through Metro over USB. Metro initially bound IPv6 only; process-local `NODE_OPTIONS=--dns-result-order=ipv4first` and the `127.0.0.1:8081` URL fixed that connection. No Windows execution policy or firewall changes were needed.
 
-Then check immediate support, save status, history, restart persistence and deletion with sample moments. Native encryption/key handling, backup exclusion, lifecycle behavior and application memory measurements still need device evidence. This is not a production release.
+The first phone run showed reminders but could not save. Android's native error identified a missing `libcrypto.so`. The old APK lacked it, and SQLite's CMake metadata had an empty `runtimeFiles` array. A subsequent build also failed at Ninja's 260-character path limit. Mapping the project to `S:` and using `S:\.local-tools\gradle` restored the runtime-file metadata and successful compilation without copying tools or dependencies. An initially considered OpenSSL dependency workaround was removed; the final build uses the existing dependency configuration.
+
+The final short-path build succeeded in 3 minutes 15 seconds: 349 tasks, 24 executed and 325 up to date. The approximately 69.8 MiB APK passed `apksigner` v2 signature verification and the new `npm.cmd run verify:apk` artifact check. It was successfully installed with `adb install -r`. C: had approximately 11.62 GiB free after the rebuilds.
+
+Verified on the phone:
+
+- A FOMO tap displayed its reminder and the saved status; its entry appeared in history.
+- Saved moments survived a full process stop and cold launch.
+- The test moment was deleted through the app's confirmation dialog and remained absent after another cold launch. The pre-existing moment remained.
+- SQLCipher reported `4.7.0 community`. The protected key was present with the expected format, and a separate connection without the key could not read the moments table. No key values or journal contents were exported to the repository.
+- The previously unsaved moment was preserved in a temporary on-device SecureStore entry before the update, then restored with every original field verified after restart. The temporary recovery entry was deleted and its removal confirmed. This was a one-time development repair, not a shipped backup/restore feature.
+- All 20 Node tests and TypeScript checking passed after the changes. Metro's IPv4 health endpoint responded successfully.
+
+Release backup/restore and missing-key recovery, app unlock, broader lifecycle/failure checks, dependency security review and application memory measurements remain. These basic runtime checks do not establish production readiness or a complete security audit.
 
 ## Repeat the build
 

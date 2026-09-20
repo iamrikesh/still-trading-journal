@@ -17,7 +17,7 @@ Screenshots show the current React Native web demo with sample moments.
 - Native SQLCipher storage implementation with a SecureStore-protected random key; refuses plaintext fallback.
 - A browser/Expo Go demo using bounded **temporary memory only**.
 
-**Development milestone, not a production release.** Native encryption and lifecycle behavior still need verification on the Samsung S20. Voice capture, personal multimedia support cards, app unlock, backup/restore, session grouping and reflections are subsequent increments. Until the release checks are met, use sample moments only. Uninstalling the native app can lose its device-bound key; there is no restore flow yet.
+**Development milestone, not a production release.** The Samsung S20 now passes native save, restart persistence and deletion checks; SQLCipher rejects reads without the protected key. Broader security and lifecycle checks remain. Voice capture, personal multimedia support cards, app unlock, backup/restore, session grouping and reflections are subsequent increments. Until the release checks are met, use sample moments only. Uninstalling the native app can lose its device-bound key; there is no restore flow yet.
 
 ## Try the demo
 
@@ -41,7 +41,7 @@ On macOS/Linux use `npm` and `npx` without `.cmd`. In PowerShell the `.cmd` form
 
 ## Native development build
 
-The first ARM64 development APK has built successfully on Windows and passed APK signature verification. Installation and runtime checks on the S20 are pending reconnection of the phone. See [build evidence and limits](docs/reviews/2026-09-20-android-build-setup.md).
+The ARM64 development APK is installed and running on the S20. It passes APK signature and SQLCipher library-packaging checks, and the basic journal flow has been verified on the phone. Windows builds on this laptop use a short `S:` project alias to avoid native build path failures without copying files. Follow [Lesson 2](docs/learning/02-android-device-build.md) for this setup and see [build evidence and limits](docs/reviews/2026-09-20-android-build-setup.md).
 
 Expo Go cannot provide SQLCipher. A native build is needed to exercise encrypted persistence. With Java and the Android SDK configured, and an emulator or authorized USB device connected:
 
@@ -66,6 +66,8 @@ npx.cmd playwright test
 ```
 
 Node's SQLite tests use real temporary databases; encryption bootstrap tests use controlled native dependencies and do **not** prove device encryption. Browser checks cover the rendered tap/support/history flow, deletion, themes and narrow screens. Android bundle export verifies compilation, not installation or native runtime behavior.
+
+After a native APK build, with `JAVA_HOME` configured, run `npm.cmd run verify:apk`. This regression check inspects the APK for SQLCipher's required `libcrypto.so` in each packaged SQLite architecture; device checks are still needed.
 
 A GitHub Actions workflow is prepared at `docs/ci/checks.yml`. It is not active yet: the current GitHub CLI credential has repository access but no `workflow` scope. After authorizing that scope with `gh auth refresh -h github.com -s workflow`, place the file at `.github/workflows/checks.yml` and push it to enable checks on pushes and pull requests.
 
