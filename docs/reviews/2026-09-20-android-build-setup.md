@@ -21,7 +21,7 @@ SQLite otherwise selected the Android Gradle Plugin's default NDK 27.0.12077973.
 
 The build targeted only ARM64, used two Gradle workers, disabled parallel Gradle projects and the build-output cache for this attempt, and used a single-use Gradle daemon. Dependency caches are retained to avoid repeating downloads. Metro is configured with two workers for this laptop's USB development workflow.
 
-C: had approximately 18.4 GiB free at the start of setup and approximately 11.4 GiB afterward. These are whole-drive observations, including other Windows activity; they are not an exact attribution of every byte to the project. Tool binaries, caches and APKs are ignored by Git.
+C: had approximately 18.4 GiB free at the start of setup and approximately 11 GiB at the final check. These are whole-drive observations, including other Windows activity; they are not an exact attribution of every byte to the project. Tool binaries, caches and APKs are ignored by Git.
 
 ## Remaining device verification
 
