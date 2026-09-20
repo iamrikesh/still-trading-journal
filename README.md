@@ -63,7 +63,9 @@ npx.cmd playwright install chromium
 npx.cmd playwright test
 ```
 
-Node's SQLite tests use real temporary databases; encryption bootstrap tests use controlled native dependencies and do **not** prove device encryption. Browser checks cover the rendered tap/support/history flow, deletion, themes and narrow screens. Android bundle export verifies compilation, not installation or native runtime behavior. GitHub Actions runs these checks on pushes and pull requests.
+Node's SQLite tests use real temporary databases; encryption bootstrap tests use controlled native dependencies and do **not** prove device encryption. Browser checks cover the rendered tap/support/history flow, deletion, themes and narrow screens. Android bundle export verifies compilation, not installation or native runtime behavior.
+
+A GitHub Actions workflow is prepared at `docs/ci/checks.yml`. It is not active yet: the current GitHub CLI credential has repository access but no `workflow` scope. After authorizing that scope with `gh auth refresh -h github.com -s workflow`, place the file at `.github/workflows/checks.yml` and push it to enable checks on pushes and pull requests.
 
 The lockfile includes a scoped `xcode → uuid` override to a patched CommonJS-compatible version. Review it when upgrading Expo and remove it once the upstream dependency is fixed. Never apply a breaking `npm audit fix --force` without examining the proposed changes.
 

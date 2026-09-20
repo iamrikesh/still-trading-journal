@@ -23,25 +23,26 @@ Spec: `MVP-SCOPE.md` and `SECURITY-AND-PERFORMANCE.md`. This is one learning inc
 
 Files: `mobile/package.json`, `mobile/App.tsx`, `mobile/src/journal/*`, `mobile/src/storage/*`, `mobile/src/theme.ts`, `mobile/tests/*`, app configuration.
 
-- [ ] Generate a blank TypeScript Expo application under `mobile/`; install compatible SQLite, secure storage, random ID, safe-area, development-client and web dependencies.
-- [ ] Define `Moment` with `id`, `emotionId`, `emotionLabel`, `createdAt` and original `supportText`. Define a repository with `save(moment)`, `list()` and `remove(id)`; list is bounded to 50 recent rows.
-- [ ] Write and observe a failing behavioral test: tapping FOMO exposes support immediately while an unresolved save remains pending. Test failure and retry without inventing another moment or timestamp.
-- [ ] Implement the smallest controller and UI needed to pass. Preserve original injecting logic in the recorded moment. Never delay the support card for storage initialization.
-- [ ] Write repository integration tests against real SQLite: save/reopen/list, parameterized unusual text, idempotent retry, newest-first ordering, bounded results, and deletion.
-- [ ] Implement parameterized SQLite persistence and native SQLCipher/SecureStore initialization. Check cipher availability; protect generated keys; do not overwrite history when a key fails.
-- [ ] Add a bounded in-memory web/Expo Go demonstration with explicit temporary status and no personal-text entry.
-- [ ] Run type checking, meaningful tests, dependency compatibility checks, and Android/web bundle generation. Attempt native build when installed tools permit; report actual evidence separately from bundle success.
+- [x] Generate a blank TypeScript Expo application under `mobile/`; install compatible SQLite, secure storage, random ID, safe-area, development-client and web dependencies.
+- [x] Define `Moment` with `id`, `emotionId`, `emotionLabel`, `createdAt` and original `supportText`. Define a repository with `save(moment)`, `list()` and `remove(id)`; list is bounded to 50 recent rows.
+- [x] Write and observe a failing behavioral test: tapping FOMO exposes support immediately while an unresolved save remains pending. Test failure and retry without inventing another moment or timestamp.
+- [x] Implement the smallest controller and UI needed to pass. Preserve original injecting logic in the recorded moment. Never delay the support card for storage initialization.
+- [x] Write repository integration tests against real SQLite: save/reopen/list, parameterized unusual text, idempotent retry, newest-first ordering, bounded results, and deletion.
+- [x] Implement parameterized SQLite persistence and native SQLCipher/SecureStore initialization. Check cipher availability; protect generated keys; do not overwrite history when a key fails.
+- [x] Add a bounded in-memory web/Expo Go demonstration with explicit temporary status and no personal-text entry.
+- [x] Run type checking, meaningful tests, dependency compatibility checks, and Android/web bundle generation. Native prebuild succeeds; native compilation is blocked by missing Java. Device execution remains unverified.
 
 ## Task 2: Learning and portfolio delivery
 
-Files: `README.md`, `docs/learning/01-first-moment.md`, `.github/workflows/checks.yml`, `.gitignore`, implementation evidence.
+Files: `README.md`, `docs/learning/01-first-moment.md`, `docs/ci/checks.yml`, `.gitignore`, implementation evidence.
 
-- [ ] Explain React components, state, TypeScript, persistence, asynchronous save states, and test-first development using this increment's real files.
-- [ ] Provide PowerShell-safe commands (`npm.cmd`, `npx.cmd`), a small exercise, and its expected visible result.
-- [ ] Document current capabilities and remaining native/privacy/recovery/release gates honestly.
-- [ ] Add continuous integration for clean install, type checking, tests and bundling; check secrets and tracked-file selection.
-- [ ] Obtain independent review; fix material findings and repeat affected tests.
-- [ ] Create local commits using verified GitHub identity; create public `iamrikesh/still-trading-journal` only if the name is available, and push the reviewed project. No paid services or store publication in this increment.
+- [x] Explain React components, state, TypeScript, persistence, asynchronous save states, and test-first development using this increment's real files.
+- [x] Provide PowerShell-safe commands (`npm.cmd`, `npx.cmd`), a small exercise, and its expected visible result.
+- [x] Document current capabilities and remaining native/privacy/recovery/release gates honestly.
+- [x] Prepare a continuous integration workflow for clean install, type checking, tests and bundling; check secrets and tracked-file selection.
+- [ ] Activate CI after the GitHub credential is granted workflow scope. Keep the complete workflow in `docs/ci/checks.yml` until then. Publishing the requested portfolio source does not depend on broadening the credential.
+- [x] Obtain independent review; fix material findings and repeat affected tests.
+- [x] Create local commits using verified GitHub identity; create public `iamrikesh/still-trading-journal` and push the reviewed project. No paid services or store publication in this increment.
 
 ## Following increments
 
