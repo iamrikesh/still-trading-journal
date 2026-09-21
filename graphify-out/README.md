@@ -25,3 +25,18 @@ The raw AST output contains **31 import edges to 20 external module reference ID
 Graphify's synthetic benchmark estimated 6.9x fewer tokens per query for its two example questions. Its corpus estimate differed from detection; this is a retrieval-size heuristic, not a measured guarantee of answer quality or future token savings.
 
 The most connected project concepts include the current S20 checkpoint, release requirements, encrypted-journal initialization and the journal repository. Treat historical review nodes as dated evidence and future feature nodes as plans.
+
+
+## 2026-09-21 limited planning refresh
+
+Re-read PROJECT-STATUS.md and refreshed the existing checkpoint and voice-increment concept descriptions; regenerated the HTML view. Several clips per moment is the user-selected ownership model. Node/edge counts and architecture remain unchanged. All 20 host tests and TypeScript checking passed; no new phone or voice validation. This was a targeted host-agent documentation refresh, with no corpus scan, dependency indexing or model API calls; host token usage is unavailable. The original extraction audit above remains historical.
+
+
+## Voice design draft added (2026-09-21)
+
+Targeted host-agent extraction added the proposed S20 voice design and its explicit document references: 229 nodes and 321 edges. The original community analysis above is historical; this addition retains existing community assignments and does not recompute rankings. No dependency/private-data scan or external model API call was made; host token usage is unavailable. The design is for review, with native compatibility and implementation still unverified.
+
+
+## Native encrypted-file milestone (2026-09-21)
+
+Current navigation graph: **244 nodes, 340 edges**. Targeted host-agent extraction added native source/tests, development controller/panel, completed plan, Lesson 3 and dated S20 evidence. Relationships above are explicit source imports/calls/tests/document references; no external dependency trees, generated native output, local tools or private data were indexed. Host token usage unavailable; no external model API call. Existing community assignments were retained for navigation; historical centrality/cohesion tables above were not recomputed. Voice recording and general file/SQLite recovery remain unimplemented.

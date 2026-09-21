@@ -1,6 +1,6 @@
 # Voice recording for the S20 — design for review
 
-Status: approved by Rikesh on 2026-09-21, including the temporary private plaintext tradeoff. User decisions: several clips per moment, about four minutes per clip, foreground capture, and low laptop disk usage. Implementation starts with the encrypted synthetic-file proof below. This document does not establish native compatibility or security verification.
+Status: approved by Rikesh on 2026-09-21, including the temporary private plaintext tradeoff. User decisions: several clips per moment, about four minutes per clip, foreground capture, and low laptop disk usage. The encrypted synthetic-file proof below is now implemented and verified on the S20; see [dated evidence](../../reviews/2026-09-21-media-vault-proof.md). Clip metadata/file recovery and microphone capture remain unimplemented. This design is not a production-security claim.
 
 ## What Rikesh will see
 

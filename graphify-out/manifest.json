@@ -1,8 +1,8 @@
 {
   "mobile/App.tsx": {
-    "mtime": 1789902427.8878884,
+    "mtime": 1789986971.642508,
     "ast_hash": "16f48132fa48fde23deef473175c8a5c",
-    "semantic_hash": "16f48132fa48fde23deef473175c8a5c"
+    "semantic_hash": "99a6a3c517a5b69ff4f3c057507f5150"
   },
   "mobile/app.json": {
     "mtime": 1789911867.5519018,
@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1789913871.4011502,
+    "mtime": 1789988554.2598596,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "65bf65dcc094cf94ab3a75b7c5bf9679"
+    "semantic_hash": "ed01070c917a1ac93b00dd5c95503e61"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -203,5 +203,85 @@
     "mtime": 1788784205.3481557,
     "ast_hash": "c0fef9680415cebdaf512e7a68812199",
     "semantic_hash": "c0fef9680415cebdaf512e7a68812199"
+  },
+  "docs/superpowers/specs/2026-09-21-voice-recording-design.md": {
+    "mtime": 1789988652.9236708,
+    "ast_hash": "",
+    "semantic_hash": "65c7f2933ff698fe55d9f455dc52eae0"
+  },
+  "mobile/modules/still-media-vault/expo-module.config.json": {
+    "mtime": 1789985318.0806565,
+    "ast_hash": "",
+    "semantic_hash": "b01b6d577c7ff602ad5d9f5ee7421449"
+  },
+  "mobile/modules/still-media-vault/android/build.gradle": {
+    "mtime": 1789985577.7427452,
+    "ast_hash": "",
+    "semantic_hash": "9371ff2d3bc737a92ef0475902208ca5"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt": {
+    "mtime": 1789985870.774254,
+    "ast_hash": "",
+    "semantic_hash": "9ff8011e11499a2a556df03df92ac32a"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StreamingFileVault.kt": {
+    "mtime": 1789985745.914313,
+    "ast_hash": "",
+    "semantic_hash": "f3c3d0ed59dcc83c834da2e357e45ac7"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ProtectedKeyset.kt": {
+    "mtime": 1789986108.0065506,
+    "ast_hash": "",
+    "semantic_hash": "93dd569bbea8161adf2974e68af8584f"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/SyntheticVaultProof.kt": {
+    "mtime": 1789986104.9836614,
+    "ast_hash": "",
+    "semantic_hash": "b86c43fd891211a5e11f5e6fcb551e58"
+  },
+  "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/StreamingFileVaultTest.kt": {
+    "mtime": 1789986113.4973762,
+    "ast_hash": "",
+    "semantic_hash": "695986d83673bce3e3fd07a5f247d79b"
+  },
+  "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ProtectedKeysetTest.kt": {
+    "mtime": 1789986110.8995528,
+    "ast_hash": "",
+    "semantic_hash": "0b6b1e9c698ea15dadfdb15b832c2835"
+  },
+  "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/SyntheticVaultProofTest.kt": {
+    "mtime": 1789986115.9457626,
+    "ast_hash": "",
+    "semantic_hash": "ea5d8a220df2f224757c36deacd02a0d"
+  },
+  "mobile/src/development/mediaVaultProof.ts": {
+    "mtime": 1789985354.7903614,
+    "ast_hash": "",
+    "semantic_hash": "e762bb4801f15e26739f9c197a96fef8"
+  },
+  "mobile/src/development/MediaVaultProofPanel.tsx": {
+    "mtime": 1789986968.7073565,
+    "ast_hash": "",
+    "semantic_hash": "33718fcc1865f919e2b417a48356e9a3"
+  },
+  "mobile/tests/mediaVaultProof.test.ts": {
+    "mtime": 1789985282.639552,
+    "ast_hash": "",
+    "semantic_hash": "8423869af65b17d520683849c4fa4101"
+  },
+  "docs/superpowers/plans/2026-09-21-media-vault-proof.md": {
+    "mtime": 1789988558.0768888,
+    "ast_hash": "",
+    "semantic_hash": "ecf979ecf5cc3ddfd82d2b7488e6b066"
+  },
+  "docs/learning/03-encrypted-files.md": {
+    "mtime": 1789988012.006217,
+    "ast_hash": "",
+    "semantic_hash": "9eb29069ebccadfb31ae7fe199233cfd"
+  },
+  "docs/reviews/2026-09-21-media-vault-proof.md": {
+    "mtime": 1789988556.8582604,
+    "ast_hash": "",
+    "semantic_hash": "77737d7f316fa26df63920d3564659da"
   }
 }

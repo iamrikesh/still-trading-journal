@@ -3,10 +3,13 @@ import { Alert, BackHandler, FlatList, Platform, Pressable, ScrollView, StyleShe
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { randomUUID } from 'expo-crypto';
+import { requireOptionalNativeModule } from 'expo-modules-core';
 import { createJournalController } from './src/journal/controller';
 import { emotions } from './src/journal/emotions';
 import { openJournal, isTemporaryJournal } from './src/storage/openJournal';
 import { palettes, type Appearance } from './src/theme';
+import { MediaVaultProofPanel } from './src/development/MediaVaultProofPanel';
+import { createMediaVaultProof, type MediaVaultProofNative } from './src/development/mediaVaultProof';
 
 export default function App() {
   return <SafeAreaProvider><JournalApp /></SafeAreaProvider>;
@@ -30,6 +33,9 @@ function JournalApp() {
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const [page, setPage] = useState<'now' | 'support' | 'history'>('now');
   const [deleteError, setDeleteError] = useState(false);
+  // Keep one operation owner across page changes; the native vault also serializes calls.
+  const [mediaProof] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
+    ? createMediaVaultProof(requireOptionalNativeModule<MediaVaultProofNative>('StillMediaVault')) : null);
 
   useEffect(() => { void controller.refresh(); }, [controller]);
   useEffect(() => {
@@ -91,6 +97,7 @@ function JournalApp() {
           <Text style={styles.sectionLabel}>MAKE YOURSELF AT HOME</Text>
           <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => chip(mode.charAt(0).toUpperCase() + mode.slice(1), () => setAppearance(mode), appearance === mode))}</View>
           <Text style={styles.footnote}>There is no perfect label. “Unsure” is a place to start.</Text>
+          {mediaProof && <MediaVaultProofPanel proof={mediaProof} ink={colors.ink} muted={colors.muted} line={colors.line} />}
         </ScrollView>}
 
         {page === 'support' && state.selected && <ScrollView contentContainerStyle={styles.body}>

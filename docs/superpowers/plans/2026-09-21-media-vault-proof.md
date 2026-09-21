@@ -26,9 +26,9 @@
 
 **Interfaces:** Expo module `StillMediaVault`: `prepareProof(): Promise<{fixtureBytes: number}>`; `verifyProof(): Promise<{checks: string[], fixtureBytes: number}>`. Prepare writes a persistent synthetic fixture once, with encrypted keyset; verify opens it without regenerating keys, checks bytes against the generated fixture and performs independent corruption/key-loss/cleanup checks in disposable proof namespaces. No IDs/paths/key material accepted or returned over this bridge.
 
-- [ ] Write native tests before core implementation. Cases: roundtrip, wrong AAD/key, ciphertext tamper/truncation, oversized input, existing destination preservation, failed plaintext cleanup. Use real Tink primitives with temporary fixture files and test keys; Android Keystore behavior is checked on device.
-- [ ] Run `:still-media-vault:testDebugUnitTest` with the existing short-path Gradle environment and observe the expected missing-implementation failure.
-- [ ] Implement native file operations with create-new destinations, generated/validated filenames, bounded input/output, cleanup and serialized ownership. Example contract:
+- [x] Write native tests before core implementation. Cases: roundtrip, wrong AAD/key, ciphertext tamper/truncation, oversized input, existing destination preservation, failed plaintext cleanup. Use real Tink primitives with temporary fixture files and test keys; Android Keystore behavior is checked on device.
+- [x] Run `:still-media-vault:testDebugUnitTest` with the existing short-path Gradle environment and observe the expected missing-implementation failure.
+- [x] Implement native file operations with create-new destinations, generated/validated filenames, bounded input/output, cleanup and serialized ownership. Example contract:
 
 ```kotlin
 fun encrypt(input: File, destination: File, context: ByteArray)
@@ -36,8 +36,8 @@ fun decrypt(input: File, destination: File, context: ByteArray)
 ```
 
 Use Tink's `StreamingAead.newEncryptingStream` / `newDecryptingStream`; copy with a fixed byte buffer, enforce bounds during copy, close fully and sync completed output. Use a Keystore-backed AEAD to encrypt the Tink keyset; check key/keyset/data presence before creating anything.
-- [ ] Implement the two debug proof methods with sanitized failures and no journal dependency. Prepare is idempotent only after validating an existing fixture; verify never prepares on the caller's behalf. Native proof tests include key-loss failure without replacement, corruption rejection, and cleanup in isolated namespaces.
-- [ ] Run native tests to green and inspect a focused review before device installation.
+- [x] Implement the two debug proof methods with sanitized failures and no journal dependency. Prepare is idempotent only after validating an existing fixture; verify never prepares on the caller's behalf. Native proof tests include key-loss failure without replacement, corruption rejection, and cleanup in isolated namespaces.
+- [x] Run native tests to green and inspect a focused review before device installation.
 
 ## Task 2: Development-only teaching controls
 
@@ -45,21 +45,26 @@ Use Tink's `StreamingAead.newEncryptingStream` / `newDecryptingStream`; copy wit
 
 **Interfaces:** UI invokes prepare/verify serially and displays statuses/boolean check names. The wrapper uses `requireOptionalNativeModule` so the old APK and temporary web demo continue to show an unavailable state rather than crash. Never surface raw errors.
 
-- [ ] Add host tests for the proof controller: no automatic native calls, absent module, busy operation exclusion, sanitized failure, prepare does not claim verification, verify reports actual checks.
-- [ ] Run the new test alone and observe expected failure before implementation.
-- [ ] Implement the tiny controller and panel behind `__DEV__`, Android native build only. Buttons: Prepare test file and Verify test file. Explanation: generated test data; no microphone or journal contents. Print no bridge results to console.
-- [ ] Run `npm.cmd test` and `npm.cmd run typecheck`.
+- [x] Add host tests for the proof controller: no automatic native calls, absent module, busy operation exclusion, sanitized failure, prepare does not claim verification, verify reports actual checks.
+- [x] Run the new test alone and observe expected failure before implementation.
+- [x] Implement the tiny controller and panel behind `__DEV__`, Android native build only. Buttons: Prepare test file and Verify test file. Explanation: generated test data; no microphone or journal contents. Print no bridge results to console.
+- [x] Run `npm.cmd test` and `npm.cmd run typecheck`.
 
 ## Task 3: S20 proof, review and handoff
 
-- [ ] Check laptop free disk and authorized USB device outside the sandbox where required. Recreate S: only if unused; verify it resolves to this checkout. Retain existing caches and native outputs.
-- [ ] Verify autolinking detects `StillMediaVault`, build ARM64 debug incrementally and run `npm.cmd run verify:apk` plus signature verification. Install with `adb install -r` only after both pass.
-- [ ] Open through existing Metro/USB. Prepare fixture, stop the process, relaunch, then Verify. Record concrete sanitized check results; use private local diagnostics only if needed and exclude them from Git.
-- [ ] Run a final code/security review; fix important findings and retest the changed scope.
-- [ ] Update PROJECT-STATUS, the approved spec's implementation status, a dated review/lesson and graph navigation. Document test commands, result counts, disk observation and remaining microphone/media-metadata recovery gates. Commit the small reviewed milestone; do not merge/push without the user's instruction.
+- [x] Check laptop free disk and authorized USB device outside the sandbox where required. Recreate S: only if unused; verify it resolves to this checkout. Retain existing caches and native outputs.
+- [x] Verify autolinking detects `StillMediaVault`, build ARM64 debug incrementally and run `npm.cmd run verify:apk` plus signature verification. Install with `adb install -r` only after both pass.
+- [x] Open through existing Metro/USB. Prepare fixture, stop the process, relaunch, then Verify. Record concrete sanitized check results; use private local diagnostics only if needed and exclude them from Git.
+- [x] Run a final code/security review; fix important findings and retest the changed scope.
+- [x] Update PROJECT-STATUS, the approved spec's implementation status, a dated review/lesson and graph navigation. Document test commands, result counts, disk observation and remaining microphone/media-metadata recovery gates. Commit the small reviewed milestone; do not merge/push without the user's instruction.
 
 ## Execution rulings and validation ledger
 
 - Baseline: 20 Node tests and TypeScript checking passed on 2026-09-21 before implementation.
 - Scope: this plan completes the design's first synthetic native-file proof only. SQLite clip migrations, clip deletion coordination, recorder/player UI and lifecycle tests follow in the next increment after native feasibility is known.
 - Worktree choice: reuse the current non-main feature checkout, as the approved design explicitly avoids duplicate dependency/native build trees on this laptop.
+
+
+## Completion evidence (2026-09-21)
+
+Task 1: 21 native tests passed; native security review had no important findings. Task 2: 26 host tests/typecheck passed, panel lifetime and message findings fixed and re-reviewed. Task 3: incremental APK build/packaging/signature passed, installed on S20, prepared 65,536-byte fixture, cold-restarted and verified all ten checks. Only encrypted fixture/keyset remained. See docs/reviews/2026-09-21-media-vault-proof.md for exact scope and limitations. Remaining work belongs to the next metadata/file-recovery increment.

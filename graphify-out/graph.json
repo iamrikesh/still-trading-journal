@@ -2170,12 +2170,12 @@
       "label": "Next Record Stop Play increment",
       "file_type": "concept",
       "source_file": "docs/PROJECT-STATUS.md",
-      "source_location": null,
+      "source_location": "Next learning increment / 2026-09-21 planning checkpoint",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Begin with current-flow learning and a visible Metro edit; then settle moment/session attachment, encrypted media persistence and recovery before recording implementation.",
+      "rationale": "Approved several four-minute clips per moment with private temporary plaintext. Native synthetic Tink proof complete; next recoverable clip metadata/file save/deletion, then recorder/playback lifecycle on S20.",
       "id": "docs_project_status_voice_increment",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2380,12 +2380,12 @@
       "label": "Current S20 development checkpoint",
       "file_type": "document",
       "source_file": "docs/PROJECT-STATUS.md",
-      "source_location": null,
+      "source_location": "Next learning increment / 2026-09-21 planning checkpoint",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Current branch codex/android-device-setup; device checkpoint 5ab68aa; later handoff commits may follow. Native first moment works; development APK requires Metro.",
+      "rationale": "2026-09-21: updated debug APK on S20 passed synthetic encrypted-file cold restart and ten checks. 26 Node and 21 native tests passed. Voice capture and clip/SQLite recovery remain unimplemented. Branch work is local, not pushed; latest disk 14.92 GiB.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2750,6 +2750,166 @@
       "community": 0,
       "community_name": "Project status and roadmap",
       "norm_label": "offline-first architecture"
+    },
+    {
+      "label": "Approved S20 voice recording design",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Project status and roadmap",
+      "rationale": "Approved by Rikesh including private temporary plaintext; synthetic-file first increment passed. General clip recovery, recording, playback and release gates remain planned.",
+      "id": "docs_voice_recording_design_proposal"
+    },
+    {
+      "id": "media_vault_proof_module_config",
+      "label": "Native vault module registration",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/expo-module.config.json",
+      "source_location": "L1",
+      "rationale": "Registers the Android-only StillMediaVaultModule.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_build_config",
+      "label": "Native vault pinned Tink dependency",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/build.gradle",
+      "source_location": "L1",
+      "rationale": "Pins Tink Android 1.23.0 and JUnit 4.13.2; no microphone dependency.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_module",
+      "label": "StillMediaVaultModule",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt",
+      "source_location": "L1",
+      "rationale": "Debug-only synthetic prepare/verify API, native serialization, isolated Keystore aliases and sanitized errors.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_stream",
+      "label": "StreamingFileVault and OwnedFiles",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StreamingFileVault.kt",
+      "source_location": "L1",
+      "rationale": "Bounded native Tink streams, owned create-new files, full authentication and failed-output cleanup.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_keyset",
+      "label": "ProtectedKeyset",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ProtectedKeyset.kt",
+      "source_location": "L1",
+      "rationale": "Only encrypted keysets; missing keys/keysets or orphan data fail closed without replacement.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_fixture",
+      "label": "SyntheticVaultProof",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/SyntheticVaultProof.kt",
+      "source_location": "L1",
+      "rationale": "Persistent 64 KiB generated fixture plus ten isolated native rejection/cleanup checks; never journal contents.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_stream_tests",
+      "label": "Native streaming file tests",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/StreamingFileVaultTest.kt",
+      "source_location": "L1",
+      "rationale": "Ten real-Tink boundary, corruption, ownership and destination-preservation tests.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_keyset_tests",
+      "label": "Native protected keyset tests",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ProtectedKeysetTest.kt",
+      "source_location": "L1",
+      "rationale": "Six host key-policy tests; actual Android Keystore persistence separately checked on S20.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_fixture_tests",
+      "label": "Native synthetic proof tests",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/SyntheticVaultProofTest.kt",
+      "source_location": "L1",
+      "rationale": "Five generated-fixture tests including restart cleanup regression.",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "media_vault_proof_controller",
+      "label": "Media vault proof controller",
+      "file_type": "code",
+      "source_file": "mobile/src/development/mediaVaultProof.ts",
+      "source_location": "L1",
+      "rationale": "Explicit serialized operations, fixed result allowlist, sanitized errors and no false prepared-as-verified state.",
+      "community": 5,
+      "community_name": "Emotion UI and state"
+    },
+    {
+      "id": "media_vault_proof_panel",
+      "label": "MediaVaultProofPanel",
+      "file_type": "code",
+      "source_file": "mobile/src/development/MediaVaultProofPanel.tsx",
+      "source_location": "L1",
+      "rationale": "Development teaching panel receives the app-owned controller across navigation.",
+      "community": 5,
+      "community_name": "Emotion UI and state"
+    },
+    {
+      "id": "media_vault_proof_host_tests",
+      "label": "Media vault proof host tests",
+      "file_type": "code",
+      "source_file": "mobile/tests/mediaVaultProof.test.ts",
+      "source_location": "L1",
+      "rationale": "Six host tests cover explicit calls, unavailable module, concurrent calls and honest sanitized results.",
+      "community": 5,
+      "community_name": "Emotion UI and state"
+    },
+    {
+      "id": "media_vault_proof_plan",
+      "label": "Completed native file proof plan",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-09-21-media-vault-proof.md",
+      "source_location": "L1",
+      "rationale": "First approved voice-design increment; fixture proof complete, clip metadata recovery and capture follow.",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "media_vault_proof_lesson",
+      "label": "Lesson 3 encrypted files",
+      "file_type": "document",
+      "source_file": "docs/learning/03-encrypted-files.md",
+      "source_location": "L1",
+      "rationale": "Learn key persistence through prepare, process restart and verification; scoped Windows build instructions.",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "media_vault_proof_review",
+      "label": "S20 native file proof evidence",
+      "file_type": "document",
+      "source_file": "docs/reviews/2026-09-21-media-vault-proof.md",
+      "source_location": "L1",
+      "rationale": "21 native tests, 26 host tests, incremental verified APK and S20 cold-restart proof; bounded security evidence.",
+      "community": 0,
+      "community_name": "Project status and roadmap"
     }
   ],
   "links": [
@@ -6291,6 +6451,153 @@
       "weight": 1.0,
       "source": "docs_learning_02_android_device_build_short_path_build",
       "target": "docs_reviews_2026_09_20_android_build_setup_apk_packaging_evidence"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md",
+      "source": "docs_project_status_current_checkpoint",
+      "target": "docs_voice_recording_design_proposal"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md",
+      "source": "security_and_performance_release_requirements",
+      "target": "docs_voice_recording_design_proposal"
+    },
+    {
+      "source": "media_vault_proof_module_config",
+      "target": "media_vault_proof_module",
+      "relation": "registers",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/expo-module.config.json"
+    },
+    {
+      "source": "media_vault_proof_build_config",
+      "target": "media_vault_proof_module",
+      "relation": "builds",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/build.gradle"
+    },
+    {
+      "source": "media_vault_proof_module",
+      "target": "media_vault_proof_fixture",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt"
+    },
+    {
+      "source": "media_vault_proof_fixture",
+      "target": "media_vault_proof_keyset",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/SyntheticVaultProof.kt"
+    },
+    {
+      "source": "media_vault_proof_fixture",
+      "target": "media_vault_proof_stream",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/SyntheticVaultProof.kt"
+    },
+    {
+      "source": "media_vault_proof_stream_tests",
+      "target": "media_vault_proof_stream",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/StreamingFileVaultTest.kt"
+    },
+    {
+      "source": "media_vault_proof_keyset_tests",
+      "target": "media_vault_proof_keyset",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ProtectedKeysetTest.kt"
+    },
+    {
+      "source": "media_vault_proof_fixture_tests",
+      "target": "media_vault_proof_fixture",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/SyntheticVaultProofTest.kt"
+    },
+    {
+      "source": "media_vault_proof_panel",
+      "target": "media_vault_proof_controller",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/development/MediaVaultProofPanel.tsx"
+    },
+    {
+      "source": "media_vault_proof_host_tests",
+      "target": "media_vault_proof_controller",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/mediaVaultProof.test.ts"
+    },
+    {
+      "source": "media_vault_proof_plan",
+      "target": "media_vault_proof_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-09-21-media-vault-proof.md"
+    },
+    {
+      "source": "media_vault_proof_lesson",
+      "target": "media_vault_proof_module",
+      "relation": "explains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/03-encrypted-files.md"
+    },
+    {
+      "source": "media_vault_proof_review",
+      "target": "media_vault_proof_module",
+      "relation": "verifies",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-21-media-vault-proof.md"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "media_vault_proof_panel",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "media_vault_proof_controller",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "media_vault_proof_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "media_vault_proof_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "media_vault_proof_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_voice_recording_design_proposal",
+      "target": "media_vault_proof_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md"
     }
   ],
   "hyperedges": [
