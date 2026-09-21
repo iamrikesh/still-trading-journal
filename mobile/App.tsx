@@ -6,10 +6,12 @@ import { randomUUID } from 'expo-crypto';
 import { requireOptionalNativeModule } from 'expo-modules-core';
 import { createJournalController } from './src/journal/controller';
 import { emotions } from './src/journal/emotions';
-import { openJournal, isTemporaryJournal } from './src/storage/openJournal';
+import { openJournal, openJournalSession, isTemporaryJournal } from './src/storage/openJournal';
 import { palettes, type Appearance } from './src/theme';
 import { MediaVaultProofPanel } from './src/development/MediaVaultProofPanel';
 import { createMediaVaultProof, type MediaVaultProofNative } from './src/development/mediaVaultProof';
+import { createClipRecoveryExercise } from './src/development/clipRecoveryExercise';
+import { ClipRecoveryPanel } from './src/development/ClipRecoveryPanel';
 
 export default function App() {
   return <SafeAreaProvider><JournalApp /></SafeAreaProvider>;
@@ -36,8 +38,13 @@ function JournalApp() {
   // Keep one operation owner across page changes; the native vault also serializes calls.
   const [mediaProof] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
     ? createMediaVaultProof(requireOptionalNativeModule<MediaVaultProofNative>('StillMediaVault')) : null);
+  const [clipExercise] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
+    ? createClipRecoveryExercise(openJournalSession) : null);
 
   useEffect(() => { void controller.refresh(); }, [controller]);
+  // Read existing state only: startup session recovery has already run. Never
+  // automatically prepare fixtures or delete a moment on mounting this panel.
+  useEffect(() => { if (clipExercise) void clipExercise.check(); }, [clipExercise]);
   useEffect(() => {
     const back = BackHandler.addEventListener('hardwareBackPress', () => {
       if (page === 'now') return false;
@@ -54,9 +61,9 @@ function JournalApp() {
       catch { setDeleteError(true); }
     };
     if (Platform.OS === 'web') {
-      if (window.confirm('Delete this moment? This cannot be undone.')) void remove();
+      if (window.confirm('Delete this moment and its attached clips? This cannot be undone.')) void remove();
     } else {
-      Alert.alert('Delete this moment?', 'This cannot be undone.', [
+      Alert.alert('Delete this moment?', 'This also deletes its attached clips. This cannot be undone.', [
         { text: 'Keep', style: 'cancel' }, { text: 'Delete', style: 'destructive', onPress: () => { void remove(); } },
       ]);
     }
@@ -98,6 +105,7 @@ function JournalApp() {
           <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => chip(mode.charAt(0).toUpperCase() + mode.slice(1), () => setAppearance(mode), appearance === mode))}</View>
           <Text style={styles.footnote}>There is no perfect label. “Unsure” is a place to start.</Text>
           {mediaProof && <MediaVaultProofPanel proof={mediaProof} ink={colors.ink} muted={colors.muted} line={colors.line} />}
+          {clipExercise && <ClipRecoveryPanel exercise={clipExercise} ink={colors.ink} muted={colors.muted} line={colors.line} />}
         </ScrollView>}
 
         {page === 'support' && state.selected && <ScrollView contentContainerStyle={styles.body}>

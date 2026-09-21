@@ -14,9 +14,14 @@ export interface EncryptionDependencies {
 }
 
 export function createEncryptedJournalOpener(dependencies: EncryptionDependencies): () => Promise<JournalRepository> {
-  let pending: Promise<JournalRepository> | undefined;
+  return createEncryptedOpener(dependencies, createSqlJournal);
+}
 
-  async function initialize(): Promise<JournalRepository> {
+/** The callback owns the keyed connection; no database pages are read before it. */
+export function createEncryptedOpener<T>(dependencies: EncryptionDependencies, initializeKeyed: (db: EncryptedDatabase) => Promise<T>): () => Promise<T> {
+  let pending: Promise<T> | undefined;
+
+  async function initialize(): Promise<T> {
     let db: EncryptedDatabase | undefined;
     try {
       let key = await dependencies.getKey();
@@ -40,7 +45,7 @@ export function createEncryptedJournalOpener(dependencies: EncryptionDependencie
       // PRAGMA cannot bind parameters. Only the validated 64 hex characters
       // reach this SQLCipher raw-key literal; moment content is always bound.
       await db.execAsync(`PRAGMA key = "x'${key}'"`);
-      return await createSqlJournal(db);
+      return await initializeKeyed(db);
     } catch {
       if (db) {
         try { await db.closeAsync(); } catch { /* Preserve the sanitized failure. */ }

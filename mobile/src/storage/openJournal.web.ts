@@ -1,9 +1,12 @@
 import { createMemoryJournal } from './memoryJournal.ts';
 import type { JournalRepository } from './types.ts';
+import { runtimeSession, type JournalSession } from './journalSession.ts';
 
 export const isTemporaryJournal = true;
-const demo = createMemoryJournal();
+export const openJournalSession = runtimeSession<JournalSession>(globalThis, async () => ({
+  journal: createMemoryJournal(), clips: null, exercise: null, recovery: async () => ({ pending: 0 }),
+}));
 
 export async function openJournal(): Promise<JournalRepository> {
-  return demo;
+  return (await openJournalSession()).journal;
 }
