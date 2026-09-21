@@ -2175,7 +2175,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Approved several four-minute clips per moment with private temporary plaintext. Native synthetic Tink proof complete; next recoverable clip metadata/file save/deletion, then recorder/playback lifecycle on S20.",
+      "rationale": "Approved several four-minute clips per moment. Native Tink synthetic proof passed; host clip metadata coordinator follows. Next connect native vault and schema2 owner on S20 before recorder/playback lifecycle work.",
       "id": "docs_project_status_voice_increment",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2385,7 +2385,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "2026-09-21: updated debug APK on S20 passed synthetic encrypted-file cold restart and ten checks. 26 Node and 21 native tests passed. Voice capture and clip/SQLite recovery remain unimplemented. Branch work is local, not pushed; latest disk 14.92 GiB.",
+      "rationale": "2026-09-21: GitHub feature checkpoint 45862b2 pushed. Subsequent opt-in clip recovery core verified with host SQLite/filesystem fixtures; native adapter/phone migration/voice capture remain separate. Installed S20 remains at the native encrypted-file proof.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2758,7 +2758,7 @@
       "source_location": "L1",
       "community": 0,
       "community_name": "Project status and roadmap",
-      "rationale": "Approved by Rikesh including private temporary plaintext; synthetic-file first increment passed. General clip recovery, recording, playback and release gates remain planned.",
+      "rationale": "Approved private temporary plaintext tradeoff and several four-minute clips. Native synthetic file proof and host recovery coordinator are separate evidence; capture, playback, device recovery and release gates remain.",
       "id": "docs_voice_recording_design_proposal"
     },
     {
@@ -2908,6 +2908,86 @@
       "source_file": "docs/reviews/2026-09-21-media-vault-proof.md",
       "source_location": "L1",
       "rationale": "21 native tests, 26 host tests, incremental verified APK and S20 cold-restart proof; bounded security evidence.",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "clip_recovery_types",
+      "label": "Clip recovery contracts",
+      "rationale": "Identifiers, metadata, phases and native file-vault obligations; no media bytes in JS.",
+      "file_type": "code",
+      "source_file": "mobile/src/storage/clipTypes.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "clip_recovery_schema",
+      "label": "Opt-in clip schema migration",
+      "rationale": "Transactional schema 1 to 2 migration retains moments and adds recoverable clip/deletion metadata.",
+      "file_type": "code",
+      "source_file": "mobile/src/storage/clipSchema.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "clip_recovery_repository",
+      "label": "Recoverable clip journal",
+      "rationale": "Serialized owner operations, idempotent file commit, staging cleanup, paged recovery and coordinated deletion.",
+      "file_type": "code",
+      "source_file": "mobile/src/storage/clipJournal.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "clip_recovery_tests",
+      "label": "Host clip recovery integration tests",
+      "rationale": "Real SQLite and disposable filesystem fixtures test persistence and interrupted save/delete recovery; not encryption or Android evidence.",
+      "file_type": "code",
+      "source_file": "mobile/tests/clipRecovery.test.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "clip_recovery_fixtures",
+      "label": "Disposable noncryptographic file fixtures",
+      "rationale": "Test-only generated files model sealing and cleanup boundaries without claiming native encryption.",
+      "file_type": "code",
+      "source_file": "mobile/tests/helpers/clipFixture.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "clip_recovery_plan",
+      "label": "Clip recovery core plan",
+      "rationale": "Approved design host coordinator slice; native adapter and S20 integration remain separate.",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-09-21-clip-recovery-core.md",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "clip_recovery_lesson",
+      "label": "Lesson 4 recoverable clip saving",
+      "rationale": "Explains intent, file verification, metadata commit, staging cleanup and deletion retry.",
+      "file_type": "document",
+      "source_file": "docs/learning/04-recoverable-clip-saving.md",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "clip_recovery_review",
+      "label": "Host clip recovery evidence",
+      "rationale": "Dated host validation and scoped limitations; installed phone remains at native file proof.",
+      "file_type": "document",
+      "source_file": "docs/reviews/2026-09-21-clip-recovery-core.md",
+      "source_location": "L1",
       "community": 0,
       "community_name": "Project status and roadmap"
     }
@@ -6595,6 +6675,90 @@
     {
       "source": "docs_voice_recording_design_proposal",
       "target": "media_vault_proof_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md"
+    },
+    {
+      "source": "clip_recovery_repository",
+      "target": "clip_recovery_types",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/clipJournal.ts"
+    },
+    {
+      "source": "clip_recovery_repository",
+      "target": "clip_recovery_schema",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/clipJournal.ts"
+    },
+    {
+      "source": "clip_recovery_tests",
+      "target": "clip_recovery_repository",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/clipRecovery.test.ts"
+    },
+    {
+      "source": "clip_recovery_tests",
+      "target": "clip_recovery_fixtures",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/clipRecovery.test.ts"
+    },
+    {
+      "source": "clip_recovery_lesson",
+      "target": "clip_recovery_tests",
+      "relation": "explains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/04-recoverable-clip-saving.md"
+    },
+    {
+      "source": "clip_recovery_plan",
+      "target": "clip_recovery_repository",
+      "relation": "specifies",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-09-21-clip-recovery-core.md"
+    },
+    {
+      "source": "clip_recovery_review",
+      "target": "clip_recovery_repository",
+      "relation": "verifies",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-21-clip-recovery-core.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "clip_recovery_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "clip_recovery_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "clip_recovery_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "clip_recovery_repository",
+      "target": "mobile_src_storage_sqljournal",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/clipJournal.ts"
+    },
+    {
+      "source": "docs_voice_recording_design_proposal",
+      "target": "clip_recovery_review",
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md"

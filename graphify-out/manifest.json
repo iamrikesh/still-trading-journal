@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1789988554.2598596,
+    "mtime": 1789990147.7660425,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "ed01070c917a1ac93b00dd5c95503e61"
+    "semantic_hash": "c24740fdf4a7687ed27d0298571798a1"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -205,9 +205,9 @@
     "semantic_hash": "c0fef9680415cebdaf512e7a68812199"
   },
   "docs/superpowers/specs/2026-09-21-voice-recording-design.md": {
-    "mtime": 1789988652.9236708,
+    "mtime": 1789990326.2969794,
     "ast_hash": "",
-    "semantic_hash": "65c7f2933ff698fe55d9f455dc52eae0"
+    "semantic_hash": "9e70bb5ec7136d81d4968623bd65631c"
   },
   "mobile/modules/still-media-vault/expo-module.config.json": {
     "mtime": 1789985318.0806565,
@@ -283,5 +283,45 @@
     "mtime": 1789988556.8582604,
     "ast_hash": "",
     "semantic_hash": "77737d7f316fa26df63920d3564659da"
+  },
+  "mobile/src/storage/clipTypes.ts": {
+    "mtime": 1789989684.2986608,
+    "ast_hash": "",
+    "semantic_hash": "2f2e6e96cd7db4d5ba121842bfeb15f0"
+  },
+  "mobile/src/storage/clipSchema.ts": {
+    "mtime": 1789989850.9770615,
+    "ast_hash": "",
+    "semantic_hash": "bca161ecbefddd8aa434730ac0c77251"
+  },
+  "mobile/src/storage/clipJournal.ts": {
+    "mtime": 1789989853.7507463,
+    "ast_hash": "",
+    "semantic_hash": "47d6c40d92fbdaefd0d87d13ce65af19"
+  },
+  "mobile/tests/clipRecovery.test.ts": {
+    "mtime": 1789989914.7832162,
+    "ast_hash": "",
+    "semantic_hash": "7c3ca3c236b005e52a4c4c9b26fdb234"
+  },
+  "mobile/tests/helpers/clipFixture.ts": {
+    "mtime": 1789989704.782378,
+    "ast_hash": "",
+    "semantic_hash": "72ff78bb11e8f6d18b419ae7e9670463"
+  },
+  "docs/superpowers/plans/2026-09-21-clip-recovery-core.md": {
+    "mtime": 1789990369.9193304,
+    "ast_hash": "",
+    "semantic_hash": "97f58b5737175b460d6c1f2df3e4a573"
+  },
+  "docs/learning/04-recoverable-clip-saving.md": {
+    "mtime": 1789989367.5253727,
+    "ast_hash": "",
+    "semantic_hash": "402c9c7fd7aa29f58693fd4222c7060b"
+  },
+  "docs/reviews/2026-09-21-clip-recovery-core.md": {
+    "mtime": 1789990366.104293,
+    "ast_hash": "",
+    "semantic_hash": "d8739490917b98a90ddf2a9812b1a52b"
   }
 }

@@ -40,3 +40,8 @@ Targeted host-agent extraction added the proposed S20 voice design and its expli
 ## Native encrypted-file milestone (2026-09-21)
 
 Current navigation graph: **244 nodes, 340 edges**. Targeted host-agent extraction added native source/tests, development controller/panel, completed plan, Lesson 3 and dated S20 evidence. Relationships above are explicit source imports/calls/tests/document references; no external dependency trees, generated native output, local tools or private data were indexed. Host token usage unavailable; no external model API call. Existing community assignments were retained for navigation; historical centrality/cohesion tables above were not recomputed. Voice recording and general file/SQLite recovery remain unimplemented.
+
+
+## Host clip recovery increment (2026-09-21)
+
+Current navigation graph: **252 nodes, 352 edges**. Targeted host-agent extraction added the opt-in repository, migration, contracts, integration tests, synthetic fixture helper, plan, lesson and evidence. Imports/tests/document references were checked against current files. No dependencies, generated native output, local tools or private data were scanned. No external model API call; host token usage unavailable. Existing communities retained; historical centrality/cohesion tables were not recomputed. Host file fixtures are noncryptographic; Android integration and voice recording remain unimplemented.

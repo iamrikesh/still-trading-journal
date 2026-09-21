@@ -1,14 +1,14 @@
 # still. — resume here
 
-Updated 2026-09-21 after the approved voice design and successful native encrypted-file proof on the S20.
+Updated 2026-09-21 after pushing the S20 encrypted-file checkpoint and implementing the host clip-recovery core.
 
 ## Current checkpoint
 
-The first development increment runs on the Samsung S20 (SM-G981U1, Android 13). Emotion tap → immediate injecting logic → timestamped saved moment → history → deletion works. The next foundation now passes: a separate synthetic file is encrypted by native Tink, survives a cold app restart with its Android Keystore-protected keyset, and passes ten displayed rejection/cleanup checks. Voice capture is not implemented. This is a development APK requiring Metro, not a standalone release or the full MVP. Use sample moments until the release gates are met.
+The first development increment runs on the Samsung S20 (SM-G981U1, Android 13). Emotion tap → immediate injecting logic → timestamped saved moment → history → deletion works. A separate synthetic file is encrypted by native Tink, survives a cold app restart with its Android Keystore-protected keyset, and passes ten displayed rejection/cleanup checks. The opt-in clip metadata coordinator now passes host SQLite/filesystem recovery tests; it is not connected to the phone yet. Voice capture is not implemented. This is a development APK requiring Metro, not a standalone release or the full MVP. Use sample moments until the release gates are met.
 
 Repository: https://github.com/iamrikesh/still-trading-journal
 
-Current work is on `codex/android-device-setup`. Earlier checkpoints were pushed to GitHub; the 2026-09-21 design and native-proof work is local and has not been pushed. The original journal device verification checkpoint is `5ab68aa`; approved design/plan commit is `f302e65`; later proof/handoff commits follow it. Do not switch to `main` assuming these changes have been merged. Check `git status` and `git log -5 --oneline` first.
+Current work is on `codex/android-device-setup`. At Rikesh's request, the approved design (`f302e65`) and native encrypted-file proof (`45862b2`) were pushed to GitHub on 2026-09-21. `git ls-remote` verified the feature branch at `45862b2fc7fbcabb1db6586eab4c9a72d1dda918`. The original journal device verification checkpoint is `5ab68aa`. Subsequent clip-recovery work is local unless a later checkpoint explicitly records another push. Do not switch to `main` assuming these changes have been merged. Check `git status` and `git log -5 --oneline` first.
 
 ## Completed and verified
 
@@ -17,7 +17,7 @@ Current work is on `codex/android-device-setup`. Earlier checkpoints were pushed
 - Visible saving/failure/retry states. Retry preserves the moment ID and time. Unsaved drafts and displayed history are bounded to 50; older saved rows are not deleted by the display limit.
 - Native SQLCipher database with a random key protected by SecureStore; no plaintext native fallback. Web and Expo Go are explicitly temporary, in-memory demos.
 - Recent history, confirmed deletion, system/light/dark appearance. Theme selection is not yet persisted.
-- 26 Node tests and TypeScript checking passed. The native media module also passed 21 real-Tink JUnit tests. Earlier browser interaction checks and web/Android bundle exports passed; see the dated review records for exact scope.
+- 46 Node tests and TypeScript checking passed, including 20 new host clip-recovery tests. The native media module previously passed 21 real-Tink JUnit tests; these were not rerun for the host-only increment. Earlier browser interaction checks and web/Android bundle exports passed; see the dated review records for exact scope.
 - S20: fresh FOMO tap saved, appeared in history, survived cold restart, and stayed deleted after deletion plus another restart. The pre-existing moment was preserved.
 - Native SQLCipher reported `4.7.0 community`; protected-key presence and rejection of an unkeyed database read were verified. This is bounded evidence, not a complete security audit.
 - APK signature and the new `npm.cmd run verify:apk` packaging check passed.
@@ -32,7 +32,7 @@ Current work is on `codex/android-device-setup`. Earlier checkpoints were pushed
 4. Start Metro with IPv4 preference and two workers, then forward USB port 8081. Open the installed development app at `http://127.0.0.1:8081`.
 5. For JavaScript-only edits, use Metro. Rebuild the APK only after native dependencies/configuration change; run `verify:apk` before installing.
 
-The session was wrapped up by stopping this project's Metro server and checking/stopping Gradle daemons. Installed tools, useful caches, the current APK and phone data are retained. The development app needs Metro started again next time. The drive alias may remain until reboot; it costs no duplicate storage.
+An earlier session stopped Metro and Gradle daemons; the native-file milestone subsequently left Metro running for learning. Check its health before restarting it. Installed tools, useful caches, the current APK and phone data are retained. The drive alias may remain until reboot; it costs no duplicate storage.
 
 ### Setup pitfalls already resolved
 
@@ -54,7 +54,9 @@ The temporary reminder edit passed `npm.cmd run typecheck` and `git diff --check
 
 The voice design is approved: **several clips per moment, four minutes per clip**, foreground stop-and-preserve, and private temporary plaintext during capture/playback with encrypted committed files. The first native-file proof is complete; see [Lesson 3](learning/03-encrypted-files.md) and the [2026-09-21 evidence](reviews/2026-09-21-media-vault-proof.md).
 
-Next: implement recoverable clip metadata/file commit and coordinated deletion using synthetic fixtures. Then add **Record / Stop / Play** with Expo Audio and actual S20 permission/lifecycle tests. The proof module is deliberately debug-only and accepts no real audio; extract its reviewed primitives into the real media repository when that increment is designed. Do not route recordings into the synthetic proof namespace.
+The host metadata/file coordination slice is implemented: see [Lesson 4](learning/04-recoverable-clip-saving.md), [implementation plan](superpowers/plans/2026-09-21-clip-recovery-core.md) and [host evidence](reviews/2026-09-21-clip-recovery-core.md). It is an opt-in schema-2 repository with durable intents, immutable clip ownership, paged recovery and coordinated deletion; the installed opener remains schema 1.
+
+Next: supply the real native `ClipVault` adapter, connect a single encrypted database/repository owner, and demonstrate migration/save/deletion recovery with fixtures on S20. Then add **Record / Stop / Play** with Expo Audio and actual S20 permission/lifecycle tests. The existing proof module is deliberately debug-only and accepts no real audio; reuse its reviewed primitives in a separate real-media namespace. Do not route recordings into the synthetic proof namespace.
 
 ### 2026-09-21 planning checkpoint
 
@@ -81,6 +83,16 @@ Resume: read the approved design, [completed native proof plan](superpowers/plan
 - The 75,530,777-byte APK replaced the existing debug artifact and updated the app with `install -r`; no extra APK copy or emulator. No microphone dependency added. Metro is left running for learning; Gradle's single-use build daemon exits after its build.
 - Known limit: interrupted initial proof preparation may deliberately fail closed on an orphan key/keyset or incomplete fixture. No reset button is shipped. Never clear app data to repair it; any future repair must be scoped only to the synthetic directory/aliases. General clip/SQLite crash recovery is still the next increment.
 
+### Host clip-recovery milestone and GitHub push (2026-09-21)
+
+- Pushed the approved design and native-file proof through `45862b2`; remote feature branch SHA verified. No merge to `main`.
+- Subsequent local source commit `ef268d9` adds `createClipJournal`, opt-in schema 1 to 2 migration, clip intents, cleanup-pending states, durable deletion records/tombstones and bounded recovery. Default app openers and the phone database remain unchanged.
+- Root verification: all **46 Node tests** passed (20 new recovery cases), typecheck passed, whitespace check passed. Tests use real SQLite and actual disposable generated files, including close/reopen and injected database/file failures. Host file fixtures are deliberately noncryptographic.
+- Failed rollback makes the connection unusable until close/reopen. Public operations serialize, snapshot caller inputs and sanitize errors. Future native integration must retire legacy repository objects and enforce one owner across connections/module reloads; this host core cannot revoke a retained old closure.
+- No dependencies, native rebuild, device operations or extra APK copies. No new phone disk measurement; 14.92 GiB above belongs to the preceding native milestone.
+- Exercise: from `mobile`, run `node --experimental-strip-types --test tests/clipRecovery.test.ts`. Use [Lesson 4](learning/04-recoverable-clip-saving.md) to predict why the interrupted save yields one clip and why a repeated recovery pass does nothing.
+- Resume: read the [host recovery review](reviews/2026-09-21-clip-recovery-core.md) and contracts in `mobile/src/storage/clipTypes.ts`, then design/implement the native file adapter and single-opener S20 integration. Do not activate schema 2 through the existing schema-1 opener or describe the host fixtures as encrypted audio.
+
 ### Follow-up: phone exercise connected (2026-09-21)
 
 ADB detected the authorized S20, USB forwarding for port 8081 succeeded, and Metro started with IPv4 preference, offline mode and two workers using the installed Expo CLI. The host health endpoint returned `packager-status:running`; opening the installed app at `http://127.0.0.1:8081` returned Android launch status `ok`, and Metro completed the Android bundle (782 modules). No APK rebuild or dependency installation was performed. Metro is intentionally left running for continued learning; repeat Lesson 2's Metro/USB steps if that process has stopped. Rikesh subsequently confirmed saved status, the history entry and the reminder-snapshot comparison. These are user-reported phone interaction checks, not new restart or encryption evidence.
@@ -89,7 +101,7 @@ ADB detected the authorized S20, USB forwarding for port 8081 succeeded, and Met
 
 | Area | Status / next work |
 | --- | --- |
-| Voice capture | Synthetic native encryption/key persistence proof passed; next recoverable clip metadata/files, then Record/Stop/Play, permissions and S20 lifecycle handling |
+| Voice capture | Native encryption proof and host metadata recovery core passed; next native adapter/S20 recovery integration, then Record/Stop/Play, permissions and lifecycle handling |
 | Personal support | Editable text, imported images, personal reminder audio, combinations; audio playback separate from capture |
 | Sessions and review | Choose grouping behavior; start/end sessions, typed notes and retrospective reflections; preserve original captures |
 | Design | Persist theme preference; broader themes, subtle animation respecting reduced motion, accessibility and device usability checks |
@@ -115,7 +127,8 @@ Rikesh has some programming experience and wants to learn the core principles th
 - [Security and memory requirements](../SECURITY-AND-PERFORMANCE.md): release gates.
 - [Lesson 1](learning/01-first-moment.md), [Lesson 2](learning/02-android-device-build.md): learning and setup.
 - [Lesson 3](learning/03-encrypted-files.md), [native-file proof evidence](reviews/2026-09-21-media-vault-proof.md): encrypted fixture, key persistence, limits and next increment.
+- [Lesson 4](learning/04-recoverable-clip-saving.md), [host recovery evidence](reviews/2026-09-21-clip-recovery-core.md), [recovery plan](superpowers/plans/2026-09-21-clip-recovery-core.md): opt-in schema-2 coordinator and the native integration still required.
 - [Android device evidence](reviews/2026-09-20-android-build-setup.md): build, native tests and limits.
 - [Graphify report](../graphify-out/GRAPH_REPORT.md), [interactive graph](../graphify-out/graph.html): source/document relationships. Query the graph to navigate, then verify claims against current source and this status file. Historical reports describe their own checkpoints.
 
-Suggested next-session prompt: **Continue still. from docs/PROJECT-STATUS.md. The S20 synthetic encrypted-file proof passed. Teach me recoverable clip saving, then build the next fixture-based metadata/file increment toward several four-minute voice clips per moment. Keep disk usage low.**
+Suggested next-session prompt: **Continue still. from docs/PROJECT-STATUS.md. The S20 native file proof and host clip-recovery core passed; the phone still uses schema 1. Teach me the ClipVault boundary, then integrate native fixture save/deletion recovery and the single encrypted database owner on S20 before microphone controls. Keep disk usage low.**
