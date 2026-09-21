@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1789996263.4113147,
+    "mtime": 1789996893.7240095,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "59a1cd260dc64ca2b0295ea8abc421ff"
+    "semantic_hash": "774b86f41896d678f2d733b6323db74c"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -355,9 +355,9 @@
     "semantic_hash": "197f18ee81953d266b7f384ebb91f819"
   },
   "docs/reviews/2026-09-21-native-clip-integration.md": {
-    "mtime": 1789996362.6514363,
+    "mtime": 1789996890.386866,
     "ast_hash": "",
-    "semantic_hash": "5fc80a726749ecbeeda9640df335cfd3"
+    "semantic_hash": "44085a6fef88c39c8b0c89cdd1346780"
   },
   "mobile/src/storage/journalSession.ts": {
     "mtime": 1789994090.5557609,

@@ -1,6 +1,6 @@
 # still. — resume here
 
-Updated 2026-09-21 after native clip/session integration and the verified S20 recovery/deletion exercise.
+Updated 2026-09-21 at session wrap-up: native clip/session integration and S20 recovery/deletion verified, checkpoint pushed, development server stopped.
 
 ## Current checkpoint
 
@@ -8,7 +8,7 @@ The first development increment runs on the Samsung S20 (SM-G981U1, Android 13).
 
 Repository: https://github.com/iamrikesh/still-trading-journal
 
-Current work is on `codex/android-device-setup`. At Rikesh's request, the approved design (`f302e65`) and native encrypted-file proof (`45862b2`) were pushed to GitHub on 2026-09-21. `git ls-remote` verified the feature branch at `45862b2fc7fbcabb1db6586eab4c9a72d1dda918`. The original journal device verification checkpoint is `5ab68aa`. Subsequent clip-recovery work is local unless a later checkpoint explicitly records another push. Do not switch to `main` assuming these changes have been merged. Check `git status` and `git log -5 --oneline` first.
+Current work is on `codex/android-device-setup`. At Rikesh's wrap-up request, all completed clip-recovery work through `f9e1587` was pushed to GitHub. `git ls-remote` verified `f9e158702a4e31a1c5159e1004257dea82633a93` on the feature branch. This handoff/Graphify update follows that checkpoint on the same branch; verify the current tip with the commands below. Earlier published checkpoints were `45862b2` (native file proof) and `5ab68aa` (journal device verification). Nothing has been merged into `main`. Check `git status` and `git log -5 --oneline` first.
 
 ## Completed and verified
 
@@ -32,7 +32,7 @@ Current work is on `codex/android-device-setup`. At Rikesh's request, the approv
 4. Start Metro with IPv4 preference and two workers, then forward USB port 8081. Open the installed development app at `http://127.0.0.1:8081`.
 5. For JavaScript-only edits, use Metro. Rebuild the APK only after native dependencies/configuration change; run `verify:apk` before installing.
 
-An earlier session stopped Metro and Gradle daemons; the native-file milestone subsequently left Metro running for learning. Check its health before restarting it. Installed tools, useful caches, the current APK and phone data are retained. The drive alias may remain until reboot; it costs no duplicate storage.
+**At this wrap-up Metro is stopped**, its port 8081 listener is absent, the development app was force-stopped and its USB port-forward removed. Restart Metro and USB forwarding next session; opening this development APK alone does not start a standalone app. Installed tools, useful caches, the current APK, phone data and media keyset are retained. The S: drive alias may remain until reboot; it costs no duplicate storage. Native builds used single-use Gradle daemons that exit after completion.
 
 ### Setup pitfalls already resolved
 
@@ -57,6 +57,8 @@ The voice design is approved: **several clips per moment, four minutes per clip*
 The metadata/file coordinator and native session integration are implemented: see [Lesson 4](learning/04-recoverable-clip-saving.md), [Lesson 5](learning/05-native-clip-recovery.md) and the [latest integration evidence](reviews/2026-09-21-native-clip-integration.md). The installed opener now migrates to schema 2, owns all operations through one queue, and recovers durable intents on startup. Earlier host-only reports describe their historical schema-1 phone state.
 
 Next: add **Record / Stop / Play** with Expo Audio and actual S20 permission/lifecycle tests, following the approved several-clips-per-moment design and four-minute limit. The new durable clip namespace is separate from the earlier debug proof; do not route recordings into the synthetic proof namespace.
+
+The dated checkpoints below preserve the sequence of work. Their earlier schema, push and server states are historical; use the current checkpoint and session wrap-up for resuming.
 
 ### 2026-09-21 planning checkpoint
 
@@ -106,6 +108,27 @@ ADB detected the authorized S20, USB forwarding for port 8081 succeeded, and Met
 - USB briefly went offline/unauthorized. Restarting the laptop ADB service and reconnecting/authorizing the phone restored access; no app data was cleared. The successful development bundle load took about 20 seconds in the observed reconnect, not a standalone launch benchmark.
 - Resume with the same installed APK and running Metro: verify `adb devices -l` says `device`, restore USB forwarding, and cold-launch. The retained marker should still report completed test deletion. For another lesson, explicitly Prepare a new test, predict the restart outcome, then follow [Lesson 5](learning/05-native-clip-recovery.md). Do not clear app data to repeat the lesson. The next code increment is microphone capture/playback; read the approved design and exact SDK 57 Audio APIs first.
 - Follow [Lesson 5](learning/05-native-clip-recovery.md) and record actual outcomes in the [dated review](reviews/2026-09-21-native-clip-integration.md). Native metadata is not microphone/playback evidence; release, lifecycle, backup/restore and power-loss gates remain.
+
+### Session wrap-up (2026-09-21)
+
+- **Published:** approved design, native vault, host coordinator, single encrypted session, learning panels/tests, S20 evidence and lessons through `f9e1587`. The current handoff and refreshed graph are included in this wrap-up commit on the same feature branch. No merge, release deployment or APK upload.
+- **Fresh wrap-up checks:** `npm.cmd test` passed 67/67, `npm.cmd run typecheck` passed. The earlier 47 native tests, APK checks and S20 exercise remain the recorded device/native evidence; no unnecessary rebuild or device exercise was repeated.
+- **Last phone result:** the generated test moment and both clips remain deleted after a cold restart. The small exercise marker, deletion tombstones and protected media keyset remain. Existing journal entries were not cleared. A new explicit Prepare uses fresh IDs.
+- **Resources:** Metro/process stopped, port 8081 checked absent, app closed and USB tunnel removed. JDK/SDK/Gradle caches, dependencies and the single current APK remain for reuse. Latest wrap-up disk observation: 15.04 GiB free before service shutdown. No new dependencies, emulator, clean build or APK copies were needed for wrap-up.
+- **Privacy:** publish source, tests, approved design, lessons, reviews and graph only. No tracked APKs, private key files, keystores, local tools or private-data files were found in the repository path check. Local diagnostics remain ignored; the exercise screenshot/UI dump had already been removed.
+- **Next code increment:** explain recorder lifecycle; create a small implementation plan from the approved design; integrate SDK 57 Expo Audio with the existing saved-moment/clip ownership; add explicit Record / Stop / Play and private staging/playback cleanup. Several clips per moment and four minutes per clip remain approved. Request microphone permission only on Record and stop/preserve on leaving the foreground. Verify actual AAC size/quality, permission/empty-capture cases and lifecycle behavior on S20 before calling recording complete.
+- **Keep visible:** app unlock, encrypted backup/export/restore, missing-key recovery UX, aggregate media usage, repeated-cycle resource measurements, release signing/privacy and release permissions/backup checks remain open. The documented minor UTF-16 admission distinction for path-only native deletion is deferred; inspect it when extending the recorder boundary. CI activation still requires separate GitHub workflow-scope authorization.
+- **Graphify:** targeted navigation refresh, currently 266 nodes / 376 edges, covering the inspected session/native source and current handoff. Dependencies, generated native output, local tools and private data are excluded; the graph is a navigation aid rather than security evidence.
+
+Verify repository continuity from the project folder:
+
+```powershell
+git status --short --branch
+git log -5 --oneline
+git ls-remote origin refs/heads/codex/android-device-setup
+```
+
+Stay on `codex/android-device-setup`; compare `git rev-parse HEAD` with the remote tip. If another checkout needs updating, inspect its changes first and use a fast-forward update. For the phone, follow Lesson 2's existing-tool environment and Metro/USB commands. Confirm ADB says `device`, not `unauthorized`; if USB reconnect loses forwarding, restore `adb -d reverse tcp:8081 tcp:8081`. Read [Lesson 5](learning/05-native-clip-recovery.md), [current evidence](reviews/2026-09-21-native-clip-integration.md), [approved voice design](superpowers/specs/2026-09-21-voice-recording-design.md) and `mobile/AGENTS.md` before the next app change.
 
 ## Remaining work
 

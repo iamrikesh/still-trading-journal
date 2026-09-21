@@ -60,6 +60,14 @@ The native module serializes file operations and invalidates callers on module d
 
 The test reads only its generated exercise marker and fixtures for destructive actions. Existing moments are preserved by migration; record any device preservation checks at their actual scope. APKs, local UI dumps, screenshots, keys and journal contents stay out of Git.
 
+## Session wrap-up addendum
+
+At Rikesh's request, the completed source/docs checkpoint `f9e1587` was pushed to `origin/codex/android-device-setup`; `git ls-remote` verified `f9e158702a4e31a1c5159e1004257dea82633a93`. The following handoff/graph commit uses the same branch. The earlier statements about local-only work and running Metro describe the pre-wrap milestone.
+
+Fresh wrap-up validation passed all 67 Node tests and TypeScript checking. No native rebuild or additional phone exercise was needed. The known experimental Node SQLite warning remains. Tracked-path checks found no APK, key, keystore, local-tools or private-data files. This is a scoped publication check, not a complete secret audit.
+
+The verified project Metro process was stopped, and port 8081 had no listener afterward. The connected development app was force-stopped and its USB tunnel removed. Installed app data, keys, APK, dependencies and toolchain caches remain. Free C: space before shutdown was 15.04 GiB. See PROJECT-STATUS's Session wrap-up for the precise resume sequence and outstanding work.
+
 ## Sources checked
 
 - [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/) and [SQLite](https://docs.expo.dev/versions/v57.0.0/sdk/sqlite/); installed module source was also inspected.

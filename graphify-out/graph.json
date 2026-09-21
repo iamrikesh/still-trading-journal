@@ -2371,12 +2371,12 @@
       "label": "Current S20 development checkpoint",
       "file_type": "document",
       "source_file": "docs/PROJECT-STATUS.md",
-      "source_location": "Next learning increment / 2026-09-21 planning checkpoint",
+      "source_location": "Current checkpoint / Session wrap-up (2026-09-21)",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Native clip integration checkpoint: consult current PROJECT-STATUS and dated integration evidence for actual host/native/S20 results. GitHub remains at 45862b2; subsequent integration work is local. Microphone recording remains unimplemented.",
+      "rationale": "Verified S20 clip recovery/deletion and schema-2 session checkpoint published through f9e1587 on codex/android-device-setup. Consult PROJECT-STATUS Session wrap-up for current tip, stopped Metro/USB state, restart commands and remaining recording/release work. Microphone recording remains unimplemented.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -3121,6 +3121,16 @@
       "source_location": "L1",
       "community": 1,
       "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "docs_session_wrap_20260921",
+      "label": "Session wrap-up and restart instructions",
+      "rationale": "Verified completed work, published checkpoint, fresh67 host tests/typecheck, stopped Metro/USB tunnel, retained phone data/tools, several four-minute clips decision and remaining recorder/release gates.",
+      "file_type": "document",
+      "source_file": "docs/PROJECT-STATUS.md",
+      "source_location": "Session wrap-up (2026-09-21)",
+      "community": 0,
+      "community_name": "Project status and roadmap"
     }
   ],
   "links": [
@@ -7036,6 +7046,27 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "docs_session_wrap_20260921",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_session_wrap_20260921",
+      "target": "native_clip_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_session_wrap_20260921",
+      "target": "docs_voice_recording_design_proposal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
     }
   ],
   "hyperedges": [
