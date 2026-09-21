@@ -19,7 +19,8 @@ export async function clipTransaction(db: JournalDatabase, work: () => Promise<v
   }
 }
 
-/** Opt-in only: the deployed schema-1 opener deliberately remains unchanged. */
+/** journalSession opts in after native vault initialization; older APKs without
+ * the clip bridge keep schema 1 and cannot open an already migrated database. */
 export async function migrateClipSchema(db: JournalDatabase): Promise<void> {
   requireUsableClipDatabase(db);
   await db.execAsync('PRAGMA foreign_keys = ON');

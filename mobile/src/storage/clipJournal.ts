@@ -22,9 +22,10 @@ function ownedIntent(row: ClipIntent): ClipIntent {
 }
 
 /** Requires an existing schema-1/2 connection and exclusive ownership of its vault
- * namespace. Retire any legacy journal object before this handoff; all subsequent
- * journal writes must use the returned journal. The future native opener must
- * enforce this precondition across connections and module reloads. */
+ * namespace. journalSession wraps this coordinator in its shared operation queue;
+ * openJournal caches that session across JS module reloads, and the native vault
+ * retires callers when its module is destroyed. Direct callers must provide the
+ * same exclusive ownership and retire legacy journal objects before handoff. */
 export async function createClipJournal(db: JournalDatabase, vault: ClipVault): Promise<ClipJournal> {
   const owner = owners.get(db);
   if (owner) {
