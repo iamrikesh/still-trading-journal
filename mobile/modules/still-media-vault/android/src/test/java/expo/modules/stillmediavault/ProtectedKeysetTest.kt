@@ -82,4 +82,14 @@ class ProtectedKeysetTest {
     assertEquals("corrupt", File(temporary.root, "protected.keyset").readText())
     assertEquals(1, wrapping.generations)
   }
+
+  @Test fun clipKeysetDomainCannotOpenAsProofOrAnotherDomain() {
+    val wrapping = TestWrappingKey()
+    val aad = "still-clips:keyset:v1".toByteArray()
+    ProtectedKeyset(temporary.root, wrapping, aad).open(create = true)
+    ProtectedKeyset(temporary.root, wrapping, aad).open(create = false)
+    assertThrows(Exception::class.java) { ProtectedKeyset(temporary.root, wrapping).open(create = true) }
+    assertThrows(Exception::class.java) { ProtectedKeyset(temporary.root, wrapping, byteArrayOf(1)).open(create = true) }
+    assertEquals(1, wrapping.generations)
+  }
 }

@@ -14,7 +14,7 @@ internal class OwnedFiles(private val root: File) {
   }
 
   fun validate(file: File) {
-    require(file.name.matches(Regex("[a-z0-9-]+\\.(plain|cipher|keyset)")))
+    require(file.name.matches(Regex("[a-z0-9-]+\\.(plain|cipher|keyset|staging\\.plain|pending\\.cipher|verify\\.plain|playback\\.plain)")))
     require(file.absoluteFile.parentFile == root.absoluteFile)
     require(file.canonicalFile == file.absoluteFile)
   }

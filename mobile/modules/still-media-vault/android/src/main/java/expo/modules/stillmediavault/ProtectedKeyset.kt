@@ -16,7 +16,8 @@ internal interface WrappingKey {
 }
 
 /** No AndroidKeysetManager fallback: only an explicitly encrypted keyset is accepted. */
-internal class ProtectedKeyset(private val root: File, private val wrapping: WrappingKey) {
+internal class ProtectedKeyset(private val root: File, private val wrapping: WrappingKey, keysetAad: ByteArray = KEYSET_AAD) {
+  private val keysetAad = keysetAad.copyOf()
   @Synchronized fun open(create: Boolean): StreamingAead {
     val files = OwnedFiles(root)
     val keyset = File(root, "protected.keyset")
@@ -30,7 +31,7 @@ internal class ProtectedKeyset(private val root: File, private val wrapping: Wra
       check(create && !hasWrapping && !hasKeyset && checkNotNull(root.listFiles()).isEmpty())
       wrapping.generate()
       val generated = KeysetHandle.generateNew(PredefinedStreamingAeadParameters.AES256_GCM_HKDF_4KB)
-      val encrypted = TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(generated, wrapping.aead(), KEYSET_AAD, RegistryConfiguration.get())
+      val encrypted = TinkJsonProtoKeysetFormat.serializeEncryptedKeyset(generated, wrapping.aead(), keysetAad, RegistryConfiguration.get())
         .toByteArray(Charsets.UTF_8)
       check(encrypted.size <= MAX_KEYSET_BYTES)
       files.writeNew(keyset) { it.write(encrypted) }
@@ -42,7 +43,7 @@ internal class ProtectedKeyset(private val root: File, private val wrapping: Wra
       val bytes = input.readBytesBounded(MAX_KEYSET_BYTES)
       String(bytes, Charsets.UTF_8)
     }
-    return TinkJsonProtoKeysetFormat.parseEncryptedKeyset(encrypted, wrapping.aead(), KEYSET_AAD, RegistryConfiguration.get())
+    return TinkJsonProtoKeysetFormat.parseEncryptedKeyset(encrypted, wrapping.aead(), keysetAad, RegistryConfiguration.get())
       .getPrimitive(RegistryConfiguration.get(), StreamingAead::class.java)
   }
 
