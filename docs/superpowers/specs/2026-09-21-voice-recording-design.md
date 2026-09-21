@@ -1,6 +1,6 @@
 # Voice recording for the S20 — design for review
 
-Status: approved by Rikesh on 2026-09-21, including the temporary private plaintext tradeoff. User decisions: several clips per moment, about four minutes per clip, foreground capture, and low laptop disk usage. The encrypted synthetic-file proof below is implemented and verified on the S20; see [dated evidence](../../reviews/2026-09-21-media-vault-proof.md). The opt-in clip metadata coordinator is now implemented and tested with host SQLite/filesystem fixtures; see [host recovery evidence](../../reviews/2026-09-21-clip-recovery-core.md). Native file-adapter/device recovery integration and microphone capture remain unimplemented. This design is not a production-security claim.
+Status: approved by Rikesh on 2026-09-21, including the temporary private plaintext tradeoff. User decisions: several clips per moment, about four minutes per clip, foreground capture, and low laptop disk usage. The encrypted synthetic-file proof is implemented and verified on the S20; see [dated evidence](../../reviews/2026-09-21-media-vault-proof.md). The clip metadata coordinator, durable native adapter and single encrypted session are implemented; see the [latest integration evidence](../../reviews/2026-09-21-native-clip-integration.md) for exact host/native tests and the S20 exercise checkpoint. Microphone capture and playback remain unimplemented. This design is not a production-security claim.
 
 ## What Rikesh will see
 
@@ -62,7 +62,7 @@ Deleting a clip first records a deletion intent, stops any owner operation, and 
 - List clips 20 at a time. Decode only the selected clip. Measure native/PSS and JavaScript memory separately over repeated operations.
 - Laptop: use the existing S: alias, JDK, SDK, ARM64 build and Gradle caches. No duplicate dependency tree, emulator, routine clean build or extra APK copies. Recheck free space before adding native dependencies. Module/native config changes require a rebuild; ordinary JavaScript changes use Metro.
 
-The byte ceiling and storage thresholds above are proposed implementation defaults, adjustable after measurements. No phone storage measurements or enforcement tests have run yet.
+The byte ceiling and storage thresholds above are initial defaults, adjustable after measurements. Native fixture operations now enforce the 4 MiB / 240000 ms bounds and 100 MiB reserve plus working allowance, with host boundary tests. Actual microphone size, quality, aggregate usage warning and repeated-cycle phone resource measurements remain to be implemented and measured.
 
 ## First demonstrable increment and gates
 

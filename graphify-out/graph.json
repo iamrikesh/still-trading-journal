@@ -563,7 +563,8 @@
       "id": "mobile_src_storage_openjournal",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "norm_label": "openjournal.ts"
+      "norm_label": "openjournal.ts",
+      "rationale": "One runtime-cached native session opens the existing keyed database, migrates and recovers clips; Expo Go remains an in-memory demo."
     },
     {
       "label": "keyOptions",
@@ -596,18 +597,8 @@
       "id": "mobile_src_storage_openjournal_web",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "norm_label": "openjournal.web.ts"
-    },
-    {
-      "label": "demo",
-      "file_type": "code",
-      "source_file": "mobile/src/storage/openJournal.web.ts",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "mobile_src_storage_openjournal_web_demo",
-      "community": 1,
-      "community_name": "Encrypted journal persistence",
-      "norm_label": "demo"
+      "norm_label": "openjournal.web.ts",
+      "rationale": "Web keeps a runtime-cached bounded in-memory journal with clip learning unavailable."
     },
     {
       "label": "isTemporaryJournal",
@@ -2175,7 +2166,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Approved several four-minute clips per moment. Native Tink synthetic proof passed; host clip metadata coordinator follows. Next connect native vault and schema2 owner on S20 before recorder/playback lifecycle work.",
+      "rationale": "Several four-minute clips per moment approved. Native file/session integration and generated-clip recovery precede Expo Audio capture/playback and lifecycle tests; see current dated evidence.",
       "id": "docs_project_status_voice_increment",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2385,7 +2376,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "2026-09-21: GitHub feature checkpoint 45862b2 pushed. Subsequent opt-in clip recovery core verified with host SQLite/filesystem fixtures; native adapter/phone migration/voice capture remain separate. Installed S20 remains at the native encrypted-file proof.",
+      "rationale": "Native clip integration checkpoint: consult current PROJECT-STATUS and dated integration evidence for actual host/native/S20 results. GitHub remains at 45862b2; subsequent integration work is local. Microphone recording remains unimplemented.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2758,7 +2749,7 @@
       "source_location": "L1",
       "community": 0,
       "community_name": "Project status and roadmap",
-      "rationale": "Approved private temporary plaintext tradeoff and several four-minute clips. Native synthetic file proof and host recovery coordinator are separate evidence; capture, playback, device recovery and release gates remain.",
+      "rationale": "Approved voice design with private temporary plaintext; native encryption proof, host coordinator and native/session integration are distinct checkpoints. Microphone/playback and release gates remain.",
       "id": "docs_voice_recording_design_proposal"
     },
     {
@@ -2787,7 +2778,7 @@
       "file_type": "code",
       "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt",
       "source_location": "L1",
-      "rationale": "Debug-only synthetic prepare/verify API, native serialization, isolated Keystore aliases and sanitized errors.",
+      "rationale": "Native module retains isolated debug encryption proof and adds durable clip methods with module ownership, native serialization and sanitized errors; fixture creation/inspection is debug-only.",
       "community": 1,
       "community_name": "Encrypted journal persistence"
     },
@@ -2807,7 +2798,7 @@
       "file_type": "code",
       "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ProtectedKeyset.kt",
       "source_location": "L1",
-      "rationale": "Only encrypted keysets; missing keys/keysets or orphan data fail closed without replacement.",
+      "rationale": "Encrypted keyset with domain-specific AAD; legacy proof default preserved, native clips use a separate directory/wrapping alias/domain. Missing key/keyset/orphans fail closed.",
       "community": 1,
       "community_name": "Encrypted journal persistence"
     },
@@ -2990,6 +2981,146 @@
       "source_location": "L1",
       "community": 0,
       "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "native_clip_files",
+      "label": "Native durable clip files",
+      "rationale": "Bounded Tink seal/verify, authenticated owner context, pending promotion, private transient cleanup and disjoint role filenames.",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ClipFileVault.kt",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_ownership",
+      "label": "Native clip module ownership",
+      "rationale": "Serializes native work and rejects callers from destroyed or competing module owners.",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ClipOwnership.kt",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_android",
+      "label": "Android clip metadata and durability",
+      "rationale": "MediaMetadataRetriever metadata validation/resource release and directory fsync.",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/AndroidClipFiles.kt",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_tests",
+      "label": "Native clip adapter and ownership tests",
+      "rationale": "Real Tink fixture, failure, file-name collision, low-space and lifecycle ownership regressions.",
+      "file_type": "code",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ClipFileVaultTest.kt",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_plan",
+      "label": "Native clip integration plan",
+      "rationale": "Connect durable native files to one encrypted journal session and a generated-clip S20 lesson.",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-09-21-native-clip-integration.md",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "native_clip_lesson",
+      "label": "Lesson 5 native clip recovery",
+      "rationale": "Prepare one saved/one interrupted generated clip, restart, verify, delete and verify after restart.",
+      "file_type": "document",
+      "source_file": "docs/learning/05-native-clip-recovery.md",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "native_clip_review",
+      "label": "Native clip integration evidence",
+      "rationale": "Exact host/native/build/device results and limitations, separate from future microphone recording.",
+      "file_type": "document",
+      "source_file": "docs/reviews/2026-09-21-native-clip-integration.md",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "native_clip_session",
+      "label": "Single encrypted journal session",
+      "rationale": "Owns schema migration, native key admission, startup recovery and a runtime-wide operation queue shared by journal, clips and composed teaching actions.",
+      "file_type": "code",
+      "source_file": "mobile/src/storage/journalSession.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_adapter",
+      "label": "Native clip bridge adapter",
+      "rationale": "Adapts ID-only native methods to ClipVault, validates bounded metadata and inspection booleans, and sanitizes errors.",
+      "file_type": "code",
+      "source_file": "mobile/src/storage/nativeClipVault.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_exercise",
+      "label": "Durable generated-clip exercise",
+      "rationale": "Persists one generated marker, validates synthetic ownership, prepares interrupted save and verifies recovery or coordinated deletion.",
+      "file_type": "code",
+      "source_file": "mobile/src/development/sessionExercise.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_controller",
+      "label": "Clip recovery learning controller",
+      "rationale": "Serializes button presses, publishes sanitized state and reads recovery status without triggering reconciliation.",
+      "file_type": "code",
+      "source_file": "mobile/src/development/clipRecoveryExercise.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_panel",
+      "label": "Clip recovery learning panel",
+      "rationale": "Displays generated-clip prepare, restart-check and scoped deletion exercise states.",
+      "file_type": "code",
+      "source_file": "mobile/src/development/ClipRecoveryPanel.tsx",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_session_tests",
+      "label": "Journal session integration tests",
+      "rationale": "Real SQLite migration/reopen, key ordering, operation ownership, generated exercise and bridge/controller regressions.",
+      "file_type": "code",
+      "source_file": "mobile/tests/journalSession.test.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "native_clip_keyed_initializer",
+      "label": "Generic keyed database initializer",
+      "rationale": "Preserves key validation, SQLCipher capability/key ordering and failure close before handing a keyed connection to the session initializer.",
+      "file_type": "code",
+      "source_file": "mobile/src/storage/encryptedJournal.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
     }
   ],
   "links": [
@@ -5204,17 +5335,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "mobile/src/storage/openJournal.web.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "mobile_src_storage_openjournal_web",
-      "target": "mobile_src_storage_openjournal_web_demo",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "mobile/src/storage/openJournal.web.ts",
       "source_location": "L7",
       "weight": 1.0,
       "_origin": "ast",
@@ -6759,6 +6879,160 @@
     {
       "source": "docs_voice_recording_design_proposal",
       "target": "clip_recovery_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md"
+    },
+    {
+      "source": "media_vault_proof_module",
+      "target": "native_clip_files",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt"
+    },
+    {
+      "source": "media_vault_proof_module",
+      "target": "native_clip_ownership",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt"
+    },
+    {
+      "source": "media_vault_proof_module",
+      "target": "native_clip_android",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt"
+    },
+    {
+      "source": "native_clip_tests",
+      "target": "native_clip_files",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ClipFileVaultTest.kt"
+    },
+    {
+      "source": "native_clip_tests",
+      "target": "native_clip_ownership",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ClipFileVaultTest.kt"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "native_clip_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "native_clip_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "native_clip_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "native_clip_files",
+      "target": "media_vault_proof_stream",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ClipFileVault.kt"
+    },
+    {
+      "source": "native_clip_review",
+      "target": "native_clip_files",
+      "relation": "verifies",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-21-native-clip-integration.md"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "clip_recovery_repository",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "native_clip_exercise",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "native_clip_exercise",
+      "target": "native_clip_adapter",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/development/sessionExercise.ts"
+    },
+    {
+      "source": "native_clip_adapter",
+      "target": "media_vault_proof_module",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/nativeClipVault.ts"
+    },
+    {
+      "source": "native_clip_session_tests",
+      "target": "native_clip_session",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/journalSession.test.ts"
+    },
+    {
+      "source": "native_clip_session_tests",
+      "target": "native_clip_controller",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/journalSession.test.ts"
+    },
+    {
+      "source": "native_clip_panel",
+      "target": "native_clip_controller",
+      "relation": "observes",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/development/ClipRecoveryPanel.tsx"
+    },
+    {
+      "source": "mobile_src_storage_openjournal",
+      "target": "native_clip_session",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/openJournal.ts"
+    },
+    {
+      "source": "mobile_src_storage_openjournal",
+      "target": "native_clip_keyed_initializer",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/openJournal.ts"
+    },
+    {
+      "source": "mobile_app_journalapp",
+      "target": "native_clip_controller",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_journalapp",
+      "target": "native_clip_panel",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "docs_voice_recording_design_proposal",
+      "target": "native_clip_review",
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/superpowers/specs/2026-09-21-voice-recording-design.md"

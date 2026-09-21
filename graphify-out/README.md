@@ -45,3 +45,8 @@ Current navigation graph: **244 nodes, 340 edges**. Targeted host-agent extracti
 ## Host clip recovery increment (2026-09-21)
 
 Current navigation graph: **252 nodes, 352 edges**. Targeted host-agent extraction added the opt-in repository, migration, contracts, integration tests, synthetic fixture helper, plan, lesson and evidence. Imports/tests/document references were checked against current files. No dependencies, generated native output, local tools or private data were scanned. No external model API call; host token usage unavailable. Existing communities retained; historical centrality/cohesion tables were not recomputed. Host file fixtures are noncryptographic; Android integration and voice recording remain unimplemented.
+
+
+## Native clip integration (2026-09-21)
+
+Current navigation graph: **265 nodes, 373 edges**. Targeted host-agent extraction covers inspected native/session source, tests, plan, lesson and dated evidence. Existing module/keyset descriptions were updated. No dependency, generated native output, local tool or private-data scan; no external model API call, host token usage unavailable. Existing communities retained; historical centrality/cohesion tables were not recomputed. The graph navigates evidence; it does not certify security or microphone behavior.

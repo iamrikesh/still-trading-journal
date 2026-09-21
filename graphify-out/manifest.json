@@ -1,8 +1,8 @@
 {
   "mobile/App.tsx": {
-    "mtime": 1789986971.642508,
+    "mtime": 1789994086.6128132,
     "ast_hash": "16f48132fa48fde23deef473175c8a5c",
-    "semantic_hash": "99a6a3c517a5b69ff4f3c057507f5150"
+    "semantic_hash": "70d6bab63729a05c3265186ddade87fe"
   },
   "mobile/app.json": {
     "mtime": 1789911867.5519018,
@@ -55,9 +55,9 @@
     "semantic_hash": "0ec79a141c96bfc4d4c0eb3af2667c41"
   },
   "mobile/src/storage/encryptedJournal.ts": {
-    "mtime": 1789901771.0481446,
+    "mtime": 1789993867.1152043,
     "ast_hash": "9dc737aec235b740a28af6d44ac0f395",
-    "semantic_hash": "9dc737aec235b740a28af6d44ac0f395"
+    "semantic_hash": "e775b1d8a3a51f04035758252a702361"
   },
   "mobile/src/storage/memoryJournal.ts": {
     "mtime": 1789901768.7835095,
@@ -65,14 +65,14 @@
     "semantic_hash": "7c1c87a20d3af38fa568bca115b10171"
   },
   "mobile/src/storage/openJournal.ts": {
-    "mtime": 1789902400.0026398,
+    "mtime": 1789993966.4224598,
     "ast_hash": "592f4e5348ed98e44a4347e49cd93072",
-    "semantic_hash": "592f4e5348ed98e44a4347e49cd93072"
+    "semantic_hash": "02e51da31cc123cd0a0654979f55912b"
   },
   "mobile/src/storage/openJournal.web.ts": {
-    "mtime": 1789901848.2419312,
+    "mtime": 1789993970.6027634,
     "ast_hash": "b3afa84eef85db054dcc5d9fee98ddd2",
-    "semantic_hash": "b3afa84eef85db054dcc5d9fee98ddd2"
+    "semantic_hash": "4e3085d799e262da37d55458cdb722d4"
   },
   "mobile/src/storage/sqlJournal.ts": {
     "mtime": 1789901610.8613176,
@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1789990147.7660425,
+    "mtime": 1789996263.4113147,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "c24740fdf4a7687ed27d0298571798a1"
+    "semantic_hash": "59a1cd260dc64ca2b0295ea8abc421ff"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -205,9 +205,9 @@
     "semantic_hash": "c0fef9680415cebdaf512e7a68812199"
   },
   "docs/superpowers/specs/2026-09-21-voice-recording-design.md": {
-    "mtime": 1789990326.2969794,
+    "mtime": 1789995676.9723828,
     "ast_hash": "",
-    "semantic_hash": "9e70bb5ec7136d81d4968623bd65631c"
+    "semantic_hash": "1bc9240e939f847583dc80358a89bac5"
   },
   "mobile/modules/still-media-vault/expo-module.config.json": {
     "mtime": 1789985318.0806565,
@@ -220,19 +220,19 @@
     "semantic_hash": "9371ff2d3bc737a92ef0475902208ca5"
   },
   "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt": {
-    "mtime": 1789985870.774254,
+    "mtime": 1789992580.6797473,
     "ast_hash": "",
-    "semantic_hash": "9ff8011e11499a2a556df03df92ac32a"
+    "semantic_hash": "30af3987c0e6d6e7d87244472e9714d7"
   },
   "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StreamingFileVault.kt": {
-    "mtime": 1789985745.914313,
+    "mtime": 1789992644.1546693,
     "ast_hash": "",
-    "semantic_hash": "f3c3d0ed59dcc83c834da2e357e45ac7"
+    "semantic_hash": "eb3c5d20d6f6f2a7979107eff69c96fa"
   },
   "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ProtectedKeyset.kt": {
-    "mtime": 1789986108.0065506,
+    "mtime": 1789992478.054981,
     "ast_hash": "",
-    "semantic_hash": "93dd569bbea8161adf2974e68af8584f"
+    "semantic_hash": "dbf0126041c65ff82ba85c4750172d84"
   },
   "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/SyntheticVaultProof.kt": {
     "mtime": 1789986104.9836614,
@@ -323,5 +323,70 @@
     "mtime": 1789990366.104293,
     "ast_hash": "",
     "semantic_hash": "d8739490917b98a90ddf2a9812b1a52b"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ClipFileVault.kt": {
+    "mtime": 1789992948.2584202,
+    "ast_hash": "",
+    "semantic_hash": "ffcae3a28eea733b129a988e808164d2"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ClipOwnership.kt": {
+    "mtime": 1789992950.8687851,
+    "ast_hash": "",
+    "semantic_hash": "9282d2ff5f3a3db0739ff4e7ff971b76"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/AndroidClipFiles.kt": {
+    "mtime": 1789992815.823266,
+    "ast_hash": "",
+    "semantic_hash": "1be11e210bafb47db484d9a57018fcc6"
+  },
+  "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/ClipFileVaultTest.kt": {
+    "mtime": 1789992818.4110305,
+    "ast_hash": "",
+    "semantic_hash": "d6368b8b3c13731b9bb5572a1c001066"
+  },
+  "docs/superpowers/plans/2026-09-21-native-clip-integration.md": {
+    "mtime": 1789996302.1698923,
+    "ast_hash": "",
+    "semantic_hash": "89add299978dea6514c5ed2a3807a577"
+  },
+  "docs/learning/05-native-clip-recovery.md": {
+    "mtime": 1789992006.035633,
+    "ast_hash": "",
+    "semantic_hash": "197f18ee81953d266b7f384ebb91f819"
+  },
+  "docs/reviews/2026-09-21-native-clip-integration.md": {
+    "mtime": 1789996362.6514363,
+    "ast_hash": "",
+    "semantic_hash": "5fc80a726749ecbeeda9640df335cfd3"
+  },
+  "mobile/src/storage/journalSession.ts": {
+    "mtime": 1789994090.5557609,
+    "ast_hash": "",
+    "semantic_hash": "009378eff7deaed538c4724c5518e6b8"
+  },
+  "mobile/src/storage/nativeClipVault.ts": {
+    "mtime": 1789993870.5978484,
+    "ast_hash": "",
+    "semantic_hash": "014cfb07ac31c558e268970bfc3bc773"
+  },
+  "mobile/src/development/sessionExercise.ts": {
+    "mtime": 1789993879.3692682,
+    "ast_hash": "",
+    "semantic_hash": "de6a47a93baec3d91e95a50deaab2883"
+  },
+  "mobile/src/development/clipRecoveryExercise.ts": {
+    "mtime": 1789994221.8048437,
+    "ast_hash": "",
+    "semantic_hash": "636f540dca764cb9b0a1921219745005"
+  },
+  "mobile/src/development/ClipRecoveryPanel.tsx": {
+    "mtime": 1789993974.1050656,
+    "ast_hash": "",
+    "semantic_hash": "0000b2fcfbb9d176c3810e19faf83711"
+  },
+  "mobile/tests/journalSession.test.ts": {
+    "mtime": 1789994191.762938,
+    "ast_hash": "",
+    "semantic_hash": "db624db641f0ec960511fd6f8c63ba37"
   }
 }
