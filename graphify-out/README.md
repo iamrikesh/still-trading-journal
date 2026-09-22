@@ -50,3 +50,8 @@ Current navigation graph: **252 nodes, 352 edges**. Targeted host-agent extracti
 ## Native clip integration (2026-09-21)
 
 Current navigation graph: **266 nodes, 376 edges**. Targeted host-agent extraction covers inspected native/session source, tests, plan, lesson, dated evidence and session wrap-up. The wrap-up records the published f9e1587 checkpoint, stopped development server and next Record/Stop/Play increment. Existing module/keyset descriptions were updated. No dependency, generated native output, local tool or private-data scan; no external model API call, host token usage unavailable. Existing communities retained; historical centrality/cohesion tables were not recomputed. The graph navigates evidence; it does not certify security or microphone behavior.
+
+
+## Recording lifecycle increment (2026-09-22)
+
+Targeted inspected-source refresh: **281 nodes / 395 edges**. Includes recording control, native lifecycle source/tests, permission migration, plan, lesson and dated evidence. Existing communities retained; historical centrality/cohesion not recomputed. No dependencies, generated Android output, local tools or private data scanned. No external model API call; host token cost unavailable. This graph is navigation, not security or device-validation evidence.

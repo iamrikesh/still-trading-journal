@@ -2166,7 +2166,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Several four-minute clips per moment approved. Native file/session integration and generated-clip recovery precede Expo Audio capture/playback and lifecycle tests; see current dated evidence.",
+      "rationale": "Several four-minute clips per saved moment: owned native audio lifecycle, Expo Audio permission, encrypted journal integration and visible controls. Verify actual device acceptance status in current dated review.",
       "id": "docs_project_status_voice_increment",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -2376,7 +2376,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Verified S20 clip recovery/deletion and schema-2 session checkpoint published through f9e1587 on codex/android-device-setup. Consult PROJECT-STATUS Session wrap-up for current tip, stopped Metro/USB state, restart commands and remaining recording/release work. Microphone recording remains unimplemented.",
+      "rationale": "Current Record/Stop/Play increment, precise verification and remaining gates are in PROJECT-STATUS and the 2026-09-22 review. Earlier synthetic clip checkpoints remain historical evidence.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -3131,6 +3131,156 @@
       "source_location": "Session wrap-up (2026-09-21)",
       "community": 0,
       "community_name": "Project status and roadmap"
+    },
+    {
+      "id": "recording_controller",
+      "label": "Recording lifecycle controller",
+      "rationale": "Immutable moment ownership, serialized UI operations, cancellation, Stop/save, polling, retry and bounded pending-owner recovery.",
+      "source_file": "mobile/src/recording/controller.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_bridge",
+      "label": "Validated native audio bridge",
+      "rationale": "ID-only audio operations with bounded sanitized status and usage metadata.",
+      "source_file": "mobile/src/recording/nativeAudio.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_runtime",
+      "label": "Recording runtime and permission",
+      "rationale": "Expo Audio permission requested on explicit Record; existing journal session owns capture/save/playback.",
+      "source_file": "mobile/src/recording/runtime.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_panel",
+      "label": "Record Stop Play controls",
+      "rationale": "Saved-moment voice controls, 20-item pages, timer, retry/discard, pending-owner access and usage warning.",
+      "source_file": "mobile/src/recording/RecordingPanel.tsx",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_controller_tests",
+      "label": "Recording controller tests",
+      "rationale": "Denial, navigation races, duplicate taps, dropped Stop regression, retry and native-stop handling with controlled external ports.",
+      "source_file": "mobile/tests/recordingController.test.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_session_tests",
+      "label": "Recording session tests",
+      "rationale": "Real SQLite intent-first capture, immutable ownership, saved-only playback, failed intents and old pending-owner/deletion recovery.",
+      "source_file": "mobile/tests/recordingSession.test.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_permission_plugin",
+      "label": "No-clean microphone permission migration",
+      "rationale": "Removes stale generated RECORD_AUDIO tools removal while preserving other permission blocks.",
+      "source_file": "mobile/plugins/withMicrophonePermission.cjs",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_lesson",
+      "label": "Lesson 6 recording lifecycle",
+      "rationale": "Explains stopped versus encrypted saved, owner identity, lifecycle, storage budget and a sample phone exercise.",
+      "source_file": "docs/learning/06-recording-lifecycle.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_review",
+      "label": "Recording increment evidence",
+      "rationale": "Exact host/native/build/device evidence and remaining acceptance/release gates. Consult this source for actual observed outcomes.",
+      "source_file": "docs/reviews/2026-09-22-record-stop-play.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_plan",
+      "label": "Recording implementation plan",
+      "rationale": "Approved scope continuation and native adapter rationale after SDK57 source inspection.",
+      "source_file": "docs/superpowers/plans/2026-09-22-record-stop-play.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_native_audiooperationstest",
+      "label": "AudioOperationsTest",
+      "rationale": "Owned Android audio lifecycle implementation or its bounded host tests; verify behavior and scope against current source and dated evidence.",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/AudioOperationsTest.kt",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_native_androidaudiodriver",
+      "label": "AndroidAudioDriver",
+      "rationale": "Owned Android audio lifecycle implementation or its bounded host tests; verify behavior and scope against current source and dated evidence.",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/AndroidAudioDriver.kt",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_native_audiooperations",
+      "label": "AudioOperations",
+      "rationale": "Owned Android audio lifecycle implementation or its bounded host tests; verify behavior and scope against current source and dated evidence.",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/AudioOperations.kt",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_wrapup",
+      "label": "September22 wrap-up and next session",
+      "rationale": "Published recording increment bc32954; services stopped with samples and caches retained. Resume with Lesson2, then actual denial, immediate or rapid taps and screen-lock checks; release gates remain.",
+      "source_file": "docs/PROJECT-STATUS.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_remaining_gates",
+      "label": "Remaining recording and release checks",
+      "rationale": "Unrun device denial, immediate and rapid taps, screen lock, calls/headphones, resource profiling and device faults. Release app unlock, backup/restore, keys, signing and privacy remain open.",
+      "source_file": "docs/reviews/2026-09-22-record-stop-play.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
     }
   ],
   "links": [
@@ -7064,6 +7214,139 @@
     {
       "source": "docs_session_wrap_20260921",
       "target": "docs_voice_recording_design_proposal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_panel",
+      "target": "recording_controller",
+      "relation": "observes",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/recording/RecordingPanel.tsx"
+    },
+    {
+      "source": "recording_runtime",
+      "target": "recording_controller",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/recording/runtime.ts"
+    },
+    {
+      "source": "recording_controller",
+      "target": "native_clip_session",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/recording/controller.ts"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "recording_bridge",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "recording_bridge",
+      "target": "media_vault_proof_module",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/recording/nativeAudio.ts"
+    },
+    {
+      "source": "mobile_app_journalapp",
+      "target": "recording_panel",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "recording_controller_tests",
+      "target": "recording_controller",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/recordingController.test.ts"
+    },
+    {
+      "source": "recording_session_tests",
+      "target": "native_clip_session",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/recordingSession.test.ts"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "recording_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "recording_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "recording_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "media_vault_proof_module",
+      "target": "recording_native_audiooperations",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt"
+    },
+    {
+      "source": "media_vault_proof_module",
+      "target": "recording_native_androidaudiodriver",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/StillMediaVaultModule.kt"
+    },
+    {
+      "source": "recording_native_audiooperationstest",
+      "target": "recording_native_audiooperations",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/AudioOperationsTest.kt"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_review",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_remaining_gates",
+      "relation": "tracks",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_review",
+      "target": "recording_remaining_gates",
+      "relation": "documents",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-22-record-stop-play.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "recording_wrapup",
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/PROJECT-STATUS.md"

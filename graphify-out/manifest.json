@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1789996893.7240095,
+    "mtime": 1790085614.3688169,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "774b86f41896d678f2d733b6323db74c"
+    "semantic_hash": "b2802788fc651b101f9bb340206a753d"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -388,5 +388,70 @@
     "mtime": 1789994191.762938,
     "ast_hash": "",
     "semantic_hash": "db624db641f0ec960511fd6f8c63ba37"
+  },
+  "mobile/src/recording/controller.ts": {
+    "mtime": 1790081735.6984448,
+    "ast_hash": "",
+    "semantic_hash": "0a31c694db9a58ae07c157b41e3ac28f"
+  },
+  "mobile/src/recording/nativeAudio.ts": {
+    "mtime": 1790079172.1498215,
+    "ast_hash": "",
+    "semantic_hash": "d3d7c05508c496a46f602f1864c601e3"
+  },
+  "mobile/src/recording/runtime.ts": {
+    "mtime": 1790083508.4417038,
+    "ast_hash": "",
+    "semantic_hash": "e74a65d721b778a85052f4b149728c22"
+  },
+  "mobile/src/recording/RecordingPanel.tsx": {
+    "mtime": 1790084045.5361564,
+    "ast_hash": "",
+    "semantic_hash": "e7ee28d2111fd3f30922b7ac90a2427b"
+  },
+  "mobile/tests/recordingController.test.ts": {
+    "mtime": 1790081644.5859594,
+    "ast_hash": "",
+    "semantic_hash": "4c48ba23e17429185e90a9a188f3c478"
+  },
+  "mobile/tests/recordingSession.test.ts": {
+    "mtime": 1790079671.9427032,
+    "ast_hash": "",
+    "semantic_hash": "e890cfbaa787f2b42bc3962119984c9c"
+  },
+  "mobile/plugins/withMicrophonePermission.cjs": {
+    "mtime": 1790080031.1827552,
+    "ast_hash": "",
+    "semantic_hash": "db37276fd91ec4470f8c2b458df55428"
+  },
+  "docs/learning/06-recording-lifecycle.md": {
+    "mtime": 1790085103.284144,
+    "ast_hash": "",
+    "semantic_hash": "2f9c33bf0c5867ccef022a572e67cd4a"
+  },
+  "docs/reviews/2026-09-22-record-stop-play.md": {
+    "mtime": 1790085572.6031356,
+    "ast_hash": "",
+    "semantic_hash": "6de5f8b570efb3c08c5bb50b13dcd218"
+  },
+  "docs/superpowers/plans/2026-09-22-record-stop-play.md": {
+    "mtime": 1790085100.7993011,
+    "ast_hash": "",
+    "semantic_hash": "8488460185edadeaf73875d1b19dff36"
+  },
+  "mobile/modules/still-media-vault/android/src/test/java/expo/modules/stillmediavault/AudioOperationsTest.kt": {
+    "mtime": 1790081027.0926547,
+    "ast_hash": "",
+    "semantic_hash": "34c6902b5232e3c55b1848d3431690bd"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/AndroidAudioDriver.kt": {
+    "mtime": 1790080948.0496035,
+    "ast_hash": "",
+    "semantic_hash": "6c64c8ccf1faaa4484d1e04d30304c14"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/AudioOperations.kt": {
+    "mtime": 1790081164.3114376,
+    "ast_hash": "",
+    "semantic_hash": "56c5bf8d20e88468af3652575d308284"
   }
 }
