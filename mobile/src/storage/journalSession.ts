@@ -3,15 +3,28 @@ import { requireUsableClipDatabase } from './clipSchema.ts';
 import type { ClipJournal } from './clipTypes.ts';
 import type { NativeClipVault } from './nativeClipVault.ts';
 import { createSqlJournal, type JournalDatabase } from './sqlJournal.ts';
-import type { JournalRepository } from './types.ts';
+import type { JournalRepository, Moment } from './types.ts';
 import { createSessionExercise, type ExerciseOperations } from '../development/sessionExercise.ts';
+import type { AudioStatus, NativeAudio } from '../recording/nativeAudio.ts';
+import type { ClipIntent } from './clipTypes.ts';
 
-export type SessionOptions = { debug: boolean; id(): string; now(): string };
+export type SessionOptions = { debug: boolean; id(): string; now(): string; audio?: NativeAudio | null };
+export interface SessionAudio {
+  start(intent: ClipIntent): Promise<void>;
+  stop(id: string): Promise<void>;
+  releaseCapture(id: string): Promise<void>;
+  play(id: string): Promise<void>;
+  stopPlayback(): Promise<void>;
+  status(): Promise<AudioStatus>;
+  usage(): Promise<number>;
+  pendingOwners(): Promise<Moment[]>;
+}
 export interface JournalSession {
   journal: JournalRepository;
   clips: Omit<ClipJournal, 'journal'> | null;
   exercise: ExerciseOperations | null;
   recovery(): Promise<{ pending: number }>;
+  audio?: SessionAudio | null;
 }
 const failure = () => new Error('Journal session unavailable. Existing data has not been reset.');
 
@@ -67,6 +80,7 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
       return row.count;
     };
     const exercise = options.debug ? await createSessionExercise(db, core, vault, options, pending) : null;
+    const audio = options.audio;
     return {
       journal: wrap(core.journal),
       clips: {
@@ -77,6 +91,32 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
       },
       exercise: exercise && { prepare: () => enqueue(exercise.prepare), check: () => enqueue(exercise.check), remove: () => enqueue(exercise.remove) },
       recovery: () => enqueue(async () => ({ pending: await pending() })),
+      audio: audio ? {
+        start: intent => {
+          const snapshot = { ...intent };
+          return enqueue(async () => {
+            if (await pending()) throw failure();
+            await core.begin(snapshot);
+            await audio.startCapture(snapshot);
+          });
+        },
+        stop: id => enqueue(async () => { await audio.stopCapture(id); await core.finish(id); }),
+        releaseCapture: id => enqueue(() => audio.stopCapture(id)),
+        play: id => enqueue(async () => {
+          const [row] = await db.getAllAsync<ClipIntent>(`SELECT id, momentId, createdAt FROM clips
+            WHERE id = ? AND status = 'saved' AND NOT EXISTS
+            (SELECT 1 FROM moment_deletions WHERE moment_deletions.id = clips.momentId)`, id);
+          if (!row) throw failure();
+          await audio.startPlayback({ id: row.id, momentId: row.momentId, createdAt: row.createdAt });
+        }),
+        stopPlayback: () => enqueue(() => audio.stopPlayback()),
+        status: () => enqueue(() => audio.status()),
+        usage: () => enqueue(() => audio.usage()),
+        pendingOwners: () => enqueue(() => db.getAllAsync<Moment>(`SELECT id, emotionId, emotionLabel, createdAt, supportText FROM moments
+          WHERE EXISTS (SELECT 1 FROM clips WHERE clips.momentId = moments.id AND clips.status <> 'saved')
+          OR EXISTS (SELECT 1 FROM moment_deletions WHERE moment_deletions.id = moments.id)
+          ORDER BY createdAt, id LIMIT 20`)),
+      } : null,
     };
   } catch { throw failure(); }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Alert, BackHandler, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Alert, AppState, BackHandler, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { randomUUID } from 'expo-crypto';
@@ -12,6 +12,9 @@ import { MediaVaultProofPanel } from './src/development/MediaVaultProofPanel';
 import { createMediaVaultProof, type MediaVaultProofNative } from './src/development/mediaVaultProof';
 import { createClipRecoveryExercise } from './src/development/clipRecoveryExercise';
 import { ClipRecoveryPanel } from './src/development/ClipRecoveryPanel';
+import { createAppRecordingController } from './src/recording/runtime';
+import { RecordingPanel } from './src/recording/RecordingPanel';
+import type { Moment } from './src/storage/types';
 
 export default function App() {
   return <SafeAreaProvider><JournalApp /></SafeAreaProvider>;
@@ -33,7 +36,19 @@ function JournalApp() {
     });
   });
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
-  const [page, setPage] = useState<'now' | 'support' | 'history'>('now');
+  const [page, setPage] = useState<'now' | 'support' | 'history' | 'clips'>('now');
+  const [clipMoment, setClipMoment] = useState<Moment | null>(null);
+  const [recording] = useState(createAppRecordingController);
+  const audioState = useSyncExternalStore(recording.subscribe, recording.getSnapshot);
+  const recordingOwner = page === 'support' && state.saveStatus === 'saved' ? state.moment?.id ?? null : page === 'clips' ? clipMoment?.id ?? null : null;
+  useEffect(() => { void recording.select(recordingOwner); }, [recording, recordingOwner]);
+  useEffect(() => {
+    const listener = AppState.addEventListener('change', value => { void (value === 'active' ? recording.foreground() : recording.background()); });
+    // Fast Refresh runs effect cleanup without an Android foreground event.
+    void (AppState.currentState === 'active' ? recording.foreground() : recording.background());
+    const timer = setInterval(() => { void recording.poll(); }, 300);
+    return () => { listener.remove(); clearInterval(timer); void recording.background(); };
+  }, [recording]);
   const [deleteError, setDeleteError] = useState(false);
   // Keep one operation owner across page changes; the native vault also serializes calls.
   const [mediaProof] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
@@ -127,7 +142,16 @@ function JournalApp() {
           {state.saveStatus === 'failed' && state.moment && chip('Retry save', () => { void controller.retry(state.moment!.id); })}
           <Text style={styles.footnote}>No explanation needed. Your emotion and the time are enough for this moment.</Text>
           {chip('See my moments', () => setPage('history'))}
-          <Text style={styles.footnote}>Original starter reminder · personal editing and voice capture are coming in the next increments.</Text>
+          {Platform.OS === 'android' && !isTemporaryJournal && state.saveStatus === 'saved' && <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); setPage('clips'); }} />}
+          <Text style={styles.footnote}>Original starter reminder · personal editing comes in a later increment.</Text>
+        </ScrollView>}
+
+        {page === 'clips' && clipMoment && <ScrollView contentContainerStyle={styles.body}>
+          {chip('← My moments', () => setPage('history'))}
+          <Text style={styles.eyebrow}>{clipMoment.emotionLabel.toUpperCase()}</Text>
+          <Text style={styles.small}>{new Date(clipMoment.createdAt).toLocaleString()}</Text>
+          <Text style={styles.supportText}>{clipMoment.supportText}</Text>
+          <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); setPage('clips'); }} />
         </ScrollView>}
 
         {page === 'history' && <FlatList data={state.history} keyExtractor={item => item.id}
@@ -148,10 +172,15 @@ function JournalApp() {
           renderItem={({ item }) => <View style={styles.historyCard}>
             <View style={styles.historyHeading}><Text style={styles.emotionTitle}>{item.emotionLabel}</Text><Text style={styles.small}>{new Date(item.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</Text></View>
             <Text style={styles.historyText}>{item.supportText}</Text>
+            {Platform.OS === 'android' && !isTemporaryJournal && chip('Open voice clips', () => { setClipMoment(item); setPage('clips'); })}
             <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${item.emotionLabel} moment`} onPress={() => removeMoment(item.id)} style={styles.delete}><Text style={styles.small}>Delete moment</Text></Pressable>
           </View>}
         />}
 
+        {audioState.phase === 'cleanup' && <View style={styles.failureBar}>
+          <Text accessibilityRole="alert" style={styles.error}>{audioState.message}</Text>
+          {chip('Stop again', () => { void recording.stop(); })}
+        </View>}
         {state.failed.length > 0 && <View style={styles.failureBar}>
           <Text style={styles.error}>{state.failed.length} moment{state.failed.length > 1 ? 's' : ''} not saved. Retry before closing.</Text>
           {chip('Retry unsaved moments', () => { for (const moment of state.failed) void controller.retry(moment.id); })}

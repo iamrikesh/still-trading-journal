@@ -41,6 +41,78 @@ class ClipFileVaultTest {
     space: () -> Long = { Long.MAX_VALUE }, sync: () -> Unit = {}): ClipFileVault =
     ClipFileVault(temporary.root, key, duration, space, sync)
 
+  @Test fun captureReservesOwnedPathWithoutOverwritingDraftOrSavedFile() {
+    val vault = vault()
+    val capture = vault.captureFile(intent)
+    assertEquals(file("clip-1.staging.plain"), capture)
+    assertTrue(capture.isFile)
+    capture.writeText("unfinished")
+    rejects { vault.captureFile(intent) }
+    assertEquals("unfinished", capture.readText())
+    rejects { vault.captureFile(intent.copy(id = "../outside")) }
+    capture.delete(); vault.prepareFixture(intent); vault.seal(intent); vault.removeStaging(intent)
+    rejects { vault.captureFile(intent) }
+  }
+
+  @Test fun captureAndPlaybackRequireReservePlusWorkingSpace() {
+    val key = key(); val normal = vault(key)
+    val low = vault(key, space = { 100L * 1024 * 1024 })
+    rejects { low.captureFile(intent) }
+    assertFalse(file("clip-1.staging.plain").exists())
+    normal.prepareFixture(intent); normal.seal(intent)
+    rejects { low.playbackFile(intent) }
+    assertFalse(file("clip-1.playback.plain").exists())
+  }
+
+  @Test fun playbackAuthenticatesWholeFileAndOwnerBeforeExposingPlaintext() {
+    val vault = vault(); vault.prepareFixture(intent); vault.seal(intent)
+    rejects { vault.playbackFile(intent.copy(momentId = "wrong")) }
+    assertFalse(file("clip-1.playback.plain").exists())
+    val playback = vault.playbackFile(intent)
+    assertArrayEquals(file("clip-1.staging.plain").readBytes(), playback.readBytes())
+    rejects { vault.playbackFile(intent) }
+    assertTrue(playback.isFile)
+    vault.removePlayback(intent); vault.removePlayback(intent)
+    assertFalse(playback.exists())
+    RandomAccessFile(file("clip-1.cipher"), "rw").use { it.setLength(it.length() - 1) }
+    rejects { vault.playbackFile(intent) }
+    assertFalse(playback.exists())
+  }
+
+  @Test fun usageCountsRetainedMediaIncludingDraftsAndWorkingCopiesButNotKeys() {
+    val vault = vault(); vault.prepareFixture(intent); vault.seal(intent)
+    file("protected.keyset").writeText("private")
+    file("clip-2.pending.cipher").writeText("partial")
+    val retained = 16044L + file("clip-1.cipher").length() + 7L
+    assertEquals(retained, vault.usageBytes())
+    vault.playbackFile(intent)
+    assertEquals(retained + 16044L, vault.usageBytes())
+    vault.removePlayback(intent)
+    assertEquals(retained, vault.usageBytes())
+  }
+
+  @Test fun destructionCleansResourcesBeforeReleasingOwnership() {
+    val gate = ClipOwnership(); val first = Any(); val second = Any()
+    gate.initialize(first) {}
+    var cleaned = false
+    gate.destroy(first) {
+      rejects { gate.run(first) {} }
+      rejects { gate.initialize(second) {} }
+      cleaned = true
+    }
+    assertTrue(cleaned)
+    gate.initialize(second) {}
+  }
+
+  @Test fun failedDestructionCleanupBlocksReplacementOwnerUntilCleanupSucceeds() {
+    val gate = ClipOwnership(); val first = Any(); val second = Any()
+    gate.initialize(first) {}
+    rejects { gate.destroy(first) { error("unreleased native resource") } }
+    rejects { gate.initialize(second) {} }
+    gate.destroy(first) {}
+    gate.initialize(second) {}
+  }
+
   @Test fun fixtureRoundtripAuthenticatesWholeStreamAndRetainsStagingUntilCommit() {
     val key = key(); val vault = vault(key)
     vault.prepareFixture(intent)

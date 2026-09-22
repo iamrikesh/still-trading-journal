@@ -87,6 +87,52 @@ internal class ClipFileVault(
     }
   }
 
+  /** Reserves the deterministic path before recorder start. Failed captures remain recoverable. */
+  fun captureFile(intent: ClipIntent): File {
+    intent.aad() // Also reject malformed Unicode before claiming a file.
+    for (suffix in listOf("staging.plain", "pending.cipher", "cipher", "verify.plain", "playback.plain")) {
+      check(!path(intent.id, suffix).exists())
+    }
+    admit(StreamingFileVault.MAX_PLAINTEXT_BYTES * 2 + StreamingFileVault.MAX_CIPHERTEXT_BYTES)
+    val staging = path(intent.id, "staging.plain")
+    files.writeNew(staging) {}
+    syncDirectory()
+    return staging
+  }
+
+  /** Complete authenticated decryption and media validation precede exposing the owned path. */
+  fun playbackFile(intent: ClipIntent): File {
+    val aad = intent.aad()
+    val playback = path(intent.id, "playback.plain")
+    check(!playback.exists())
+    admit(StreamingFileVault.MAX_PLAINTEXT_BYTES)
+    try {
+      streams.decrypt(path(intent.id, "cipher"), playback, aad)
+      metadata(playback)
+      return playback
+    } catch (error: Exception) {
+      files.remove(playback)
+      throw error
+    }
+  }
+
+  fun removePlayback(intent: ClipIntent) {
+    intent.validate()
+    files.remove(path(intent.id, "playback.plain"))
+  }
+
+  fun usageBytes(): Long {
+    var total = 0L
+    for (file in checkNotNull(root.listFiles())) {
+      if (file.name.matches(Regex("[a-z0-9-]{1,64}\\.(staging\\.plain|pending\\.cipher|cipher|verify\\.plain|playback\\.plain)"))) {
+        files.validate(file)
+        check(file.isFile)
+        total = Math.addExact(total, file.length())
+      }
+    }
+    return total
+  }
+
   fun seal(intent: ClipIntent): ClipMetadata {
     intent.validate()
     val final = path(intent.id, "cipher")

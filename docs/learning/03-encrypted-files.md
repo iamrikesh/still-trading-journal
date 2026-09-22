@@ -50,15 +50,17 @@ See the current PROJECT-STATUS and dated review for the checks actually observed
 Expo autolinking resolves the local Kotlin module and Expo's generated module list to C: paths, while the native build root uses S:. Kotlin incremental compilation cannot relativize those paths across drives. This laptop's ignored `.local-tools/gradle/init.d/still-local-module-paths.gradle` disables incremental compilation only for these two projects:
 
 ```groovy
-gradle.beforeProject { project ->
-    if (project.name in ['still-media-vault', 'expo'] && project.rootProject.name == 'still') {
-        project.tasks.matching { task ->
-            task.name.startsWith('compile') && task.name.endsWith('Kotlin')
-        }.configureEach { task ->
-            if (task.hasProperty('incremental')) task.incremental = false
-        }
+gradle.taskGraph.whenReady { graph ->
+    graph.allTasks.findAll { task ->
+        task.project.rootProject.name == 'still' &&
+        task.project.name in ['still-media-vault', 'expo'] &&
+        task.name.startsWith('compile') && task.name.endsWith('Kotlin')
+    }.each { task ->
+        if (task.hasProperty('incremental')) task.incremental = false
     }
 }
 ```
+
+On September 22, the earlier hook did not reliably disable incremental compilation. Applying the same two-project setting when the task graph is ready restored the intended `incremental=false` value; subsequent native tests avoided the cross-drive cache failure. This local hook assumes the current workflow without Gradle configuration caching.
 
 Retain the short-path cache and all other modules' incremental work. Do not run clean or duplicate the project to address this local path issue. This ignored machine setting must be recreated on this laptop after a fresh clone; environments without drive aliases may not need it.

@@ -10,6 +10,7 @@ import { createNativeClipVault } from './nativeClipVault.ts';
 import { createMemoryJournal } from './memoryJournal.ts';
 import { sqliteDirectoryUri } from './sqliteDirectoryUri.ts';
 import type { JournalRepository } from './types.ts';
+import { createNativeAudio } from '../recording/nativeAudio.ts';
 
 export const isTemporaryJournal = Constants.appOwnership === 'expo';
 const databaseName = 'still-journal.db';
@@ -34,6 +35,7 @@ const openEncrypted = createEncryptedOpener({
   openDatabase: () => openDatabaseAsync(databaseName, { useNewConnection: true }),
 }, db => createJournalSession(db, createNativeClipVault(requireOptionalNativeModule('StillMediaVault')), {
   debug: __DEV__, id: Crypto.randomUUID, now: () => new Date().toISOString(),
+  audio: createNativeAudio(requireOptionalNativeModule('StillMediaVault')),
 }));
 
 // One connection/queue per JS runtime, including React remounts and Fast Refresh.

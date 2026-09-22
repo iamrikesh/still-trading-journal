@@ -20,11 +20,18 @@ internal class ClipOwnership {
     return operation()
   }
 
-  fun destroy(owner: Any) {
+  @Synchronized fun callback(owner: Any, operation: () -> Unit) {
+    if (owner !in destroyed && active === owner) operation()
+  }
+
+  fun destroy(owner: Any, cleanup: () -> Unit = {}) {
     // Revoke first: queued work must fail even while destruction waits on an active operation.
     destroyed.add(owner)
     synchronized(this) {
-      if (active === owner) active = null
+      if (active === owner) {
+        cleanup() // An unconfirmed release fails closed, retaining ownership until cleanup retries.
+        active = null
+      }
     }
   }
 }
