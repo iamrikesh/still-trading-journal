@@ -3330,7 +3330,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Tracks sessions/timelines, notes/reflections, custom emotion/reminder media, older history and persisted themes. Eleven session/note/reflection choices confirmed; first concrete design awaits review and implementation remains pending."
+      "rationale": "Tracks all four journal feature deliverables. Eleven choices and autonomous execution approved; sessions/writing storage implemented with review and UI/device work tracked separately."
     },
     {
       "id": "journal_domain_language",
@@ -3341,6 +3341,86 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Glossary distinguishing manually bounded trading sessions, timestamped moments, preserved originals, recoverable note drafts, dated reflections and personal reminders."
+    },
+    {
+      "id": "sessions_writing_spec",
+      "label": "Approved sessions and writing design",
+      "source_file": "docs/superpowers/specs/2026-09-23-sessions-writing-design.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Manual sessions, immutable final writing, recoverable drafts and safe End/Archive behavior."
+    },
+    {
+      "id": "sessions_writing_plan",
+      "label": "Sessions and writing implementation plan",
+      "source_file": "docs/superpowers/plans/2026-09-23-sessions-writing.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Storage, controllers/UI and physical-device acceptance tasks."
+    },
+    {
+      "id": "sessions_writing_evidence",
+      "label": "Sessions and writing verification",
+      "source_file": "docs/reviews/2026-09-23-sessions-writing.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Exact host/device evidence and remaining validation; no production-readiness claim."
+    },
+    {
+      "id": "sessions_writing_lesson",
+      "label": "Lesson7 capture time and hindsight",
+      "source_file": "docs/learning/07-sessions-and-writing.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Distinguishes capture, finalisation and session boundaries using prediction exercises."
+    },
+    {
+      "id": "reminders_history_spec",
+      "label": "Personal reminders and history design",
+      "source_file": "docs/superpowers/specs/2026-09-23-personal-reminders-history-design.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Bounded SQLCipher media, temporary-grant picker, explicit playback, custom buttons and saved preferences."
+    },
+    {
+      "id": "reminders_history_plan",
+      "label": "Personal reminders and history plan",
+      "source_file": "docs/superpowers/plans/2026-09-23-reminders-history.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Native validation/audio exclusion, storage transactions, UI and S20 checks."
+    },
+    {
+      "id": "trading_repository",
+      "label": "Trading session and writing repository",
+      "source_file": "mobile/src/storage/tradingJournal.ts",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Transactional session lifecycle, explicit grouping and immutable writing finalisation."
+    },
+    {
+      "id": "trading_schema",
+      "label": "Trading schema migration",
+      "source_file": "mobile/src/storage/tradingSchema.ts",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Schema2 to3 adds sessions, association and writings while preserving original moments/clips."
     }
   ],
   "links": [
@@ -7526,6 +7606,62 @@
     {
       "source": "journal_features_milestone",
       "target": "recording_wrapup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "sessions_writing_spec",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "sessions_writing_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "sessions_writing_evidence",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "sessions_writing_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "reminders_history_spec",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "reminders_history_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "trading_repository",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "trading_schema",
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/JOURNAL-FEATURES.md"

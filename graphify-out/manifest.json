@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790142414.5537245,
+    "mtime": 1790143279.2551239,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "ffa574e397fe843ab81cfea347d8aa61"
+    "semantic_hash": "2cdbd38ef01c83e75e480bd7cce5f422"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -475,13 +475,53 @@
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   },
   "docs/JOURNAL-FEATURES.md": {
-    "mtime": 1790142450.1386805,
+    "mtime": 1790143402.86985,
     "ast_hash": "",
-    "semantic_hash": "17941d80628c900c59fad68c580e322c"
+    "semantic_hash": "f30315808e6cc419fe9185b5a3635091"
   },
   "CONTEXT.md": {
     "mtime": 1790142414.5527272,
     "ast_hash": "",
     "semantic_hash": "152d51e74b31bb17d52499f1895dd800"
+  },
+  "docs/superpowers/specs/2026-09-23-sessions-writing-design.md": {
+    "mtime": 1790142749.8733647,
+    "ast_hash": "",
+    "semantic_hash": "39fd88c503fc125a24c4cdd0a0821528"
+  },
+  "docs/superpowers/plans/2026-09-23-sessions-writing.md": {
+    "mtime": 1790142749.5259519,
+    "ast_hash": "",
+    "semantic_hash": "19fba9112cfdff57c8bd679ae282c297"
+  },
+  "docs/reviews/2026-09-23-sessions-writing.md": {
+    "mtime": 1790143402.8682513,
+    "ast_hash": "",
+    "semantic_hash": "8048369857c2ed2b1484a4a0e53f8604"
+  },
+  "docs/learning/07-sessions-and-writing.md": {
+    "mtime": 1790142942.3164883,
+    "ast_hash": "",
+    "semantic_hash": "f27e41fd2bb9ba12b783acd764f033da"
+  },
+  "docs/superpowers/specs/2026-09-23-personal-reminders-history-design.md": {
+    "mtime": 1790143279.2551239,
+    "ast_hash": "",
+    "semantic_hash": "469a0a395ffb1bcc894115374ea569f3"
+  },
+  "docs/superpowers/plans/2026-09-23-reminders-history.md": {
+    "mtime": 1790143231.3256843,
+    "ast_hash": "",
+    "semantic_hash": "cc38915a9b5562ba82d3465e8a88731e"
+  },
+  "mobile/src/storage/tradingJournal.ts": {
+    "mtime": 1790143098.2312796,
+    "ast_hash": "",
+    "semantic_hash": "270cb00c5d541c70c7cdedda58b76f3b"
+  },
+  "mobile/src/storage/tradingSchema.ts": {
+    "mtime": 1790142880.4265223,
+    "ast_hash": "",
+    "semantic_hash": "8cd00e06d4c9cf574a0f233f48dd0bad"
   }
 }
