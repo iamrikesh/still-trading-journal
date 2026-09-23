@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790133386.8122392,
+    "mtime": 1790134888.7614274,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "e611fcd97c7ca87d628fe7ebad75cea5"
+    "semantic_hash": "b1564a4a45f9e4f3d4df659ecac3ce94"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -425,9 +425,9 @@
     "semantic_hash": "db37276fd91ec4470f8c2b458df55428"
   },
   "docs/learning/06-recording-lifecycle.md": {
-    "mtime": 1790133449.717018,
+    "mtime": 1790134954.7323356,
     "ast_hash": "",
-    "semantic_hash": "78f1402d429aad2955070cf63342f0db"
+    "semantic_hash": "5ff3ba4d5d34fc256e61ab71c7a11bc1"
   },
   "docs/reviews/2026-09-22-record-stop-play.md": {
     "mtime": 1790085572.6031356,
@@ -458,5 +458,10 @@
     "mtime": 1790133388.882016,
     "ast_hash": "",
     "semantic_hash": "a74fada1b4ec4057d7f7ec6f61b80c00"
+  },
+  "docs/reviews/2026-09-23-recording-resource-cycles.md": {
+    "mtime": 1790134954.7323356,
+    "ast_hash": "",
+    "semantic_hash": "30d7573ecd33b8252b87905f7640f310"
   }
 }

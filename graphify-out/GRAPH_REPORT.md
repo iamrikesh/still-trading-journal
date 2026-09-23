@@ -206,3 +206,8 @@ Targeted inspected-source refresh: **281 nodes / 395 edges**. Includes recording
 ## Device lifecycle evidence (2026-09-23)
 
 Targeted public-document refresh: **282 nodes / 399 edges**. Added the dated S20 check record and explicit status/lesson references; updated the current checkpoint. Existing communities and historical cohesion/centrality remain unchanged. No corpus, dependency, generated-native, local-tool or private-data scan; no external model API call. Host token cost is unavailable. No dangling endpoints in the saved graph; historical extraction limits above remain. Device evidence is bounded as recorded in the review.
+
+
+## Resource-cycle evidence (2026-09-23)
+
+Targeted public-document refresh: **283 nodes / 402 edges**. Added resource-cycle evidence and explicit status/lesson/review references. Communities and historical cohesion/centrality retained. No corpus, dependency, generated-native, local-tool or private-data scan; no external model API call. Host token cost unavailable. No dangling endpoints in the saved graph; historical extraction limitations above remain. The review separates cleanup evidence from limited memory measurements.

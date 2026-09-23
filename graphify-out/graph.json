@@ -3205,7 +3205,7 @@
     {
       "id": "recording_lesson",
       "label": "Lesson 6 recording lifecycle",
-      "rationale": "Explains stopped versus encrypted saved, owner identity, lifecycle, storage budget and a sample phone exercise.",
+      "rationale": "Recording/save lifecycle, immutable owner, sample exercises and separate checks for temporary files, OS handles and memory; explains debugger measurement controls.",
       "source_file": "docs/learning/06-recording-lifecycle.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September23 device checkpoint and next session",
-      "rationale": "S20 Android-enforced denial, bounded immediate Stop and screen-lock preservation checked; seven samples retained and services running. Next: coordinate call/headphone interruption. See dated review for limits.",
+      "label": "September23 resource-check checkpoint",
+      "rationale": "Device lifecycle and bounded record/play/delete cleanup evidence. Resource review separates memory measurements from debugger overhead; long-run profiling, calls/headphones and release gates remain. Consult current status and dated reviews.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3287,6 +3287,16 @@
       "label": "September23 S20 recording device evidence",
       "rationale": "Actual Android-enforced denial, two sub-second Stop clips, Dozing-confirmed screen lock, unlock no-resume and cold-restart preservation. Invalid prompt/timing attempts are distinguished. No app code or build change.",
       "source_file": "docs/reviews/2026-09-23-recording-device-checks.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_resources_sep23",
+      "label": "September23 recording resource-cycle evidence",
+      "rationale": "Bounded UI recording/playback/deletion, exact file/storage cleanup, memory and handle samples, debugger-only controls and UI-comparison limits. No app source fix or native build.",
+      "source_file": "docs/reviews/2026-09-23-recording-resource-cycles.md",
       "source_location": "L1",
       "file_type": "document",
       "community": 1,
@@ -7388,6 +7398,27 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/reviews/2026-09-23-recording-device-checks.md"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_resources_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_lesson",
+      "target": "recording_resources_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/06-recording-lifecycle.md"
+    },
+    {
+      "source": "recording_resources_sep23",
+      "target": "recording_device_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-23-recording-resource-cycles.md"
     }
   ],
   "hyperedges": [

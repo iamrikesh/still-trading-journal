@@ -47,7 +47,13 @@ For the September22 exercise, **Voice test Sep22** retains three clips: 0:47, 0:
 
 ## September 23 follow-up
 
-The [next device review](../reviews/2026-09-23-recording-device-checks.md) records Android-enforced denial, two immediate-Stop clips (488 ms and 534 ms), and a screen-lock clip (3576 ms) that stayed stopped after unlocking. All survived cold restart. These live under **Voice test Sep23**; earlier samples are retained separately. The UI floors durations to whole seconds, so the two short saved clips display **0:00**. Predict why that label does not mean the files are empty. Denying by tapping the Android dialog, calls/headphones and resource/fault tests remain unverified.
+The [next device review](../reviews/2026-09-23-recording-device-checks.md) records Android-enforced denial, two immediate-Stop clips (488 ms and 534 ms), and a screen-lock clip (3576 ms) that stayed stopped after unlocking. All survived cold restart. These live under **Voice test Sep23**; earlier samples are retained separately. The UI floors durations to whole seconds, so the two short saved clips display **0:00**. Predict why that label does not mean the files are empty. Denying by tapping the Android dialog, calls/headphones, longer memory profiling and device fault tests remain open; bounded cleanup checks follow below.
+
+## Measuring cleanup
+
+The [resource-cycle review](../reviews/2026-09-23-recording-resource-cycles.md) separates three checks: temporary files disappear, operating-system handles do not keep accumulating, and memory stays within a measured range. They answer different questions. A recording can be saved and its files cleaned up while the runtime still retains memory.
+
+During testing, even debugger evaluations of `1 + 1` increased measured native-heap memory. Before blaming recording, repeat the measurement without those debugger calls. **Exercise:** if deleting a test clip restores the exact original file set but memory stays higher, what has been verified, and what still needs investigation?
 
 ## Storage intuition
 
