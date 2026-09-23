@@ -1,5 +1,8 @@
 import { createClipJournal } from './clipJournal.ts';
-import { requireUsableClipDatabase } from './clipSchema.ts';
+import { clipTransaction, requireUsableClipDatabase } from './clipSchema.ts';
+import { migrateTradingSchema } from './tradingSchema.ts';
+import { createTradingRepository } from './tradingJournal.ts';
+import type { TradingRepository } from './tradingTypes.ts';
 import type { ClipJournal } from './clipTypes.ts';
 import type { NativeClipVault } from './nativeClipVault.ts';
 import { createSqlJournal, type JournalDatabase } from './sqlJournal.ts';
@@ -25,6 +28,7 @@ export interface JournalSession {
   exercise: ExerciseOperations | null;
   recovery(): Promise<{ pending: number }>;
   audio?: SessionAudio | null;
+  trading?: TradingRepository;
 }
 const failure = () => new Error('Journal session unavailable. Existing data has not been reset.');
 
@@ -44,8 +48,8 @@ export function runtimeSession<T>(host: object, factory: () => Promise<T>): () =
 export async function createJournalSession(db: JournalDatabase, vault: NativeClipVault | null, options: SessionOptions): Promise<JournalSession> {
   try {
     const [version] = await db.getAllAsync<{ user_version: number }>('PRAGMA user_version');
-    if (!version || ![0, 1, 2].includes(version.user_version)) throw failure();
-    if (!vault && version.user_version === 2) throw failure();
+    if (!version || ![0, 1, 2, 3].includes(version.user_version)) throw failure();
+    if (!vault && version.user_version >= 2) throw failure();
     let legacy: JournalRepository | undefined;
     if (version.user_version < 2) legacy = await createSqlJournal(db);
     let tail: Promise<unknown> = Promise.resolve();
@@ -54,15 +58,23 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
       tail = result.catch(() => undefined);
       return result;
     }
-    function wrap(journal: JournalRepository): JournalRepository {
+    function wrap(journal: JournalRepository, autoAssociate = false): JournalRepository {
       return {
-        save: moment => { const snapshot = { ...moment }; return enqueue(() => journal.save(snapshot)); },
+        save: moment => { const snapshot = { ...moment }; return enqueue(async () => {
+          if (!autoAssociate) return journal.save(snapshot);
+          await clipTransaction(db, async () => {
+            const existing = await db.getAllAsync<{ id: string }>('SELECT id FROM moments WHERE id = ?', snapshot.id);
+            await journal.save(snapshot);
+            if (!existing.length) await db.runAsync(`INSERT INTO trading_memberships(momentId, sessionId)
+              SELECT ?, id FROM trading_sessions WHERE endedAt IS NULL`, snapshot.id);
+          });
+        }); },
         list: () => enqueue(() => journal.list()), remove: id => enqueue(() => journal.remove(id)),
       };
     }
     if (!vault) return { journal: wrap(legacy!), clips: null, exercise: null, recovery: () => enqueue(async () => ({ pending: 0 })) };
     let evidence = false;
-    if (version.user_version === 2) {
+    if (version.user_version >= 2) {
       const [row] = await db.getAllAsync<{ count: number }>(`SELECT
         (SELECT count(*) FROM clips) + (SELECT count(*) FROM moment_deletions) +
         (SELECT count(*) FROM clip_tombstones) + (SELECT count(*) FROM moment_tombstones) AS count`);
@@ -72,6 +84,23 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
     await vault.initialize(!evidence);
     const core = await createClipJournal(db, vault);
     await core.recover();
+    await migrateTradingSchema(db);
+    const tradingCore = createTradingRepository(db);
+    const trading: TradingRepository = {
+      active: () => enqueue(() => tradingCore.active()),
+      start: input => { const snapshot = { ...input }; return enqueue(() => tradingCore.start(snapshot)); },
+      end: (id, at) => enqueue(() => tradingCore.end(id, at)),
+      adjust: (id, input) => { const snapshot = { ...input }; return enqueue(() => tradingCore.adjust(id, snapshot)); },
+      archive: (id, archived, at) => enqueue(() => tradingCore.archive(id, archived, at)),
+      sessions: (archived, before) => { const cursor = before && { ...before }; return enqueue(() => tradingCore.sessions(archived, cursor)); },
+      assign: (momentId, sessionId) => enqueue(() => tradingCore.assign(momentId, sessionId)),
+      membership: momentId => enqueue(() => tradingCore.membership(momentId)),
+      timeline: (sessionId, before) => { const cursor = before && { ...before }; return enqueue(() => tradingCore.timeline(sessionId, cursor)); },
+      writings: (owner, before) => { const owned = { ...owner }; const cursor = before && { ...before }; return enqueue(() => tradingCore.writings(owned, cursor)); },
+      saveDraft: input => { const snapshot = { ...input, owner: { ...input.owner } }; return enqueue(() => tradingCore.saveDraft(snapshot)); },
+      finalise: (id, text, revision, at) => enqueue(() => tradingCore.finalise(id, text, revision, at)),
+      discardDraft: id => enqueue(() => tradingCore.discardDraft(id)),
+    };
     const pending = async (exceptOwner?: string) => {
       const [row] = await db.getAllAsync<{ count: number }>(`SELECT
         (SELECT count(*) FROM moment_deletions) + (SELECT count(*) FROM clips WHERE status <> 'saved'
@@ -82,7 +111,8 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
     const exercise = options.debug ? await createSessionExercise(db, core, vault, options, pending) : null;
     const audio = options.audio;
     return {
-      journal: wrap(core.journal),
+      journal: wrap(core.journal, true),
+      trading,
       clips: {
         begin: intent => { const snapshot = { ...intent }; return enqueue(async () => { if (await pending()) throw failure(); await core.begin(snapshot); }); },
         finish: id => enqueue(() => core.finish(id)),

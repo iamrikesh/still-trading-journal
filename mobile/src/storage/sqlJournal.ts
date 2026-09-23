@@ -2,7 +2,7 @@ import type { JournalRepository, Moment } from './types.ts';
 
 export interface JournalDatabase {
   execAsync(sql: string): Promise<void>;
-  runAsync(sql: string, ...params: string[]): Promise<unknown>;
+  runAsync(sql: string, ...params: (string | null)[]): Promise<unknown>;
   getAllAsync<T>(sql: string, ...params: string[]): Promise<T[]>;
 }
 

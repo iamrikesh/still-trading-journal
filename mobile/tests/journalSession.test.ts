@@ -48,7 +48,7 @@ test('schema1 moment survives migration; interrupted fixture recovers on reopen 
   } finally { r.f.close(); }
 });
 
-test('older APK keeps schema1 usable and refuses schema2 or newer without downgrading', async () => {
+test('older APK keeps schema1 usable and refuses schema3 or newer without downgrading', async () => {
   const r = await rig();
   try {
     const old = await createJournalSession(r.f.db, null, options);
@@ -57,9 +57,9 @@ test('older APK keeps schema1 usable and refuses schema2 or newer without downgr
     assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 1);
     await r.open();
     await assert.rejects(createJournalSession(r.f.db, null, options));
-    r.f.sqlite.exec('PRAGMA user_version = 3');
+    r.f.sqlite.exec('PRAGMA user_version = 4');
     await assert.rejects(r.open());
-    assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 3);
+    assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 4);
   } finally { r.f.close(); }
 });
 
@@ -254,7 +254,7 @@ test('fresh schema0 initializes moments before migration and keeps subsequent sn
   try {
     r.f.sqlite.exec('DROP TABLE moments; PRAGMA user_version = 0');
     const s = await r.open(); await s.journal.save(moment());
-    assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 2);
+    assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 3);
     assert.deepEqual(await s.journal.list(), [moment()]);
   } finally { r.f.close(); }
 });
@@ -271,7 +271,7 @@ test('each kind of prior clip or deletion evidence independently disables media 
       await r.open(); r.f.sqlite.exec(statement); r.f.reopen();
       r.bridge.initializeClips = async allow => { assert.equal(allow, false); throw Error('media key missing'); };
       await assert.rejects(r.open());
-      assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 2);
+      assert.equal(r.f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 3);
     } finally { r.f.close(); }
   }
 });

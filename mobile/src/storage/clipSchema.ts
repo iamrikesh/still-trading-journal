@@ -27,7 +27,7 @@ export async function migrateClipSchema(db: JournalDatabase): Promise<void> {
   const [foreignKeys] = await db.getAllAsync<{ foreign_keys: number }>('PRAGMA foreign_keys');
   if (foreignKeys?.foreign_keys !== 1) throw new Error('Foreign key enforcement required.');
   const [version] = await db.getAllAsync<{ user_version: number }>('PRAGMA user_version');
-  if (version?.user_version === 2) return;
+  if (version?.user_version === 2 || version?.user_version === 3) return;
   if (version?.user_version !== 1) throw new Error('Unsupported clip schema.');
   await clipTransaction(db, async () => {
     await db.execAsync(`
