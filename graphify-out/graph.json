@@ -3135,7 +3135,7 @@
     {
       "id": "recording_controller",
       "label": "Recording lifecycle controller",
-      "rationale": "Owns recording lifecycle and invalidates pending permission/start work on every background transition, including return before permission resolution.",
+      "rationale": "Invalidates pending capture on every background transition. A separate selection epoch permits denial feedback across background but rejects stale feedback after navigation, including A-to-B-to-A.",
       "source_file": "mobile/src/recording/controller.ts",
       "source_location": "L1",
       "file_type": "code",
@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September23 actual Deny and navigation checkpoint",
-      "rationale": "Actual Android Deny blocked capture; Home during the prompt and return stayed idle. Restored access and fresh recording passed. Denial explanation is missing and reproduced in a local probe; app source unchanged in this follow-up. Current 17-file baseline preserved; original cycle17 failure unresolved.",
+      "label": "September23 denial-feedback fix checkpoint",
+      "rationale": "Denial explanation now survives background for the same selection; navigation invalidates old feedback. 87 tests, TypeScript, independent review and actual S20 Deny/Home-return checks passed. Fresh recording saved and replay observed; initial brief Play stop unclassified. Current 17-file baseline preserved; original cycle17 failure unresolved.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3320,7 +3320,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Device delayed-start reproduction, permission-phase cancellation regression, grant-query adapter, real grant dialog and cold-restart preservation evidence. Does not attribute the earlier cycle17 failure. Actual Deny/navigation follow-up passes capture safeguards but reproduces missing denial feedback; current baseline preserved."
+      "rationale": "Device delayed-start reproduction, permission-phase cancellation regression, grant-query adapter, real grant dialog and cold-restart preservation evidence. Does not attribute the earlier cycle17 failure. Actual Deny feedback gap subsequently fixed with selection-scoped feedback; 87 host tests and bounded device evidence. First brief playback stop remains unclassified; baseline preserved."
     }
   ],
   "links": [

@@ -17,6 +17,7 @@ export function createRecordingController(ports: Ports) {
   const listeners = new Set<() => void>();
   let running: Promise<void> | null = null;
   let epoch = 0;
+  let selectionEpoch = 0;
   let active: ClipIntent | null = null;
   let playingId: string | null = null;
   let foreground = true;
@@ -80,6 +81,7 @@ export function createRecordingController(ports: Ports) {
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     getSnapshot: () => state,
     async select(momentId: string | null) {
+      ++selectionEpoch;
       const version = ++epoch;
       cursor = undefined;
       publish({ momentId, clips: [], older: false, message: null });
@@ -96,12 +98,18 @@ export function createRecordingController(ports: Ports) {
       if (state.pending) { publish({ message: 'Resolve pending clips before recording another. Open their moment to Retry or Discard.' }); return Promise.resolve(); }
       const owner = state.momentId;
       const version = epoch;
+      const selection = selectionEpoch;
       publish({ phase: 'permission', message: null });
       return run(async () => {
         try {
           const allowed = await ports.permission();
+          if (!allowed) {
+            // Permission dialogs can background the app. Keep the explanation
+            // for this selection, while navigation invalidates old feedback.
+            if (selection === selectionEpoch) publish({ message: 'Microphone permission was not granted. Your moment is saved; you can allow access in Android Settings.' });
+            return;
+          }
           if (version !== epoch || !foreground) return;
-          if (!allowed) { publish({ message: 'Microphone permission was not granted. Your moment is saved; you can allow access in Android Settings.' }); return; }
           const s = await session();
           if (version !== epoch || !foreground) return;
           const intent = { id: ports.id(), momentId: owner, createdAt: ports.now() };

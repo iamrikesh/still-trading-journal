@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790140903.8119442,
+    "mtime": 1790141391.6902027,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "212ba27baf881bee0ccaf6df93102c19"
+    "semantic_hash": "40fb356d7a6c2240fd313d7d9f7efb98"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -390,9 +390,9 @@
     "semantic_hash": "db624db641f0ec960511fd6f8c63ba37"
   },
   "mobile/src/recording/controller.ts": {
-    "mtime": 1790138997.2437572,
+    "mtime": 1790141067.642523,
     "ast_hash": "",
-    "semantic_hash": "bf9d7979393e6888b3882f72bed1254d"
+    "semantic_hash": "e72b65dfe1cf97bbf7623179e752011b"
   },
   "mobile/src/recording/nativeAudio.ts": {
     "mtime": 1790079172.1498215,
@@ -410,9 +410,9 @@
     "semantic_hash": "e7ee28d2111fd3f30922b7ac90a2427b"
   },
   "mobile/tests/recordingController.test.ts": {
-    "mtime": 1790138987.2794166,
+    "mtime": 1790141048.486045,
     "ast_hash": "",
-    "semantic_hash": "2aebfdbbec1e0a94c00812eadb52e7cc"
+    "semantic_hash": "2d56726486c725a0df21bf9f9066d3fd"
   },
   "mobile/tests/recordingSession.test.ts": {
     "mtime": 1790079671.9427032,
@@ -425,9 +425,9 @@
     "semantic_hash": "db37276fd91ec4470f8c2b458df55428"
   },
   "docs/learning/06-recording-lifecycle.md": {
-    "mtime": 1790140903.813231,
+    "mtime": 1790141238.718387,
     "ast_hash": "",
-    "semantic_hash": "20c86c0a74dabad232f46d6b1f731624"
+    "semantic_hash": "d2ebc2693c7cd67eca06ddbff43126a9"
   },
   "docs/reviews/2026-09-22-record-stop-play.md": {
     "mtime": 1790085572.6031356,
@@ -470,8 +470,8 @@
     "semantic_hash": "2f9cd310b71721d158486c158e03aad2"
   },
   "docs/reviews/2026-09-23-permission-start-cancellation.md": {
-    "mtime": 1790140903.8108757,
+    "mtime": 1790141391.6914427,
     "ast_hash": "",
-    "semantic_hash": "caa2a1b049c758b695dd0f0a16055f4a"
+    "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   }
 }

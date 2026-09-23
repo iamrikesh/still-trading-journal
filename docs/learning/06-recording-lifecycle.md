@@ -71,7 +71,7 @@ The [permission-start review](../reviews/2026-09-23-permission-start-cancellatio
 
 If granting permission backgrounds the app, granting access now leaves it stopped. Press Record again to capture. **Exercise:** predict what should happen when permission resolves (a) while still away and (b) after returning. Both must leave the old request cancelled.
 
-The later actual-Deny check blocked capture but showed no explanation. The cancellation guard returned before publishing the denial message. That feedback gap remains open. **Exercise:** name the two separate assertions here: what must never happen, and what the user should be told. A test can pass one and fail the other.
+The later actual-Deny check blocked capture but showed no explanation because the cancellation guard returned before publishing it. The follow-up fix separates recording cancellation from ownership of the explanation: backgrounding cancels capture, while changing the selected moment invalidates old feedback. Actual Deny now shows the explanation and stays stopped. **Exercise:** why must A → B → A discard an old denial result despite returning to the same moment ID? See the dated review for the host and device evidence.
 
 ## Storage intuition
 

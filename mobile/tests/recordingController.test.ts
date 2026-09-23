@@ -45,6 +45,38 @@ test('denied permission leaves no intent and exposes a helpful message', async (
   assert.equal(r.rows.length, 0);
   assert.match(r.controller.getSnapshot().message!, /Microphone permission/);
 });
+for (const returnBeforeDenial of [false, true]) {
+  test(`denial explains cancelled capture across background; return first: ${returnBeforeDenial}`, async () => {
+    const r = rig(); const permission = deferred<boolean>(); r.permission(() => permission.promise);
+    await r.controller.select('moment-a');
+    const recording = r.controller.record();
+    await new Promise(resolve => setImmediate(resolve));
+    const leaving = r.controller.background();
+    if (returnBeforeDenial) await r.controller.foreground();
+    permission.resolve(false);
+    await Promise.all([recording, leaving]);
+    if (!returnBeforeDenial) await r.controller.foreground();
+    assert.equal(r.rows.length, 0);
+    assert.equal(r.controller.getSnapshot().pending, 0);
+    assert.equal(r.controller.getSnapshot().phase, 'ready');
+    assert.match(r.controller.getSnapshot().message!, /Microphone permission was not granted/);
+  });
+}
+for (const returnToOriginalMoment of [false, true]) {
+  test(`late denial cannot update a new selection; original moment reselected: ${returnToOriginalMoment}`, async () => {
+    const r = rig(); const permission = deferred<boolean>(); r.permission(() => permission.promise);
+    await r.controller.select('moment-a');
+    const recording = r.controller.record();
+    await new Promise(resolve => setImmediate(resolve));
+    const navigation = r.controller.select('moment-b');
+    const returning = returnToOriginalMoment ? r.controller.select('moment-a') : Promise.resolve();
+    permission.resolve(false);
+    await Promise.all([recording, navigation, returning]);
+    assert.equal(r.rows.length, 0);
+    assert.equal(r.controller.getSnapshot().momentId, returnToOriginalMoment ? 'moment-a' : 'moment-b');
+    assert.equal(r.controller.getSnapshot().message, null);
+  });
+}
 test('navigation while permission is pending cancels capture', async () => {
   const r = rig(); const p = deferred<boolean>(); r.permission(() => p.promise);
   await r.controller.select('moment-a'); const recording = r.controller.record();
