@@ -29,6 +29,17 @@ No native source, dependencies or APK changed; the installed S20 development bui
 
 ## Learning and remaining work
 
+### Actual Deny and permission-navigation follow-up
+
+Continued from published `2a4cda4` with unchanged app/native source. The starting device vault now contained **17 files / 3920423 bytes**, including additional saved audio since the previous checkpoint. This current baseline was preserved; it was not reduced to the older 15-file baseline. The Deny check ran on an existing saved moment without capture; the named empty **Cycle test Sep23** panel was explicitly verified before new recording tests.
+
+- **Actual Deny:** tapped Android's permission-controller Deny button by its resource ID. The active user's microphone grant became false, native audio stayed idle, pending stayed zero and vault usage was unchanged. **Feedback failed:** no denial explanation appeared in the app.
+- **Leave during the prompt:** opened a fresh permission prompt, sent Home while it was displayed, verified launcher focus and no running microphone app-op, then reopened the existing activity. The prompt was dismissed; the synthetic moment stayed empty with native audio idle and zero pending. No Record press was issued on returning. This validates Home/return, not every navigation route or permission-dialog variant.
+- **Restore and record:** a fresh Record opened the permission prompt again. Tapping **While using the app** restored access while leaving audio idle. A subsequent explicit Record/Stop/Play/Delete cycle passed and restored the exact initial vault file set.
+- **Final cold restart:** audio idle, zero pending, empty synthetic moment, **3920423-byte usage** and the exact original **17-file set**. All eleven earlier retained sample duration/byte pairs also matched. Microphone grant and USER_SET/sensitivity flags were restored. Owned UI dumps were removed; app left stopped on Now. No journal/audio export or app-data reset.
+
+An ignored deterministic host probe reproduced the feedback gap: permission pending → background → foreground → denied produced `phase=ready`, zero starts, zero pending and `message=null`; the assertion requiring a denial explanation failed. In `controller.ts`, the stale-request/foreground guard returns before the existing denial-message branch. Cancellation is working; denial feedback is suppressed by that ordering. This is a recorded failing check, not a passing regression or a completed fix. No app code was changed for this follow-up, and the full 83-test/TypeScript results above remain the prior implementation's validation.
+
 **Exercise:** why is “the app is foreground now” insufficient to authorize a Record request made before leaving? Explain how invalidating the earlier request differs from checking current foreground state.
 
-The original cycle17 failed-start cause remains unproven. Calls/headphone changes, actual Deny-button/navigation checks, device low-space/save faults and existing release gates remain open. Repeat future interruption tests with disposable samples and verify both native state and pending work before continuing.
+Next: show the denial explanation without reviving cancelled Record work or overwriting another moment's messages. The original cycle17 failed-start cause remains unproven. Calls/headphone changes, additional navigation variants, device low-space/save faults and existing release gates remain open. Repeat future interruption tests with disposable samples and verify both native state and pending work before continuing.

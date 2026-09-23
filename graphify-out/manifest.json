@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790139583.114044,
+    "mtime": 1790140903.8119442,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "0495504e86f768d76f9374cc6d8d4b65"
+    "semantic_hash": "212ba27baf881bee0ccaf6df93102c19"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -425,9 +425,9 @@
     "semantic_hash": "db37276fd91ec4470f8c2b458df55428"
   },
   "docs/learning/06-recording-lifecycle.md": {
-    "mtime": 1790139635.0683672,
+    "mtime": 1790140903.813231,
     "ast_hash": "",
-    "semantic_hash": "0c82f9e94bd4f73fc16431e13cd2bfab"
+    "semantic_hash": "20c86c0a74dabad232f46d6b1f731624"
   },
   "docs/reviews/2026-09-22-record-stop-play.md": {
     "mtime": 1790085572.6031356,
@@ -470,8 +470,8 @@
     "semantic_hash": "2f9cd310b71721d158486c158e03aad2"
   },
   "docs/reviews/2026-09-23-permission-start-cancellation.md": {
-    "mtime": 1790139583.1267946,
+    "mtime": 1790140903.8108757,
     "ast_hash": "",
-    "semantic_hash": "e5b7286ed61f3af29d023f85be03eba8"
+    "semantic_hash": "caa2a1b049c758b695dd0f0a16055f4a"
   }
 }

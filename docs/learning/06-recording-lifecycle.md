@@ -71,6 +71,8 @@ The [permission-start review](../reviews/2026-09-23-permission-start-cancellatio
 
 If granting permission backgrounds the app, granting access now leaves it stopped. Press Record again to capture. **Exercise:** predict what should happen when permission resolves (a) while still away and (b) after returning. Both must leave the old request cancelled.
 
+The later actual-Deny check blocked capture but showed no explanation. The cancellation guard returned before publishing the denial message. That feedback gap remains open. **Exercise:** name the two separate assertions here: what must never happen, and what the user should be told. A test can pass one and fail the other.
+
 ## Storage intuition
 
 At 64000 bits/second, four minutes is approximately `64000 × 240 ÷ 8 = 1,920,000 bytes` before container/encryption overhead. Mono AAC avoids the much larger uncompressed PCM files. The recorder stops at 239.5 seconds to leave a small AAC finalization margin within the strict 240-second saved-file bound. The native file ceiling is 4 MiB, and admission keeps 100 MiB plus working allowance free on the phone. Audio storage includes saved and temporary files; a 250 MiB warning asks you to review, never automatically deletes originals.

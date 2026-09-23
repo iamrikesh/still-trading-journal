@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September23 permission-start cancellation checkpoint",
-      "rationale": "Delayed capture on foreground return reproduced and fixed by cancelling permission-phase requests on background, with an existing-grant query. 83 host tests, TypeScript, independent review and bounded S20 checks; original cycle17 failure remains unresolved.",
+      "label": "September23 actual Deny and navigation checkpoint",
+      "rationale": "Actual Android Deny blocked capture; Home during the prompt and return stayed idle. Restored access and fresh recording passed. Denial explanation is missing and reproduced in a local probe; app source unchanged in this follow-up. Current 17-file baseline preserved; original cycle17 failure unresolved.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3320,7 +3320,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Device delayed-start reproduction, permission-phase cancellation regression, grant-query adapter, real grant dialog and cold-restart preservation evidence. Does not attribute the earlier cycle17 failure."
+      "rationale": "Device delayed-start reproduction, permission-phase cancellation regression, grant-query adapter, real grant dialog and cold-restart preservation evidence. Does not attribute the earlier cycle17 failure. Actual Deny/navigation follow-up passes capture safeguards but reproduces missing denial feedback; current baseline preserved."
     }
   ],
   "links": [

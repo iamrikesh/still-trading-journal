@@ -2,6 +2,17 @@
 
 ## Current checkpoint (2026-09-23)
 
+Continued from published `2a4cda4` on `codex/android-device-setup` for the requested Deny/navigation checks. See the [Deny/navigation follow-up](reviews/2026-09-23-permission-start-cancellation.md#actual-deny-and-permission-navigation-follow-up). App/native source is unchanged in this follow-up.
+
+- **Verified:** actual Android Deny blocked capture with zero pending. Home while the permission prompt was open, followed by returning, left audio idle and the synthetic moment empty. Restoring access with **While using the app** stayed stopped; a fresh Record/Stop/Play/Delete cycle passed.
+- **Failed check / next increment:** denial shows no explanation. A deterministic local probe reproduced zero starts and `message=null`: the cancellation guard returns before the denial-message branch. Fix the feedback without reviving stale Record requests or overwriting another moment's messages, then repeat actual Deny and recording checks. The 83-test/TypeScript results below belong to the previous implementation; no fresh full suite or native build was run for this diagnostic follow-up.
+- **Preserved/final:** the starting baseline included additional saved audio: **17 files / 3920423 bytes**. Final cold restart restored that exact file set and usage, native audio idle, zero pending and no cycle-test clips; the original eleven sample duration/byte pairs also matched. Only the new synthetic cycle clip was deleted. Microphone grant and prior flags were restored; sleep settings and app data were not reset. Owned UI dumps removed; app stopped on Now.
+- **Resume:** check branch/status and Metro/USB forwarding, then explicitly locate **Cycle test Sep23** in My moments; it is no longer the newest entry. Verify its heading and empty state before creating disposable samples. Reuse the installed APK, S: alias and toolchains. Preserve all existing audio, including additions since older checkpoints.
+- **Still open:** original cycle17 failure, call/headphone interruptions when available, other navigation variants, low-space/save-fault recovery, memory limits and release gates.
+- **Exercise:** why can denying permission safely prevent capture while still failing the feedback check? Separate what the app did from what it explained.
+
+## Previous permission-start fix checkpoint (2026-09-23)
+
 Continued from published `b1a9c79` on `codex/android-device-setup`. Fixed a reproduced delayed recording start after leaving and returning during the permission request. See the [permission-start cancellation review](reviews/2026-09-23-permission-start-cancellation.md). The memory/recovery checkpoint below is historical; its cycle17 failure is still not attributed to this defect.
 
 - **Behavior:** backgrounding now invalidates a pending Record request, even if permission resolves after returning. The runtime checks an existing microphone grant before opening a permission request. If a permission prompt backgrounds the app, granting access leaves it stopped; press Record again to capture.
