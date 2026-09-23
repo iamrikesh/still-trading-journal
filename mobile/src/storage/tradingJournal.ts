@@ -8,12 +8,18 @@ const sessionFields = 'id, title, startedAt, endedAt, originalStartedAt, origina
 const writingFields = 'id, momentId, sessionId, kind, text, createdAt, updatedAt, finalisedAt, revision';
 const failure = () => new Error('Trading journal operation failed.');
 function id(value: string): void { if (typeof value !== 'string' || !/^[a-z0-9-]{1,64}$/.test(value)) throw failure(); }
+// The schema-1 journal accepted arbitrary text moment IDs. References to
+// existing moments must retain that domain; new session/writing IDs stay strict.
+function momentIdCheck(value: string): void { if (typeof value !== 'string') throw failure(); }
 function at(value: string): void { if (typeof value !== 'string' || !Number.isFinite(Date.parse(value)) || new Date(value).toISOString() !== value) throw failure(); }
 function title(value: string): void { if (typeof value !== 'string' || value.length > 120) throw failure(); }
 function text(value: string): void { if (typeof value !== 'string' || value.length > 20000) throw failure(); }
 function revision(value: number): void { if (!Number.isSafeInteger(value) || value < 0) throw failure(); }
-function cursor(value?: TradingCursor): void { if (value) { at(value.at); id(value.id); } }
-function owner(value: WritingOwner): void { if (!value || !['moment', 'session'].includes(value.kind)) throw failure(); id(value.id); }
+function cursor(value?: TradingCursor, validateId = id): void { if (value) { at(value.at); validateId(value.id); } }
+function owner(value: WritingOwner): void {
+  if (!value || !['moment', 'session'].includes(value.kind)) throw failure();
+  (value.kind === 'moment' ? momentIdCheck : id)(value.id);
+}
 function writing(row: WritingRow): Writing {
   return { id: row.id, owner: row.momentId ? { kind: 'moment', id: row.momentId } : { kind: 'session', id: row.sessionId! },
     kind: row.kind, text: row.text, createdAt: row.createdAt, updatedAt: row.updatedAt, finalisedAt: row.finalisedAt, revision: row.revision };
@@ -82,7 +88,7 @@ export function createTradingRepository(db: JournalDatabase): TradingRepository 
         ORDER BY startedAt DESC, id DESC LIMIT 30`, ...(before ? [before.at, before.at, before.id] : []));
     },
     async assign(momentId, sessionId) {
-      id(momentId); if (sessionId !== null) id(sessionId);
+      momentIdCheck(momentId); if (sessionId !== null) id(sessionId);
       await clipTransaction(db, async () => {
         if (!await liveOwner({ kind: 'moment', id: momentId }) || sessionId !== null && !await session(sessionId)) throw failure();
         if (sessionId === null) await db.runAsync('DELETE FROM trading_memberships WHERE momentId = ?', momentId);
@@ -91,14 +97,14 @@ export function createTradingRepository(db: JournalDatabase): TradingRepository 
       });
     },
     async membership(momentId) {
-      id(momentId);
+      momentIdCheck(momentId);
       return (await db.getAllAsync<TradingSession>(`SELECT ${sessionFields} FROM trading_sessions
         JOIN trading_memberships ON trading_memberships.sessionId = trading_sessions.id
         WHERE trading_memberships.momentId = ? AND NOT EXISTS
         (SELECT 1 FROM moment_deletions WHERE moment_deletions.id = trading_memberships.momentId)`, momentId))[0] ?? null;
     },
     async timeline(sessionId, before) {
-      id(sessionId); cursor(before);
+      id(sessionId); cursor(before, momentIdCheck);
       if (!await session(sessionId)) throw failure();
       return db.getAllAsync<Moment>(`SELECT moments.id, emotionId, emotionLabel, createdAt, supportText FROM moments
         JOIN trading_memberships ON trading_memberships.momentId = moments.id

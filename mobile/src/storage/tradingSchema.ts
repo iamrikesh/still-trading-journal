@@ -38,8 +38,8 @@ export async function migrateTradingSchema(db: JournalDatabase): Promise<void> {
         CHECK(kind <> 'note' OR momentId IS NOT NULL)
       );
       CREATE UNIQUE INDEX writing_one_note ON journal_writings(momentId) WHERE kind = 'note';
-      CREATE INDEX writing_moment_recent ON journal_writings(momentId, finalisedAt DESC, updatedAt DESC, id DESC);
-      CREATE INDEX writing_session_recent ON journal_writings(sessionId, finalisedAt DESC, updatedAt DESC, id DESC);
+      CREATE INDEX writing_moment_recent ON journal_writings(momentId, COALESCE(finalisedAt, updatedAt) DESC, id DESC);
+      CREATE INDEX writing_session_recent ON journal_writings(sessionId, COALESCE(finalisedAt, updatedAt) DESC, id DESC);
       PRAGMA user_version = 3;
     `);
   });

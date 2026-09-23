@@ -76,6 +76,28 @@ test('new moments attach atomically to active session while immutable retries pr
   } finally { f.close(); }
 });
 
+test('legacy moment IDs remain writable, movable and pageable as bound text', async () => {
+  const f = await fixture();
+  try {
+    const s = await createJournalSession(f.db, native(f), options);
+    await s.trading!.start({ id: 'session-a', title: '', at });
+    const ids = ["Legacy_1", "odd' text id"];
+    for (const legacyId of ids) await s.journal.save({ ...moment(legacyId), createdAt: at });
+    assert.equal((await s.trading!.membership('Legacy_1'))?.id, 'session-a');
+    await s.trading!.saveDraft(draft('legacy-note', { kind: 'moment', id: "odd' text id" }));
+    assert.equal((await s.trading!.writings({ kind: 'moment', id: "odd' text id" }))[0]!.text, ' first  line\n');
+    const first = await s.trading!.timeline('session-a');
+    assert.equal(first.length, 2);
+    assert.deepEqual((await s.trading!.timeline('session-a', { at, id: first[0]!.id })).map(row => row.id), [first[1]!.id]);
+    await s.trading!.end('session-a', later);
+    await s.trading!.start({ id: 'session-b', title: '', at: later });
+    await s.trading!.assign('Legacy_1', 'session-b');
+    assert.equal((await s.trading!.membership('Legacy_1'))?.id, 'session-b');
+    await s.trading!.assign("odd' text id", null);
+    assert.equal(await s.trading!.membership("odd' text id"), null);
+  } finally { f.close(); }
+});
+
 test('draft revisions, finalisation after End, and final text survive reopen', async () => {
   const f = await fixture();
   try {
@@ -157,17 +179,42 @@ test('session and writing pages use stable descending time and ID ties', async (
   } finally { f.close(); }
 });
 
+test('writing pages use owner indexes for their finalisation-aware order', async () => {
+  const f = await fixture();
+  try {
+    await createJournalSession(f.db, native(f), options);
+    for (const column of ['momentId', 'sessionId']) {
+      const steps = f.sqlite.prepare(`EXPLAIN QUERY PLAN SELECT id FROM journal_writings WHERE ${column} = ?
+        ORDER BY COALESCE(finalisedAt, updatedAt) DESC, id DESC LIMIT 30`).all('owner') as { detail: string }[];
+      assert.equal(steps.some(step => step.detail.includes('USE TEMP B-TREE')), false, column);
+    }
+  } finally { f.close(); }
+});
+
 test('failed schema2 upgrade rolls back tables and version, then reopens', async () => {
   const f = await fixture();
   try {
     await createJournalSession(f.db, native(f), options);
     f.sqlite.exec('DROP TABLE journal_writings; DROP TABLE trading_memberships; DROP TABLE trading_sessions; PRAGMA user_version = 2');
+    f.sqlite.exec("INSERT INTO clip_tombstones(id) VALUES ('old-media')");
     f.reopen();
-    f.inject(sql => { if (sql.includes('CREATE TABLE trading_sessions')) throw Error('injected migration fault'); });
+    let reachedMutatedSchema = false;
+    f.inject(sql => {
+      if (sql !== 'COMMIT') return;
+      assert.equal(f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 3);
+      assert.equal(f.sqlite.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name = 'journal_writings'").get()!.n, 1);
+      reachedMutatedSchema = true;
+      throw Error('injected commit fault');
+    });
     await assert.rejects(createJournalSession(f.db, native(f), options));
+    assert.equal(reachedMutatedSchema, true);
     assert.equal(f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 2);
-    assert.equal(f.sqlite.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name = 'trading_sessions'").get()!.n, 0);
-    f.inject();
+    for (const name of ['trading_sessions', 'trading_memberships', 'journal_writings', 'trading_one_active', 'trading_recent', 'trading_membership_timeline', 'writing_one_note', 'writing_moment_recent', 'writing_session_recent']) {
+      assert.equal(f.sqlite.prepare('SELECT count(*) AS n FROM sqlite_master WHERE name = ?').get(name)!.n, 0, name);
+    }
+    assert.equal(f.sqlite.prepare('SELECT count(*) AS n FROM moments').get()!.n, 1);
+    assert.equal(f.sqlite.prepare("SELECT count(*) AS n FROM clip_tombstones WHERE id = 'old-media'").get()!.n, 1);
+    f.reopen();
     const s = await createJournalSession(f.db, native(f), options);
     assert.ok(s.trading);
     assert.equal((await s.journal.list()).length, 1);
