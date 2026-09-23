@@ -15,7 +15,7 @@ Started 2026-09-23 from `a873ab2` on `codex/android-device-setup`, at Rikesh's r
 
 | Increment | Scope | Required demonstration | State |
 | --- | --- | --- | --- |
-| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Design discovery |
+| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Implementation planning |
 | 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Queued |
 | 3 | Custom emotions and personal reminders | Customize emotion buttons; edit support text; add/play personal audio and images; preserve historical captures under later edits; validate and clean up media | Queued |
 | 4 | Older history and theme preferences | Browse beyond the recent-history limit with bounded loading; retain chosen theme after restart; verify empty/end/error states and readable presentation | Queued |
@@ -60,7 +60,7 @@ All three answers were explicitly submitted.
 
 All eleven product answers were explicitly submitted. The design proposal below translates them into a reviewable first increment; additional details in the proposal are recommendations, not previously answered questions.
 
-## First design proposal — awaiting review
+## First design — approved for autonomous execution
 
 Sessions, notes and reflections share ownership and draft rules, so review their design together, then implement and demonstrate them in small steps. Reminder customization and general history/theme work remain later increments.
 
@@ -100,7 +100,7 @@ Sessions, notes and reflections share ownership and draft rules, so review their
 3. App integration: demonstrate ordinary and outside-session capture, unfinished-session prompt, timeline, note/reflection drafts and Archive/Restore on the S20. Use synthetic content; preserve existing device data.
 4. Recording integration: test End during pending permission, active capture and pending save; simulate unconfirmed release and storage failure in controlled host tests. Check restart, no automatic capture and recovery visibility on the device where feasible. Record exact coverage and limits.
 
-This proposal has not been implemented or approved. Next: review the proposed approach and behavior, write/self-review the focused spec, obtain the written-spec review, then create the implementation plan.
+Rikesh approved autonomous completion on 2026-09-23, asking to be notified when the journal features are complete. Proceed with the [sessions/writing spec](superpowers/specs/2026-09-23-sessions-writing-design.md), plans, review and verification without repeated routine permission requests. Additional skill approval gates are superseded by that direction. App data preservation and honest completion evidence remain required.
 
 ## Read-only foundation audit
 
