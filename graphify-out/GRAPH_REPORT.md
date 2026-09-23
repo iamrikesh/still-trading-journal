@@ -201,3 +201,8 @@ Current navigation graph: **266 nodes, 376 edges**. Targeted host-agent extracti
 ## Recording lifecycle increment (2026-09-22)
 
 Targeted inspected-source refresh: **281 nodes / 395 edges**. Includes recording control, native lifecycle source/tests, permission migration, plan, lesson and dated evidence. Existing communities retained; historical centrality/cohesion not recomputed. No dependencies, generated Android output, local tools or private data scanned. No external model API call; host token cost unavailable. This graph is navigation, not security or device-validation evidence.
+
+
+## Device lifecycle evidence (2026-09-23)
+
+Targeted public-document refresh: **282 nodes / 399 edges**. Added the dated S20 check record and explicit status/lesson references; updated the current checkpoint. Existing communities and historical cohesion/centrality remain unchanged. No corpus, dependency, generated-native, local-tool or private-data scan; no external model API call. Host token cost is unavailable. No dangling endpoints in the saved graph; historical extraction limits above remain. Device evidence is bounded as recorded in the review.

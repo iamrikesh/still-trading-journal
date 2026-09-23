@@ -1,5 +1,19 @@
 # still. — resume here
 
+## Current checkpoint (2026-09-23)
+
+Continued `codex/android-device-setup` from published `2252f5a`. This increment adds device evidence and documentation; app/native source is unchanged. See [September 23 lifecycle checks](reviews/2026-09-23-recording-device-checks.md). Earlier sections below are historical.
+
+- **Fresh verification:** 81/81 host tests, TypeScript and whitespace checks passed. On the S20, Android-enforced microphone denial showed the expected message with no new clip/pending save; two rapid Record/Stop sequences saved 488 ms and 534 ms clips; deliberate screen-off reached Dozing and stopped/saved a 3576 ms clip. Unlocking did not resume capture. All seven new test clips survived cold restart, with native audio idle and zero pending operations. No new native build/test run or production-readiness claim.
+- **Preserved data:** the earlier sample moment now had four clips at session start, including an additional 4179 ms clip. All four retained their baseline duration/size through restart. Today's separate **Voice test Sep23** retains seven samples. No audio, keys or journal prose was exported. Filename-only checks found no staging, verification or playback plaintext in the clip vault. Final measured usage: 3896667 bytes; laptop free disk: 10.81 GiB (whole-drive reading).
+- **Environment:** existing installed APK, toolchains and caches reused; S: alias and USB port8081 forwarding restored. Metro is running with IPv4 preference and two workers, and the sample clip panel is open for learning. Original microphone grant/flags restored; no app-data reset or phone sleep-setting change. Development services may need restarting in a later session.
+- **Next small increment:** coordinate an actual phone-call or headphone-disconnection check with Rikesh, verifying stop/no automatic resume and preserved clip state. Denial via tapping the Android prompt remains unverified: the prompt attempts received grants; the successful denial used ADB-set denied/user-fixed permission. Repeated-cycle resource profiling and device low-space/save-fault recovery remain open. Inspect the dated review before repeating or extending any check.
+- **Resume:** read this section and the September23 review; run `git status --short --branch` and `git log -5 --oneline`. Connect/unlock the S20. Check Metro `/status` and USB forwarding before starting another server; use [Lesson2](learning/02-android-device-build.md) if either stopped. Open **My moments → Voice test Sep23 → Open voice clips**. No rebuild is required for these checks. Never clear data to repeat a test.
+- **Exercise:** predict whether locking during a clip will keep increasing its duration after unlocking. Compare the newest 0:03 clip with the two immediate-Stop clips displayed as 0:00 (the UI floors sub-second durations). Stop, save and display rounding are separate concepts; see [Lesson6](learning/06-recording-lifecycle.md).
+- **Release gates remain:** app unlock, encrypted backup/export/restore, missing-key recovery UX, release signing/privacy and release permission/backup checks. Slow development cold launches still need investigation; Android activity-launch times are not end-to-end usable-app benchmarks.
+
+## Historical September 22 handoff
+
 Updated at session wrap-up, 2026-09-22. Record / Stop / Play is committed and pushed as **`bc32954`** on **`codex/android-device-setup`**; GitHub's branch SHA was verified as `bc3295459fe61c2d7bb205dc1795f00508873854`. This final handoff/Graphify commit follows it on the same branch. Nothing is merged into `main`. See [today's recording evidence](reviews/2026-09-22-record-stop-play.md) and [Lesson 6](learning/06-recording-lifecycle.md). Earlier checkpoints below are historical.
 
 ### Session wrap-up and next session

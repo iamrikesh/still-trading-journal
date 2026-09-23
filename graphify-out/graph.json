@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September22 wrap-up and next session",
-      "rationale": "Published recording increment bc32954; services stopped with samples and caches retained. Resume with Lesson2, then actual denial, immediate or rapid taps and screen-lock checks; release gates remain.",
+      "label": "September23 device checkpoint and next session",
+      "rationale": "S20 Android-enforced denial, bounded immediate Stop and screen-lock preservation checked; seven samples retained and services running. Next: coordinate call/headphone interruption. See dated review for limits.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3275,8 +3275,18 @@
     {
       "id": "recording_remaining_gates",
       "label": "Remaining recording and release checks",
-      "rationale": "Unrun device denial, immediate and rapid taps, screen lock, calls/headphones, resource profiling and device faults. Release app unlock, backup/restore, keys, signing and privacy remain open.",
+      "rationale": "September22 historical gates; consult September23 review for completed denial-state, bounded rapid taps and deliberate screen lock. Call/headphone changes, profiling, device faults and release gates remain.",
       "source_file": "docs/reviews/2026-09-22-record-stop-play.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_device_sep23",
+      "label": "September23 S20 recording device evidence",
+      "rationale": "Actual Android-enforced denial, two sub-second Stop clips, Dozing-confirmed screen lock, unlock no-resume and cold-restart preservation. Invalid prompt/timing attempts are distinguished. No app code or build change.",
+      "source_file": "docs/reviews/2026-09-23-recording-device-checks.md",
       "source_location": "L1",
       "file_type": "document",
       "community": 1,
@@ -7350,6 +7360,34 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_device_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_lesson",
+      "target": "recording_device_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/06-recording-lifecycle.md"
+    },
+    {
+      "source": "recording_device_sep23",
+      "target": "recording_wrapup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-23-recording-device-checks.md"
+    },
+    {
+      "source": "recording_device_sep23",
+      "target": "recording_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-23-recording-device-checks.md"
     }
   ],
   "hyperedges": [

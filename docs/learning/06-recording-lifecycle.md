@@ -45,6 +45,10 @@ Record what actually happened, including permission decisions, measured duration
 
 For the September22 exercise, **Voice test Sep22** retains three clips: 0:47, 0:09 and 3:59. The last stopped automatically at 239.527 seconds and used 1,965,396 encoded bytes. All three survived the final cold restart, and Rikesh reported earlier playback clear enough. Try predicting what Play and then Stop will do to temporary storage before using those controls. Deliberate screen lock, permission denial and the other unrun checks remain listed in the review.
 
+## September 23 follow-up
+
+The [next device review](../reviews/2026-09-23-recording-device-checks.md) records Android-enforced denial, two immediate-Stop clips (488 ms and 534 ms), and a screen-lock clip (3576 ms) that stayed stopped after unlocking. All survived cold restart. These live under **Voice test Sep23**; earlier samples are retained separately. The UI floors durations to whole seconds, so the two short saved clips display **0:00**. Predict why that label does not mean the files are empty. Denying by tapping the Android dialog, calls/headphones and resource/fault tests remain unverified.
+
 ## Storage intuition
 
 At 64000 bits/second, four minutes is approximately `64000 × 240 ÷ 8 = 1,920,000 bytes` before container/encryption overhead. Mono AAC avoids the much larger uncompressed PCM files. The recorder stops at 239.5 seconds to leave a small AAC finalization margin within the strict 240-second saved-file bound. The native file ceiling is 4 MiB, and admission keeps 100 MiB plus working allowance free on the phone. Audio storage includes saved and temporary files; a 250 MiB warning asks you to review, never automatically deletes originals.
