@@ -3330,7 +3330,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Tracks all four journal feature deliverables. Eleven choices and autonomous execution approved; sessions/writing storage implemented with review and UI/device work tracked separately."
+      "rationale": "Tracks all four journal feature deliverables. Sessions/writing storage and UI checkpoint, review fixes, bounded device evidence, requested stop and remaining acceptance are tracked separately from queued reminders/history."
     },
     {
       "id": "journal_domain_language",
@@ -3421,6 +3421,46 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Schema2 to3 adds sessions, association and writings while preserving original moments/clips."
+    },
+    {
+      "id": "trading_controller",
+      "label": "Trading session controller",
+      "source_file": "mobile/src/journal/tradingController.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Coordinates session lifecycle, paging and End after confirmed audio release."
+    },
+    {
+      "id": "writing_controller",
+      "label": "Draft and final writing controller",
+      "source_file": "mobile/src/journal/writingController.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Serializes draft saves/finalisation and retains ownership across delayed operations."
+    },
+    {
+      "id": "trading_panel",
+      "label": "Trading session screens",
+      "source_file": "mobile/src/journal/TradingPanel.tsx",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Session lists, timelines, corrected boundaries and archive/restore controls."
+    },
+    {
+      "id": "writing_panel",
+      "label": "Note and reflection screens",
+      "source_file": "mobile/src/journal/WritingPanel.tsx",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Recoverable draft editing, immutable finished writing and dated follow-ups."
     }
   ],
   "links": [
@@ -7662,6 +7702,34 @@
     {
       "source": "journal_features_milestone",
       "target": "trading_schema",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "trading_controller",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "writing_controller",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "trading_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "writing_panel",
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/JOURNAL-FEATURES.md"

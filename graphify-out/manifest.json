@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790144026.0400846,
+    "mtime": 1790145286.6973293,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "2e8437cb94eaca831cdd0633de85c7ae"
+    "semantic_hash": "122eec437aa607c9d4f9e0a1d7243ba6"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -475,9 +475,9 @@
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   },
   "docs/JOURNAL-FEATURES.md": {
-    "mtime": 1790144001.8922825,
+    "mtime": 1790145286.699871,
     "ast_hash": "",
-    "semantic_hash": "4c96a4e857046633de8a61fbf84b6d7d"
+    "semantic_hash": "9da28155d827a069b79d4fd141676169"
   },
   "CONTEXT.md": {
     "mtime": 1790142414.5527272,
@@ -490,19 +490,19 @@
     "semantic_hash": "39fd88c503fc125a24c4cdd0a0821528"
   },
   "docs/superpowers/plans/2026-09-23-sessions-writing.md": {
-    "mtime": 1790142749.5259519,
+    "mtime": 1790145286.7024114,
     "ast_hash": "",
-    "semantic_hash": "19fba9112cfdff57c8bd679ae282c297"
+    "semantic_hash": "1b79e833c2d93cf930772d5e4f798edf"
   },
   "docs/reviews/2026-09-23-sessions-writing.md": {
-    "mtime": 1790144001.8922825,
+    "mtime": 1790145286.699871,
     "ast_hash": "",
-    "semantic_hash": "82f885d8bbeae5e2ec80822040c7d7da"
+    "semantic_hash": "3ffb42dd492ced7ec15a499fe328db1a"
   },
   "docs/learning/07-sessions-and-writing.md": {
-    "mtime": 1790142942.3164883,
+    "mtime": 1790144866.0491652,
     "ast_hash": "",
-    "semantic_hash": "f27e41fd2bb9ba12b783acd764f033da"
+    "semantic_hash": "8153602d2a9632b5885a8cd4cb3fdd3c"
   },
   "docs/superpowers/specs/2026-09-23-personal-reminders-history-design.md": {
     "mtime": 1790143279.2551239,
@@ -523,5 +523,25 @@
     "mtime": 1790143636.772581,
     "ast_hash": "",
     "semantic_hash": "e6b586056d366a7fe9467871ed0635e0"
+  },
+  "mobile/src/journal/tradingController.ts": {
+    "mtime": 1790144475.7181776,
+    "ast_hash": "",
+    "semantic_hash": "7e22b318fbfb4cca458533eb56cd2410"
+  },
+  "mobile/src/journal/writingController.ts": {
+    "mtime": 1790145105.431286,
+    "ast_hash": "",
+    "semantic_hash": "9837fc1b04e40c345adc5d5043f6e10c"
+  },
+  "mobile/src/journal/TradingPanel.tsx": {
+    "mtime": 1790144475.7181776,
+    "ast_hash": "",
+    "semantic_hash": "138c2dd49fc449f8002c522f6c04b9c2"
+  },
+  "mobile/src/journal/WritingPanel.tsx": {
+    "mtime": 1790145105.4333153,
+    "ast_hash": "",
+    "semantic_hash": "7211f0f55de0a5f4b5e432ef309cd507"
   }
 }

@@ -225,4 +225,4 @@ Targeted refresh of reviewed public source/document relationships: **285 nodes /
 
 ## Journal features design milestone (2026-09-23)
 
-Targeted public source/document refresh: **295 nodes / 420 edges**. Added approved specs, plans, storage entry points, evidence and learning links. Current source/reviews distinguish implementation from pending validation. Existing communities and historical centrality retained; no full structural extraction or private/dependency/native-output scan. No external model API call; host token cost unavailable.
+Targeted public source/document refresh: **299 nodes / 424 edges**. Added approved specs, plans, storage entry points, evidence and learning links. Current source/reviews distinguish implementation from pending validation. Existing communities and historical centrality retained; no full structural extraction or private/dependency/native-output scan. No external model API call; host token cost unavailable.

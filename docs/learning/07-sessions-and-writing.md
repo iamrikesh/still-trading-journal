@@ -16,4 +16,6 @@ Consider a note started at 10:55 pm. You end the session at 11 pm, then finish w
 
 ## Verification status
 
-This lesson describes the approved behavior. Use the [dated review](../reviews/2026-09-23-sessions-writing.md) for implementation and device evidence; do not treat these examples as completed tests.
+Session/writing storage is implemented and independently reviewed. The S20 retained an ended/adjusted synthetic session, notes and reflection across restart. A bounded UI check recovered a draft, edited it, pressed Done and verified its finished text after another restart. Broader UI and failure checks remain; use the [dated review](../reviews/2026-09-23-sessions-writing.md) for precise coverage rather than treating every example above as a completed test.
+
+For a retained example next time, open Sessions → Feature test Sep23. Its two moments are synthetic. The note labelled Feature test draft was subsequently finished through the UI and now reads “Feature test edited on S20.” Compare its capture time with finalisation time and the session ending.

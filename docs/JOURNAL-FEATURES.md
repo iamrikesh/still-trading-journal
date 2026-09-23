@@ -4,6 +4,7 @@ Started 2026-09-23 from `a873ab2` on `codex/android-device-setup`, at Rikesh's r
 
 ## Working agreement
 
+- Latest steering: stop at the nearest logical checkpoint after the interruption, update/commit/push progress and resume next session. This supersedes continuing through the full milestone in this sitting; the four-deliverable objective is retained.
 - Continue toward all four deliverables below, with progress updates and durable handoffs between increments.
 - Use brainstorming and grilling to resolve product decisions; look up technical facts in the repository rather than asking Rikesh to supply them.
 - Record decisions as they are answered. Present concrete designs for review before implementation, then use plans, meaningful regression tests, code review and S20 verification.
@@ -15,8 +16,8 @@ Started 2026-09-23 from `a873ab2` on `codex/android-device-setup`, at Rikesh's r
 
 | Increment | Scope | Required demonstration | State |
 | --- | --- | --- | --- |
-| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Storage reviewed and S20 persistence checked; UI in progress |
-| 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Storage reviewed and S20 persistence checked; UI in progress |
+| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Implemented/reviewed; bounded S20 check passed; broader acceptance next |
+| 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Implemented/reviewed; bounded S20 check passed; broader acceptance next |
 | 3 | Custom emotions and personal reminders | Customize emotion buttons; edit support text; add/play personal audio and images; preserve historical captures under later edits; validate and clean up media | Queued |
 | 4 | Older history and theme preferences | Browse beyond the recent-history limit with bounded loading; retain chosen theme after restart; verify empty/end/error states and readable presentation | Queued |
 
@@ -117,10 +118,10 @@ Audit references: `mobile/src/storage/types.ts`, `journalSession.ts`, `clipSchem
 
 ## Current evidence and open work
 
-- Autonomous implementation is authorized. [Sessions/writing plan](superpowers/plans/2026-09-23-sessions-writing.md) Task1 and review fixes are committed through `8bdeefa`; independent review approved. Latest full host run102/102 preceded the final empty-ID fix, whose covering suite passed16/16 plus TypeScript. S20 storage-only acceptance preserved all original media and recovered synthetic sessions/writing after restart; see the [dated evidence](reviews/2026-09-23-sessions-writing.md). Task2 UI is in progress. Continue with the [reminders/history plan](superpowers/plans/2026-09-23-reminders-history.md) after the first subsystem. Its [spec](superpowers/specs/2026-09-23-personal-reminders-history-design.md) records delegated defaults and bounded encrypted attachment decisions.
+- Requested stopping checkpoint: reviewed source through `2be987d`; final 123/123 host tests, TypeScript and Android export passed. Sessions/writing storage and UI are implemented and task-reviewed. S20 storage restart and bounded draft edit/Done checks passed before the final UI locking fixes. Broader Task3 device acceptance remains, then the [reminders/history plan](superpowers/plans/2026-09-23-reminders-history.md). See [current status](PROJECT-STATUS.md) and [dated evidence](reviews/2026-09-23-sessions-writing.md); do not mark the whole item2 milestone complete.
 - Design checkpoint validation: local links in the tracker, glossary, status and selected evidence documents resolve; graph IDs are unique and edge endpoints valid (287 nodes / 412 edges); whitespace checks passed. This increment changes public documentation/navigation only. App tests were not rerun and the S20 was not operated.
 - The milestone started from a clean checkout at `a873ab2`; the earlier denial-feedback fix has 87 passing host tests, TypeScript, independent review and bounded S20 evidence. These checks do not validate any feature in this milestone yet.
-- Read-only storage/UI audit completed; constraints are recorded above. Schema and feature designs are not approved yet.
+- Read-only storage/UI audit completed; constraints are recorded above. Sessions/writing design is approved and its storage implementation reviewed; later-feature defaults are documented under the user's autonomous-execution instruction.
 - Previous device checkpoint: idle audio, zero pending, exact 17-file / 3920423-byte vault baseline preserved. Recheck actual device state before each test; additional user data may exist.
 - Recording investigations remain open: original cycle17 failed start, brief first-Play stop, real call/headphone interruptions, low-space/save faults and longer memory behavior. App unlock, backup/restore and release validation remain separate work.
 
