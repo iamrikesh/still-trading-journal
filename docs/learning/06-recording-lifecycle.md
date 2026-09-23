@@ -61,6 +61,10 @@ The [longer baseline](../reviews/2026-09-23-recording-memory-baseline.md) comple
 
 Exercise: compare cycles seven/eight in that review. Allocated native memory fell by 15654 KiB, while PSS fell by 6731 KiB. Why is that useful evidence of memory release but insufficient to certify indefinite stability? Keep the separate start failure in view: good memory readings do not prove every recording transition succeeds.
 
+## Pending work without audio
+
+The September23 failed-start follow-up demonstrated a pending intent with no remaining audio file. Retry kept it pending; confirmed Discard cleared it and enabled Record. **Exercise:** why can a pending operation exist without a playable clip, and why should Retry preserve it instead of silently treating it as Saved? Trace `journalSession.ts`: the durable intent is created before native capture is requested. This ordering makes interrupted work discoverable, while the original start-failure cause still needs separate evidence.
+
 ## Storage intuition
 
 At 64000 bits/second, four minutes is approximately `64000 × 240 ÷ 8 = 1,920,000 bytes` before container/encryption overhead. Mono AAC avoids the much larger uncompressed PCM files. The recorder stops at 239.5 seconds to leave a small AAC finalization margin within the strict 240-second saved-file bound. The native file ceiling is 4 MiB, and admission keeps 100 MiB plus working allowance free on the phone. Audio storage includes saved and temporary files; a 250 MiB warning asks you to review, never automatically deletes originals.

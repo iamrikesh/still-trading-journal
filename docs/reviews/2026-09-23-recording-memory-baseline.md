@@ -36,9 +36,23 @@ Opening the activity did not bypass the lock, and the development inspector was 
 
 Later read-only checks confirmed the active user's microphone grant, an allowed RECORD_AUDIO app-op with foreground UID mode, and **1008432 KiB available on /data**. This is above the native 100 MiB admission threshold; it is a later snapshot, not proof of free space or focus at the failed-start instant. Metro remained healthy and USB forwarding was present.
 
+## Unlock and recovery follow-up
+
+After Rikesh unlocked the S20, the existing activity showed **one pending clip operation** in **Cycle test Sep23**, with Record disabled. The vault still contained 15 files and no plaintext or pending ciphertext. **Retry save** retained the pending operation and showed “Audio could not complete.” After verifying the synthetic owner, **Discard → DISCARD** removed that failed intent: the moment became empty and Record enabled again. No earlier sample was selected or deleted.
+
+This distinguishes a durable database intent from captured audio. Current `journalSession.ts` persists `core.begin(snapshot)` before calling native `startCapture`; a failed start can therefore leave a pending intent without an audio file. This explains the recoverable state, but does not identify which native check or operation rejected the seventeenth start. The later lock, granted permission and available-space readings do not establish its cause.
+
+Metro was running, but its inspector target list was empty while the app UI remained usable. Recovery used the normal UI before any reload. The follow-up cycle helper was also tightened to require the exact recording timer, rather than matching the start-error prefix.
+
+**Five separate follow-up cycles passed**, each observing Record/Stop/Saved/Play/Delete and restoring the exact original vault filename set. No JavaScript inspection occurred during these five cycles. The app process matched the earlier run before and after this segment; no restart was needed to recover recording. A mid-segment snapshot showed the phone awake with the app window focused. The start failure did not recur. These five cycles are not a continuous twenty-cycle pass and do not establish a root cause.
+
+For context, this segment's baseline/final total PSS was **330083/335480 KiB**, and native-heap PSS was **120476/128992 KiB**. Sampled descriptors ranged 160–161 and threads 51–53 including baseline. There were no fixed idle checkpoints or detailed allocated-heap readings in this recovery segment; it should not be compared directly to the earlier idle allocation table as a plateau test.
+
+A subsequent cold restart restored the inspector target. Fresh checks confirmed **native audio idle, zero pending operations, zero cycle-test clips, 3896667-byte usage**, and the original duration/byte pairs for all **four earlier plus seven September23 lifecycle samples**. Final vault inspection found 15 files, no plaintext temporaries and no pending ciphertext. The empty synthetic panel was reopened and the two owned temporary UI dumps removed. App data was not reset; earlier samples, permissions and sleep settings were preserved. No audio was exported.
+
 ## Resume and learning
 
-Unlock the S20, foreground still. and inspect **Cycle test Sep23**. Confirm native status and pending count before recording again. If there is a pending intent, inspect whether staging exists and use the normal Retry/Discard UI only for the synthetic cycle clip; preserve all earlier samples. Diagnose/reproduce the failed start before proposing an app fix. Any resumed measurement is a separate segment, not completion of an uninterrupted twenty-cycle run.
+Recovery is complete for this failed synthetic intent. Resume by checking the branch and environment, then open the empty **Cycle test Sep23** moment. Investigate the failed-start boundary with correlated foreground/focus/power/admission evidence before proposing an app fix; the generic native error does not reveal which check failed. Preserve all earlier samples. Any new measurement is a separate segment, not completion of an uninterrupted twenty-cycle run.
 
 Use the previous resource review's ADB procedure, adding full `dumpsys meminfo` for the Native Heap Size/Alloc/Free fields. Keep the same process, check actual timer text, and use fixed idle intervals. Do not use JavaScript inspection inside the measured interval.
 

@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September23 memory baseline and interrupted start",
-      "rationale": "Sixteen completed device cycles with bounded idle allocation readings; cycle seventeen could not start. Phone unlock and pending-state recovery inspection remain required. Consult current status and the dated review; twenty-cycle target incomplete.",
+      "label": "September23 memory baseline and verified recovery",
+      "rationale": "Sixteen completed device cycles; cycle seventeen could not start. After unlock, Retry retained one pending synthetic intent and confirmed Discard cleared it. Five separate follow-up cycles passed; cold restart verified idle, zero pending and retained samples. Start-failure cause unresolved; twenty-cycle target incomplete.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",

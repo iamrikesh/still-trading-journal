@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790137073.9824657,
+    "mtime": 1790137921.676653,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "015d4be49f32667e175af6ebb376eec7"
+    "semantic_hash": "c7a221a3f9d99203d9345cc914077bd9"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -425,9 +425,9 @@
     "semantic_hash": "db37276fd91ec4470f8c2b458df55428"
   },
   "docs/learning/06-recording-lifecycle.md": {
-    "mtime": 1790137074.0008082,
+    "mtime": 1790137954.2955685,
     "ast_hash": "",
-    "semantic_hash": "6d608e6322ca61a4215f73aab2507a7d"
+    "semantic_hash": "5689adf1d99de4bb61f4dd05ada95dbb"
   },
   "docs/reviews/2026-09-22-record-stop-play.md": {
     "mtime": 1790085572.6031356,
@@ -465,8 +465,8 @@
     "semantic_hash": "30d7573ecd33b8252b87905f7640f310"
   },
   "docs/reviews/2026-09-23-recording-memory-baseline.md": {
-    "mtime": 1790137073.9839764,
+    "mtime": 1790137954.293427,
     "ast_hash": "",
-    "semantic_hash": "2e956a9de57a136726caba5535a13738"
+    "semantic_hash": "2f9cd310b71721d158486c158e03aad2"
   }
 }
