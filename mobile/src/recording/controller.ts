@@ -142,6 +142,14 @@ export function createRecordingController(ports: Ports) {
       if (running) await running;
       await run(settle);
     },
+    async stopForSessionEnd() {
+      // Invalidate a Record request synchronously, including one waiting for
+      // permission. Keep the same owner until all native cleanup completes.
+      ++epoch;
+      if (running) await running;
+      await run(settle);
+      return !active && !playingId && state.phase !== 'cleanup';
+    },
     retry(id: string) {
       if (running || active || playingId) return Promise.resolve();
       return run(async () => {

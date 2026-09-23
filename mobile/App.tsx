@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Alert, AppState, BackHandler, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Alert, AppState, BackHandler, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { randomUUID } from 'expo-crypto';
@@ -15,6 +15,17 @@ import { ClipRecoveryPanel } from './src/development/ClipRecoveryPanel';
 import { createAppRecordingController } from './src/recording/runtime';
 import { RecordingPanel } from './src/recording/RecordingPanel';
 import type { Moment } from './src/storage/types';
+import type { TradingRepository, TradingSession, WritingOwner } from './src/storage/tradingTypes';
+import { createTradingController } from './src/journal/tradingController';
+import { createWritingController } from './src/journal/writingController';
+import { TradingPanel } from './src/journal/TradingPanel';
+import { WritingPanel } from './src/journal/WritingPanel';
+
+async function tradingRepository(): Promise<TradingRepository> {
+  const trading = (await openJournalSession()).trading;
+  if (!trading) throw new Error('Sessions and writing require the Android development build.');
+  return trading;
+}
 
 export default function App() {
   return <SafeAreaProvider><JournalApp /></SafeAreaProvider>;
@@ -36,9 +47,19 @@ function JournalApp() {
     });
   });
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
-  const [page, setPage] = useState<'now' | 'support' | 'history' | 'clips'>('now');
+  const [page, setPage] = useState<'now' | 'support' | 'history' | 'clips' | 'sessions' | 'writing'>('now');
   const [clipMoment, setClipMoment] = useState<Moment | null>(null);
   const [recording] = useState(createAppRecordingController);
+  const [trading] = useState(() => createTradingController({ repository: tradingRepository, recording, id: randomUUID, now: () => new Date().toISOString() }));
+  const tradingState = useSyncExternalStore(trading.subscribe, trading.getSnapshot);
+  const [writing] = useState(() => createWritingController({ repository: tradingRepository, id: randomUUID, now: () => new Date().toISOString() }));
+  const [writingOwner, setWritingOwner] = useState<WritingOwner | null>(null);
+  const [writingKind, setWritingKind] = useState<'note' | 'reflection'>('note');
+  const [startTitle, setStartTitle] = useState('');
+  const [momentSession, setMomentSession] = useState<TradingSession | null>(null);
+  const [groupSessions, setGroupSessions] = useState<TradingSession[]>([]);
+  const [groupMore, setGroupMore] = useState(false);
+  const [groupError, setGroupError] = useState<string | null>(null);
   const audioState = useSyncExternalStore(recording.subscribe, recording.getSnapshot);
   const recordingOwner = page === 'support' && state.saveStatus === 'saved' ? state.moment?.id ?? null : page === 'clips' ? clipMoment?.id ?? null : null;
   useEffect(() => { void recording.select(recordingOwner); }, [recording, recordingOwner]);
@@ -56,7 +77,9 @@ function JournalApp() {
   const [clipExercise] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
     ? createClipRecoveryExercise(openJournalSession) : null);
 
-  useEffect(() => { void controller.refresh(); }, [controller]);
+  useEffect(() => { void controller.refresh(); if (!isTemporaryJournal) void trading.refresh(); }, [controller, trading]);
+  useEffect(() => { if (page !== 'writing') void writing.background(); }, [page, writing]);
+  useEffect(() => { if (clipMoment && page === 'clips' && !isTemporaryJournal) { void tradingRepository().then(repo => repo.membership(clipMoment.id)).then(setMomentSession).catch(() => setGroupError('Grouping could not load.')); } }, [clipMoment, page]);
   // Read existing state only: startup session recovery has already run. Never
   // automatically prepare fixtures or delete a moment on mounting this panel.
   useEffect(() => { if (clipExercise) void clipExercise.check(); }, [clipExercise]);
@@ -76,12 +99,29 @@ function JournalApp() {
       catch { setDeleteError(true); }
     };
     if (Platform.OS === 'web') {
-      if (window.confirm('Delete this moment and its attached clips? This cannot be undone.')) void remove();
+      if (window.confirm('Delete this moment, its note, reflections and attached clips? This cannot be undone.')) void remove();
     } else {
-      Alert.alert('Delete this moment?', 'This also deletes its attached clips. This cannot be undone.', [
+      Alert.alert('Delete this moment?', 'This also deletes its note, reflections and attached clips. This cannot be undone.', [
         { text: 'Keep', style: 'cancel' }, { text: 'Delete', style: 'destructive', onPress: () => { void remove(); } },
       ]);
     }
+  }
+
+  function openWriting(owner: WritingOwner, kind: 'note' | 'reflection' = owner.kind === 'session' ? 'reflection' : 'note') { setWritingKind(kind); setWritingOwner(owner); setPage('writing'); }
+  async function createNote() {
+    if (isTemporaryJournal) return;
+    const moment: Moment = { id: randomUUID(), emotionId: 'note', emotionLabel: 'Note', createdAt: new Date().toISOString(), supportText: '' };
+    try { await (await openJournal()).save(moment); await controller.refresh(); setClipMoment(moment); openWriting({ kind: 'moment', id: moment.id }); }
+    catch { setGroupError('Note could not be saved. Please try again.'); }
+  }
+  async function loadGrouping(older = false) {
+    try { const last = older ? groupSessions.at(-1) : undefined; const rows = await (await tradingRepository()).sessions(false, last ? { at: last.startedAt, id: last.id } : undefined); setGroupSessions(older ? [...groupSessions, ...rows] : rows); setGroupMore(rows.length === 30); setGroupError(null); }
+    catch { setGroupError('Sessions could not load. Please try again.'); }
+  }
+  async function assignSession(id: string | null) {
+    if (!clipMoment) return;
+    try { await (await tradingRepository()).assign(clipMoment.id, id); setMomentSession(await (await tradingRepository()).membership(clipMoment.id)); setGroupError(null); }
+    catch { setGroupError('Grouping could not be saved. Please try again.'); }
   }
 
   const chip = (label: string, onPress: () => void, selected = false) => (
@@ -102,6 +142,15 @@ function JournalApp() {
         <View style={styles.demoBanner}>
           <Text style={styles.small}>{isTemporaryJournal ? 'Temporary demo · history resets when you reload' : 'Development build · use sample moments for now'}</Text>
         </View>
+        {!isTemporaryJournal && tradingState.active && <View style={styles.failureBar}>
+          <Text style={styles.emotionTitle}>Open session: {tradingState.active.title || new Date(tradingState.active.startedAt).toLocaleString()}</Text>
+          {!tradingState.acknowledged && <Text style={styles.small}>This session was open when you returned. New moments are grouped here.</Text>}
+          <View style={styles.row}>
+            {!tradingState.acknowledged && chip('Resume session', trading.resume)}
+            {chip('End session', () => { void trading.end(); })}
+          </View>
+          {tradingState.error && <Text accessibilityRole="alert" style={styles.error}>{tradingState.error}</Text>}
+        </View>}
 
         {page === 'now' && <ScrollView contentContainerStyle={styles.body}>
           <Text style={styles.eyebrow}>A MOMENT FOR YOU</Text>
@@ -116,6 +165,15 @@ function JournalApp() {
               <Text style={styles.small}>{emotion.hint}</Text>
             </Pressable>)}
           </View>
+          {isTemporaryJournal ? <Text style={styles.small}>Sessions, notes and reflections need the Android development build. Demo moments reset on reload.</Text> : <>
+            {!tradingState.active && <>
+              <TextInput accessibilityLabel="Optional session title" placeholder="Optional session title" placeholderTextColor={colors.muted} value={startTitle} onChangeText={setStartTitle} style={[styles.historyCard, { color: colors.ink }]} />
+              {chip('Start session', () => { void trading.start(startTitle); })}
+            </>}
+            {tradingState.error && <Text accessibilityRole="alert" style={styles.error}>{tradingState.error}</Text>}
+            {chip('Write note', () => { void createNote(); })}
+            {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
+          </>}
           <Text style={styles.sectionLabel}>MAKE YOURSELF AT HOME</Text>
           <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => chip(mode.charAt(0).toUpperCase() + mode.slice(1), () => setAppearance(mode), appearance === mode))}</View>
           <Text style={styles.footnote}>There is no perfect label. “Unsure” is a place to start.</Text>
@@ -140,6 +198,10 @@ function JournalApp() {
             </Text>
           </View>
           {state.saveStatus === 'failed' && state.moment && chip('Retry save', () => { void controller.retry(state.moment!.id); })}
+          {!isTemporaryJournal && state.saveStatus === 'saved' && state.moment && <>
+            {chip('Write original note', () => openWriting({ kind: 'moment', id: state.moment!.id }))}
+            {chip('Add moment reflection', () => openWriting({ kind: 'moment', id: state.moment!.id }, 'reflection'))}
+          </>}
           <Text style={styles.footnote}>No explanation needed. Your emotion and the time are enough for this moment.</Text>
           {chip('See my moments', () => setPage('history'))}
           {Platform.OS === 'android' && !isTemporaryJournal && state.saveStatus === 'saved' && <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); setPage('clips'); }} />}
@@ -151,8 +213,20 @@ function JournalApp() {
           <Text style={styles.eyebrow}>{clipMoment.emotionLabel.toUpperCase()}</Text>
           <Text style={styles.small}>{new Date(clipMoment.createdAt).toLocaleString()}</Text>
           <Text style={styles.supportText}>{clipMoment.supportText}</Text>
+          {!isTemporaryJournal && <>
+            {chip('Open note and reflections', () => openWriting({ kind: 'moment', id: clipMoment.id }))}
+            <Text style={styles.small}>Grouped in: {momentSession ? `${momentSession.title || new Date(momentSession.startedAt).toLocaleString()}${momentSession.archivedAt ? ' · Archived' : ''}` : 'Outside session'}</Text>
+            {chip('Choose session grouping', () => { void loadGrouping(); })}
+            {groupSessions.length > 0 && chip('Outside session', () => { void assignSession(null); })}
+            {groupSessions.map(row => chip(`Group in ${row.title || new Date(row.startedAt).toLocaleString()}`, () => { void assignSession(row.id); }))}
+            {groupMore && chip('Older grouping choices', () => { void loadGrouping(true); })}
+            {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
+          </>}
           <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); setPage('clips'); }} />
         </ScrollView>}
+
+        {page === 'sessions' && !isTemporaryJournal && <TradingPanel controller={trading} ink={colors.ink} muted={colors.muted} line={colors.line} onMoment={moment => { setClipMoment(moment); setPage('clips'); }} onReflection={session => openWriting({ kind: 'session', id: session.id })} />}
+        {page === 'writing' && writingOwner && !isTemporaryJournal && <WritingPanel controller={writing} repository={tradingRepository} owner={writingOwner} initialKind={writingKind} ink={colors.ink} muted={colors.muted} line={colors.line} onBack={() => setPage(writingOwner.kind === 'session' ? 'sessions' : 'clips')} />}
 
         {page === 'history' && <FlatList data={state.history} keyExtractor={item => item.id}
           contentContainerStyle={styles.body} initialNumToRender={10} windowSize={5}
@@ -172,6 +246,7 @@ function JournalApp() {
           renderItem={({ item }) => <View style={styles.historyCard}>
             <View style={styles.historyHeading}><Text style={styles.emotionTitle}>{item.emotionLabel}</Text><Text style={styles.small}>{new Date(item.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</Text></View>
             <Text style={styles.historyText}>{item.supportText}</Text>
+            {!isTemporaryJournal && chip(`Open ${item.emotionLabel} writing`, () => { setClipMoment(item); openWriting({ kind: 'moment', id: item.id }); })}
             {Platform.OS === 'android' && !isTemporaryJournal && chip('Open voice clips', () => { setClipMoment(item); setPage('clips'); })}
             <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${item.emotionLabel} moment`} onPress={() => removeMoment(item.id)} style={styles.delete}><Text style={styles.small}>Delete moment</Text></Pressable>
           </View>}
@@ -181,13 +256,19 @@ function JournalApp() {
           <Text accessibilityRole="alert" style={styles.error}>{audioState.message}</Text>
           {chip('Stop again', () => { void recording.stop(); })}
         </View>}
+        {audioState.pending > 0 && <View style={styles.failureBar}>
+          <Text style={styles.error}>{audioState.pending} clip operation(s) need attention.</Text>
+          {chip('Retry pending clips', () => { void recording.recover(); })}
+          {audioState.pendingOwners.map(owner => chip(`Open pending ${owner.emotionLabel} moment`, () => { setClipMoment(owner); setPage('clips'); }))}
+        </View>}
         {state.failed.length > 0 && <View style={styles.failureBar}>
           <Text style={styles.error}>{state.failed.length} moment{state.failed.length > 1 ? 's' : ''} not saved. Retry before closing.</Text>
           {chip('Retry unsaved moments', () => { for (const moment of state.failed) void controller.retry(moment.id); })}
         </View>}
         <View style={styles.tabs}>
-          {chip('Now', () => setPage('now'), page !== 'history')}
+          {chip('Now', () => setPage('now'), page === 'now')}
           {chip('My moments', () => { setPage('history'); void controller.refresh(); }, page === 'history')}
+          {!isTemporaryJournal && chip('Sessions', () => setPage('sessions'), page === 'sessions')}
         </View>
       </View>
     </SafeAreaView>

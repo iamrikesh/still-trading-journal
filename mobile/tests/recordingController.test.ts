@@ -62,6 +62,37 @@ for (const returnBeforeDenial of [false, true]) {
     assert.match(r.controller.getSnapshot().message!, /Microphone permission was not granted/);
   });
 }
+
+test('session End cancels pending permission and does not start on return', async () => {
+  const r = rig(); const permission = deferred<boolean>(); r.permission(() => permission.promise);
+  await r.controller.select('moment-a');
+  const recording = r.controller.record();
+  const ending = r.controller.stopForSessionEnd();
+  permission.resolve(true);
+  assert.equal(await ending, true);
+  await recording; await r.controller.foreground();
+  assert.equal(r.rows.length, 0);
+});
+
+test('session End waits for release and blocks on unconfirmed cleanup', async () => {
+  const r = rig(); await r.controller.select('moment-a'); await r.controller.record();
+  const release = deferred<void>();
+  r.session.audio!.releaseCapture = () => release.promise;
+  const ending = r.controller.stopForSessionEnd();
+  let settled = false; void ending.then(() => { settled = true; });
+  await Promise.resolve(); assert.equal(settled, false);
+  release.resolve(); assert.equal(await ending, true);
+  await r.controller.record();
+  r.session.audio!.releaseCapture = async () => { throw Error('unconfirmed'); };
+  assert.equal(await r.controller.stopForSessionEnd(), false);
+  assert.equal(r.controller.getSnapshot().phase, 'cleanup');
+});
+
+test('session End permits save failure after confirmed release with pending recovery visible', async () => {
+  const r = rig(); await r.controller.select('moment-a'); await r.controller.record(); r.fail(true);
+  assert.equal(await r.controller.stopForSessionEnd(), true);
+  assert.equal(r.controller.getSnapshot().pending, 1);
+});
 for (const returnToOriginalMoment of [false, true]) {
   test(`late denial cannot update a new selection; original moment reselected: ${returnToOriginalMoment}`, async () => {
     const r = rig(); const permission = deferred<boolean>(); r.permission(() => permission.promise);
