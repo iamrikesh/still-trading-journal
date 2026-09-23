@@ -109,8 +109,8 @@ function JournalApp() {
 
   function openWriting(owner: WritingOwner, kind: 'note' | 'reflection' = owner.kind === 'session' ? 'reflection' : 'note') {
     const current = writing.getSnapshot();
-    if (['Saving', 'Not saved'].includes(current.status) && current.writing && (current.writing.owner.kind !== owner.kind || current.writing.owner.id !== owner.id || current.writing.kind !== kind)) {
-      setGroupError('Save or retry your current draft before opening different writing. Your text is still here.');
+    if (!writing.canSwitch(owner, kind) && current.writing) {
+      writing.open(owner, kind);
       setWritingOwner(current.writing.owner); setWritingKind(current.writing.kind); setPage('writing'); return;
     }
     setWritingKind(kind); setWritingOwner(owner); setPage('writing');

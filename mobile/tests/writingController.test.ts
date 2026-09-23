@@ -79,12 +79,13 @@ test('failed save blocks switching writing until retry preserves latest text', a
   assert.equal(r.controller.getSnapshot().writing?.owner.id, 'm');
 });
 
-test('old discard completion cannot clear a newly opened editor', async () => {
+test('pending discard refuses owner switch until it completes', async () => {
   const r = rig(); const removal = deferred<void>(); r.repository.discardDraft = () => removal.promise;
   r.controller.open({ kind: 'moment', id: 'first' }, 'note'); await r.controller.edit('old');
   const discard = r.controller.discard();
-  r.controller.open({ kind: 'moment', id: 'second' }, 'note');
-  await r.controller.edit('new'); removal.resolve(); await discard;
+  assert.equal(r.controller.open({ kind: 'moment', id: 'second' }, 'note'), false);
+  removal.resolve(); await discard;
+  r.controller.open({ kind: 'moment', id: 'second' }, 'note'); await r.controller.edit('new');
   assert.equal(r.controller.getSnapshot().text, 'new');
   assert.equal(r.controller.getSnapshot().writing?.owner.id, 'second');
 });
@@ -116,4 +117,26 @@ test('late original-note lookup cannot reopen an old owner', async () => {
   const found = (await lookup)[0];
   assert.equal(r.controller.openIfCurrent(version, oldOwner, 'note', found), false);
   assert.equal(r.controller.getSnapshot().writing?.owner.id, 'new');
+});
+
+test('owner switch is refused while Done is finalising', async () => {
+  const r = rig(); const finish = deferred<Writing>();
+  r.repository.finalise = () => finish.promise;
+  r.controller.open({ kind: 'moment', id: 'first' }, 'note'); await r.controller.edit('finished');
+  const done = r.controller.done(); await Promise.resolve();
+  assert.equal(r.controller.canSwitch({ kind: 'moment', id: 'second' }, 'note'), false);
+  assert.equal(r.controller.open({ kind: 'moment', id: 'second' }, 'note'), false);
+  assert.equal(r.controller.getSnapshot().writing?.owner.id, 'first');
+  finish.resolve({ ...r.controller.getSnapshot().writing!, finalisedAt: '2026-09-23T10:00:00.000Z' }); await done;
+});
+
+test('edit during pending discard cannot recreate text that discard clears', async () => {
+  const r = rig(); const removal = deferred<void>(); r.repository.discardDraft = () => removal.promise;
+  r.controller.open({ kind: 'moment', id: 'first' }, 'note'); await r.controller.edit('old');
+  const discard = r.controller.discard();
+  await r.controller.edit('typed during discard');
+  assert.equal(r.controller.getSnapshot().text, 'old');
+  assert.equal(r.controller.canSwitch({ kind: 'moment', id: 'second' }, 'note'), false);
+  removal.resolve(); await discard;
+  assert.equal(r.controller.getSnapshot().writing, null);
 });

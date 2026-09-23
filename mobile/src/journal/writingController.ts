@@ -29,6 +29,10 @@ export function createWritingController(deps: { repository(): Promise<TradingRep
   let tail: Promise<void> = Promise.resolve();
   let finalising: Promise<void> | null = null;
   function update(patch: Partial<State>) { state = { ...state, ...patch }; listeners.forEach(fn => fn()); }
+  function canSwitch(owner: WritingOwner, kind: Writing['kind'], saved?: Writing) {
+    return !state.busy && !(['Saving', 'Not saved'].includes(state.status) && state.writing &&
+      (state.writing.owner.id !== owner.id || state.writing.owner.kind !== owner.kind || state.writing.kind !== kind || saved && saved.id !== state.writing.id));
+  }
   function queue(work: () => Promise<void>) { const result = tail.catch(() => undefined).then(work); tail = result.catch(() => undefined); return result; }
   function save(snapshot: Writing, token: number) { return queue(async () => {
     try {
@@ -40,13 +44,14 @@ export function createWritingController(deps: { repository(): Promise<TradingRep
   }); }
   const controller = {
     subscribe(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn); }; }, getSnapshot: () => state,
+    canSwitch,
     version: () => generation,
     openIfCurrent(version: number, owner: WritingOwner, kind: Writing['kind'], saved?: Writing) {
       if (version !== generation) return false;
       return controller.open(owner, kind, saved);
     },
     open(owner: WritingOwner, kind: Writing['kind'], saved?: Writing) {
-      if (finalising || (['Saving', 'Not saved'].includes(state.status) && state.writing && (state.writing.owner.id !== owner.id || state.writing.owner.kind !== owner.kind || state.writing.kind !== kind || saved && saved.id !== state.writing.id))) {
+      if (!canSwitch(owner, kind, saved)) {
         update({ error: 'Save or retry this draft before switching writing.' }); return false;
       }
       if (['Saving', 'Not saved'].includes(state.status) && state.writing) return true;
@@ -58,7 +63,7 @@ export function createWritingController(deps: { repository(): Promise<TradingRep
     },
     edit(text: string) {
       const current = state.writing;
-      if (!current || current.finalisedAt || finalising) return Promise.resolve();
+      if (!current || current.finalisedAt || state.busy) return Promise.resolve();
       const token = generation;
       const snapshot = { ...current, owner: { ...current.owner }, text, updatedAt: deps.now(), revision: current.revision + 1 };
       update({ writing: snapshot, text, status: 'Saving', error: null });
@@ -68,6 +73,7 @@ export function createWritingController(deps: { repository(): Promise<TradingRep
     async background() { await tail; if (state.status === 'Not saved') await controller.retry(); },
     done() {
       if (finalising) return finalising;
+      if (state.busy) return Promise.resolve();
       if (!state.writing || state.writing.finalisedAt) return Promise.resolve();
       if (!state.text.trim()) { update({ error: 'Add some text before Done.' }); return Promise.resolve(); }
       const token = generation;
@@ -90,7 +96,7 @@ export function createWritingController(deps: { repository(): Promise<TradingRep
       return finalising;
     },
     async discard() {
-      if (!state.writing || state.writing.finalisedAt) return;
+      if (!state.writing || state.writing.finalisedAt || state.busy) return;
       const id = state.writing.id;
       const token = ++generation;
       update({ busy: true, error: null });
