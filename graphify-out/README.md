@@ -65,3 +65,8 @@ Targeted public-document refresh: **282 nodes / 399 edges**. Added the dated S20
 ## Resource-cycle evidence (2026-09-23)
 
 Targeted public-document refresh: **283 nodes / 402 edges**. Added resource-cycle evidence and explicit status/lesson/review references. Communities and historical cohesion/centrality retained. No corpus, dependency, generated-native, local-tool or private-data scan; no external model API call. Host token cost unavailable. No dangling endpoints in the saved graph; historical extraction limitations above remain. The review separates cleanup evidence from limited memory measurements.
+
+
+## Longer memory baseline (2026-09-23)
+
+Targeted public-document refresh: **284 nodes / 405 edges**. Added the memory-baseline review and explicit document references; current checkpoint and lesson descriptions updated. Existing communities and historical cohesion/centrality retained. No corpus, dependency, generated-native, local-tool or private-data scan; no external model API call. Host token cost unavailable. Saved graph endpoints are valid; historical extraction limitations remain. Read the review for measured scope, not a production-readiness inference.

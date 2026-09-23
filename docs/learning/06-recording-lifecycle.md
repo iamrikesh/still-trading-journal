@@ -55,6 +55,12 @@ The [resource-cycle review](../reviews/2026-09-23-recording-resource-cycles.md) 
 
 During testing, even debugger evaluations of `1 + 1` increased measured native-heap memory. Before blaming recording, repeat the measurement without those debugger calls. **Exercise:** if deleting a test clip restores the exact original file set but memory stays higher, what has been verified, and what still needs investigation?
 
+## PSS and allocated memory
+
+The [longer baseline](../reviews/2026-09-23-recording-memory-baseline.md) completed sixteen cycles before a failed start interrupted the planned twenty. At three fixed idle checkpoints, allocated native memory stayed around 111–113 MiB even though total PSS was higher than at startup. These counters measure different aspects of the whole app; they do not directly measure how much audio is stored.
+
+Exercise: compare cycles seven/eight in that review. Allocated native memory fell by 15654 KiB, while PSS fell by 6731 KiB. Why is that useful evidence of memory release but insufficient to certify indefinite stability? Keep the separate start failure in view: good memory readings do not prove every recording transition succeeds.
+
 ## Storage intuition
 
 At 64000 bits/second, four minutes is approximately `64000 × 240 ÷ 8 = 1,920,000 bytes` before container/encryption overhead. Mono AAC avoids the much larger uncompressed PCM files. The recorder stops at 239.5 seconds to leave a small AAC finalization margin within the strict 240-second saved-file bound. The native file ceiling is 4 MiB, and admission keeps 100 MiB plus working allowance free on the phone. Audio storage includes saved and temporary files; a 250 MiB warning asks you to review, never automatically deletes originals.

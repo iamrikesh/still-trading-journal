@@ -3205,7 +3205,7 @@
     {
       "id": "recording_lesson",
       "label": "Lesson 6 recording lifecycle",
-      "rationale": "Recording/save lifecycle, immutable owner, sample exercises and separate checks for temporary files, OS handles and memory; explains debugger measurement controls.",
+      "rationale": "Recording/save lifecycle, owner identity, resource cleanup and why PSS differs from allocated native heap; prediction exercises refer to dated evidence.",
       "source_file": "docs/learning/06-recording-lifecycle.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September23 resource-check checkpoint",
-      "rationale": "Device lifecycle and bounded record/play/delete cleanup evidence. Resource review separates memory measurements from debugger overhead; long-run profiling, calls/headphones and release gates remain. Consult current status and dated reviews.",
+      "label": "September23 memory baseline and interrupted start",
+      "rationale": "Sixteen completed device cycles with bounded idle allocation readings; cycle seventeen could not start. Phone unlock and pending-state recovery inspection remain required. Consult current status and the dated review; twenty-cycle target incomplete.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3297,6 +3297,16 @@
       "label": "September23 recording resource-cycle evidence",
       "rationale": "Bounded UI recording/playback/deletion, exact file/storage cleanup, memory and handle samples, debugger-only controls and UI-comparison limits. No app source fix or native build.",
       "source_file": "docs/reviews/2026-09-23-recording-resource-cycles.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_memory_sep23",
+      "label": "September23 longer recording memory baseline",
+      "rationale": "Longer continuous-process UI cycling without JavaScript inspection, fixed idle checkpoints, PSS/RSS and allocated native heap. Exact measured outcomes, interrupted attempt and limits are recorded in the review.",
+      "source_file": "docs/reviews/2026-09-23-recording-memory-baseline.md",
       "source_location": "L1",
       "file_type": "document",
       "community": 1,
@@ -7419,6 +7429,27 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/reviews/2026-09-23-recording-resource-cycles.md"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_memory_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_lesson",
+      "target": "recording_memory_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/06-recording-lifecycle.md"
+    },
+    {
+      "source": "recording_memory_sep23",
+      "target": "recording_resources_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-23-recording-memory-baseline.md"
     }
   ],
   "hyperedges": [
