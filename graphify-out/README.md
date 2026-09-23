@@ -70,3 +70,8 @@ Targeted public-document refresh: **283 nodes / 402 edges**. Added resource-cycl
 ## Longer memory baseline (2026-09-23)
 
 Targeted public-document refresh: **284 nodes / 405 edges**. Added the memory-baseline review and explicit document references; current checkpoint and lesson descriptions updated. Existing communities and historical cohesion/centrality retained. No corpus, dependency, generated-native, local-tool or private-data scan; no external model API call. Host token cost unavailable. Saved graph endpoints are valid; historical extraction limitations remain. Read the review for measured scope, not a production-readiness inference.
+
+
+## Permission-start cancellation (2026-09-23)
+
+Targeted refresh of reviewed public source/document relationships: **285 nodes / 409 edges**. Added the dated evidence and updated controller/runtime/checkpoint descriptions. Existing communities and historical centrality retained; no full structural re-extraction. No dependency, generated-native, local-tool or private-data scan, and no external model API call. Host token cost unavailable. Current source, tests and dated evidence take precedence over navigation metadata.

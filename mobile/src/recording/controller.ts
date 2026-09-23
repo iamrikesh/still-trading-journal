@@ -176,9 +176,8 @@ export function createRecordingController(ports: Ports) {
       });
     },
     async background() {
-      // Android permission dialogs may temporarily change AppState. They never
-      // start audio themselves; native foreground admission remains mandatory.
-      if (state.phase === 'permission') return;
+      // Invalidate pending permission/start work even if we return before it
+      // resolves. Foreground admission alone cannot reject that stale request.
       foreground = false; ++epoch;
       if (running) await running;
       await run(settle);

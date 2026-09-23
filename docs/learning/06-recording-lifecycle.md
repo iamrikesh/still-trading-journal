@@ -65,6 +65,12 @@ Exercise: compare cycles seven/eight in that review. Allocated native memory fel
 
 The September23 failed-start follow-up demonstrated a pending intent with no remaining audio file. Retry kept it pending; confirmed Discard cleared it and enabled Record. **Exercise:** why can a pending operation exist without a playable clip, and why should Retry preserve it instead of silently treating it as Saved? Trace `journalSession.ts`: the durable intent is created before native capture is requested. This ordering makes interrupted work discoverable, while the original start-failure cause still needs separate evidence.
 
+## Cancelling an old Record request
+
+The [permission-start review](../reviews/2026-09-23-permission-start-cancellation.md) documents a reproduced race: Record was waiting for permission, the user left, and capture started only after returning. A foreground check alone allowed it because the app was foreground again by then. The fix invalidates the earlier request when leaving; a fresh Record press gets a new request. The permission adapter checks an existing grant first to avoid an unnecessary Android permission request.
+
+If granting permission backgrounds the app, granting access now leaves it stopped. Press Record again to capture. **Exercise:** predict what should happen when permission resolves (a) while still away and (b) after returning. Both must leave the old request cancelled.
+
 ## Storage intuition
 
 At 64000 bits/second, four minutes is approximately `64000 × 240 ÷ 8 = 1,920,000 bytes` before container/encryption overhead. Mono AAC avoids the much larger uncompressed PCM files. The recorder stops at 239.5 seconds to leave a small AAC finalization margin within the strict 240-second saved-file bound. The native file ceiling is 4 MiB, and admission keeps 100 MiB plus working allowance free on the phone. Audio storage includes saved and temporary files; a 250 MiB warning asks you to review, never automatically deletes originals.

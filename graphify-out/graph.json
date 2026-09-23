@@ -3135,7 +3135,7 @@
     {
       "id": "recording_controller",
       "label": "Recording lifecycle controller",
-      "rationale": "Immutable moment ownership, serialized UI operations, cancellation, Stop/save, polling, retry and bounded pending-owner recovery.",
+      "rationale": "Owns recording lifecycle and invalidates pending permission/start work on every background transition, including return before permission resolution.",
       "source_file": "mobile/src/recording/controller.ts",
       "source_location": "L1",
       "file_type": "code",
@@ -3155,7 +3155,7 @@
     {
       "id": "recording_runtime",
       "label": "Recording runtime and permission",
-      "rationale": "Expo Audio permission requested on explicit Record; existing journal session owns capture/save/playback.",
+      "rationale": "Creates recording controller and checks current microphone grant before requesting permission, avoiding redundant Android permission lifecycle transitions.",
       "source_file": "mobile/src/recording/runtime.ts",
       "source_location": "L1",
       "file_type": "code",
@@ -3264,8 +3264,8 @@
     },
     {
       "id": "recording_wrapup",
-      "label": "September23 memory baseline and verified recovery",
-      "rationale": "Sixteen completed device cycles; cycle seventeen could not start. After unlock, Retry retained one pending synthetic intent and confirmed Discard cleared it. Five separate follow-up cycles passed; cold restart verified idle, zero pending and retained samples. Start-failure cause unresolved; twenty-cycle target incomplete.",
+      "label": "September23 permission-start cancellation checkpoint",
+      "rationale": "Delayed capture on foreground return reproduced and fixed by cancelling permission-phase requests on background, with an existing-grant query. 83 host tests, TypeScript, independent review and bounded S20 checks; original cycle17 failure remains unresolved.",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "L1",
       "file_type": "document",
@@ -3311,6 +3311,16 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence"
+    },
+    {
+      "id": "recording_permission_sep23",
+      "label": "Permission-start cancellation evidence",
+      "source_file": "docs/reviews/2026-09-23-permission-start-cancellation.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Device delayed-start reproduction, permission-phase cancellation regression, grant-query adapter, real grant dialog and cold-restart preservation evidence. Does not attribute the earlier cycle17 failure."
     }
   ],
   "links": [
@@ -7450,6 +7460,34 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/reviews/2026-09-23-recording-memory-baseline.md"
+    },
+    {
+      "source": "recording_wrapup",
+      "target": "recording_permission_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "recording_lesson",
+      "target": "recording_permission_sep23",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/06-recording-lifecycle.md"
+    },
+    {
+      "source": "recording_permission_sep23",
+      "target": "recording_controller",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-23-permission-start-cancellation.md"
+    },
+    {
+      "source": "recording_permission_sep23",
+      "target": "recording_runtime",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-23-permission-start-cancellation.md"
     }
   ],
   "hyperedges": [

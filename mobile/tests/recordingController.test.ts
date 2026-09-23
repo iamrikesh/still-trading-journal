@@ -54,6 +54,28 @@ test('navigation while permission is pending cancels capture', async () => {
   assert.equal(r.rows.length, 0);
   assert.equal(r.controller.getSnapshot().momentId, 'moment-b');
 });
+for (const returnBeforePermission of [false, true]) {
+  test(`leaving during permission cancels capture even when returning first: ${returnBeforePermission}`, async () => {
+    const r = rig(); const permission = deferred<boolean>(); r.permission(() => permission.promise);
+    await r.controller.select('moment-a');
+    const recording = r.controller.record();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(r.controller.getSnapshot().phase, 'permission');
+    const leaving = r.controller.background();
+    if (returnBeforePermission) await r.controller.foreground();
+    permission.resolve(true);
+    await Promise.all([recording, leaving]);
+    assert.equal(r.rows.length, 0, 'A delayed permission result must not start capture');
+    assert.equal(r.controller.getSnapshot().phase, 'ready');
+    assert.equal((await r.session.audio!.status()).state, 'idle');
+    if (!returnBeforePermission) await r.controller.foreground();
+    r.permission(async () => true);
+    await r.controller.record();
+    assert.equal(r.rows.length, 1, 'A fresh explicit Record press should still work');
+    await r.controller.stop();
+    assert.equal(r.rows[0]!.status, 'saved');
+  });
+}
 test('duplicate Record and Stop append once and preserve original owner on navigation', async () => {
   const r = rig(); await r.controller.select('moment-a');
   await Promise.all([r.controller.record(), r.controller.record()]);

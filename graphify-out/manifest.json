@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790137921.676653,
+    "mtime": 1790139583.114044,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "c7a221a3f9d99203d9345cc914077bd9"
+    "semantic_hash": "0495504e86f768d76f9374cc6d8d4b65"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -390,9 +390,9 @@
     "semantic_hash": "db624db641f0ec960511fd6f8c63ba37"
   },
   "mobile/src/recording/controller.ts": {
-    "mtime": 1790081735.6984448,
+    "mtime": 1790138997.2437572,
     "ast_hash": "",
-    "semantic_hash": "0a31c694db9a58ae07c157b41e3ac28f"
+    "semantic_hash": "bf9d7979393e6888b3882f72bed1254d"
   },
   "mobile/src/recording/nativeAudio.ts": {
     "mtime": 1790079172.1498215,
@@ -400,9 +400,9 @@
     "semantic_hash": "d3d7c05508c496a46f602f1864c601e3"
   },
   "mobile/src/recording/runtime.ts": {
-    "mtime": 1790083508.4417038,
+    "mtime": 1790139183.723296,
     "ast_hash": "",
-    "semantic_hash": "e74a65d721b778a85052f4b149728c22"
+    "semantic_hash": "bd0d7de7caa9d491fa96cb7cd2698026"
   },
   "mobile/src/recording/RecordingPanel.tsx": {
     "mtime": 1790084045.5361564,
@@ -410,9 +410,9 @@
     "semantic_hash": "e7ee28d2111fd3f30922b7ac90a2427b"
   },
   "mobile/tests/recordingController.test.ts": {
-    "mtime": 1790081644.5859594,
+    "mtime": 1790138987.2794166,
     "ast_hash": "",
-    "semantic_hash": "4c48ba23e17429185e90a9a188f3c478"
+    "semantic_hash": "2aebfdbbec1e0a94c00812eadb52e7cc"
   },
   "mobile/tests/recordingSession.test.ts": {
     "mtime": 1790079671.9427032,
@@ -425,9 +425,9 @@
     "semantic_hash": "db37276fd91ec4470f8c2b458df55428"
   },
   "docs/learning/06-recording-lifecycle.md": {
-    "mtime": 1790137954.2955685,
+    "mtime": 1790139635.0683672,
     "ast_hash": "",
-    "semantic_hash": "5689adf1d99de4bb61f4dd05ada95dbb"
+    "semantic_hash": "0c82f9e94bd4f73fc16431e13cd2bfab"
   },
   "docs/reviews/2026-09-22-record-stop-play.md": {
     "mtime": 1790085572.6031356,
@@ -468,5 +468,10 @@
     "mtime": 1790137954.293427,
     "ast_hash": "",
     "semantic_hash": "2f9cd310b71721d158486c158e03aad2"
+  },
+  "docs/reviews/2026-09-23-permission-start-cancellation.md": {
+    "mtime": 1790139583.1267946,
+    "ast_hash": "",
+    "semantic_hash": "e5b7286ed61f3af29d023f85be03eba8"
   }
 }
