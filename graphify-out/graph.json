@@ -2368,7 +2368,7 @@
       "norm_label": "lesson 2: physical android development"
     },
     {
-      "label": "Current S20 development checkpoint",
+      "label": "Current verified checkpoint and active journal milestone",
       "file_type": "document",
       "source_file": "docs/PROJECT-STATUS.md",
       "source_location": "Current checkpoint / Session wrap-up (2026-09-21)",
@@ -2376,7 +2376,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Current Record/Stop/Play increment, precise verification and remaining gates are in PROJECT-STATUS and the 2026-09-22 review. Earlier synthetic clip checkpoints remain historical evidence.",
+      "rationale": "Start here for verified recording baseline, user-requested journal feature milestone, settled decisions, open work and resume instructions. Current source and dated reviews supersede historical status.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -3321,6 +3321,26 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Device delayed-start reproduction, permission-phase cancellation regression, grant-query adapter, real grant dialog and cold-restart preservation evidence. Does not attribute the earlier cycle17 failure. Actual Deny feedback gap subsequently fixed with selection-scoped feedback; 87 host tests and bounded device evidence. First brief playback stop remains unclassified; baseline preserved."
+    },
+    {
+      "id": "journal_features_milestone",
+      "label": "Journal features milestone and design decisions",
+      "source_file": "docs/JOURNAL-FEATURES.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Tracks sessions/timelines, notes/reflections, custom emotion/reminder media, older history and persisted themes. Eleven session/note/reflection choices confirmed; first concrete design awaits review and implementation remains pending."
+    },
+    {
+      "id": "journal_domain_language",
+      "label": "Trading journal domain language",
+      "source_file": "CONTEXT.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Glossary distinguishing manually bounded trading sessions, timestamped moments, preserved originals, recoverable note drafts, dated reflections and personal reminders."
     }
   ],
   "links": [
@@ -7488,6 +7508,27 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/reviews/2026-09-23-permission-start-cancellation.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "journal_features_milestone",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "journal_domain_language",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "recording_wrapup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
     }
   ],
   "hyperedges": [

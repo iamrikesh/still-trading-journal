@@ -221,3 +221,8 @@ Targeted public-document refresh: **284 nodes / 405 edges**. Added the memory-ba
 ## Permission-start cancellation (2026-09-23)
 
 Targeted refresh of reviewed public source/document relationships: **285 nodes / 409 edges**. Added the dated evidence and updated controller/runtime/checkpoint descriptions. Existing communities and historical centrality retained; no full structural re-extraction. No dependency, generated-native, local-tool or private-data scan, and no external model API call. Host token cost unavailable. Current source, tests and dated evidence take precedence over navigation metadata.
+
+
+## Journal features design milestone (2026-09-23)
+
+Targeted public-document refresh: **287 nodes / 412 edges**. Added the milestone tracker and agreed glossary; refreshed the current-checkpoint description. This records design discovery, not implemented features. Existing communities and historical centrality retained; no full structural extraction or private/dependency/native-output scan. No external model API call; host token cost unavailable.

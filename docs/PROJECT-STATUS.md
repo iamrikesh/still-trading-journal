@@ -2,6 +2,8 @@
 
 ## Current checkpoint (2026-09-23)
 
+**Active direction:** Rikesh requested sustained work through **item 2: the remaining journal features**, using brainstorming, grilling, progress updates and durable tracking. All eleven session/note/reflection choices are confirmed in the [journal-features milestone](JOURNAL-FEATURES.md): manual sessions, outside-session capture, recoverable drafts, preserved final writing, corrected boundaries, regrouping, stop-before-End and Archive/Restore. The read-only source audit is complete. A concrete first design with alternatives, failure behavior and verification steps is recorded there and awaits review; no feature implementation has begun. Resume with that design review, then the focused spec and implementation plan. The verified recording checkpoint below remains the baseline; its open investigations are retained rather than substituted for the new milestone.
+
 Continued from published `a817b41` on `codex/android-device-setup`; fixed the reproduced missing denial explanation. See the [denial-feedback fix and device evidence](reviews/2026-09-23-permission-start-cancellation.md#denial-feedback-fix). Native/runtime source and dependencies are unchanged.
 
 - **Fix:** denial feedback survives background/foreground for the same selection. Any new selection invalidates it, including A → B → A. Granted results still pass the existing recording cancellation checks; showing a message cannot restart capture.

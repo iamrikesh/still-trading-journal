@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790141391.6902027,
+    "mtime": 1790142414.5537245,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "40fb356d7a6c2240fd313d7d9f7efb98"
+    "semantic_hash": "ffa574e397fe843ab81cfea347d8aa61"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -473,5 +473,15 @@
     "mtime": 1790141391.6914427,
     "ast_hash": "",
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
+  },
+  "docs/JOURNAL-FEATURES.md": {
+    "mtime": 1790142450.1386805,
+    "ast_hash": "",
+    "semantic_hash": "17941d80628c900c59fad68c580e322c"
+  },
+  "CONTEXT.md": {
+    "mtime": 1790142414.5527272,
+    "ast_hash": "",
+    "semantic_hash": "152d51e74b31bb17d52499f1895dd800"
   }
 }
