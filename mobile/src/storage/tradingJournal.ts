@@ -20,8 +20,11 @@ function owner(value: WritingOwner): void {
   if (!value || !['moment', 'session'].includes(value.kind)) throw failure();
   (value.kind === 'moment' ? momentIdCheck : id)(value.id);
 }
+function rowOwner(row: WritingRow): WritingOwner {
+  return row.momentId !== null ? { kind: 'moment', id: row.momentId } : { kind: 'session', id: row.sessionId! };
+}
 function writing(row: WritingRow): Writing {
-  return { id: row.id, owner: row.momentId ? { kind: 'moment', id: row.momentId } : { kind: 'session', id: row.sessionId! },
+  return { id: row.id, owner: rowOwner(row),
     kind: row.kind, text: row.text, createdAt: row.createdAt, updatedAt: row.updatedAt, finalisedAt: row.finalisedAt, revision: row.revision };
 }
 function validateWriting(value: Writing): void {
@@ -153,7 +156,7 @@ export function createTradingRepository(db: JournalDatabase): TradingRepository 
       if (!value.trim()) throw failure();
       return clipTransactionResult(db, async () => {
         const current = await entry(idValue);
-        if (!current || !await liveOwner(current.momentId ? { kind: 'moment', id: current.momentId } : { kind: 'session', id: current.sessionId! })) throw failure();
+        if (!current || !await liveOwner(rowOwner(current))) throw failure();
         if (current.finalisedAt !== null) {
           if (current.text === value && current.revision === nextRevision && current.finalisedAt === time) return writing(current);
           throw failure();
@@ -167,7 +170,7 @@ export function createTradingRepository(db: JournalDatabase): TradingRepository 
     async discardDraft(idValue) {
       id(idValue);
       const current = await entry(idValue);
-      if (current && !await liveOwner(current.momentId ? { kind: 'moment', id: current.momentId } : { kind: 'session', id: current.sessionId! })) throw failure();
+      if (current && !await liveOwner(rowOwner(current))) throw failure();
       await db.runAsync('DELETE FROM journal_writings WHERE id = ? AND finalisedAt IS NULL', idValue);
     },
   };

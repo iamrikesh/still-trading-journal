@@ -98,6 +98,24 @@ test('legacy moment IDs remain writable, movable and pageable as bound text', as
   } finally { f.close(); }
 });
 
+test('empty legacy moment owner remains a moment through finalise and draft discard', async () => {
+  const f = await fixture();
+  try {
+    const s = await createJournalSession(f.db, native(f), options);
+    await s.journal.save(moment(''));
+    const emptyOwner = { kind: 'moment' as const, id: '' };
+    const note = draft('empty-note', emptyOwner);
+    assert.deepEqual(await s.trading!.saveDraft(note), note);
+    assert.deepEqual(await s.trading!.writings(emptyOwner), [note]);
+    const finalised = await s.trading!.finalise(note.id, note.text, 0, later);
+    assert.deepEqual(finalised.owner, emptyOwner);
+    assert.equal(finalised.finalisedAt, later);
+    await s.trading!.saveDraft(draft('empty-reflection', emptyOwner, 'reflection'));
+    await s.trading!.discardDraft('empty-reflection');
+    assert.deepEqual(await s.trading!.writings(emptyOwner), [finalised]);
+  } finally { f.close(); }
+});
+
 test('draft revisions, finalisation after End, and final text survive reopen', async () => {
   const f = await fixture();
   try {
