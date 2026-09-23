@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createWritingController, findOpeningWriting } from '../src/journal/writingController.ts';
+import { createWritingController, findOpeningWriting, findWritingById } from '../src/journal/writingController.ts';
 import type { TradingRepository, Writing } from '../src/storage/tradingTypes.ts';
 
 function deferred<T>() { let resolve!: (value: T) => void; let reject!: (reason: Error) => void; const promise = new Promise<T>((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
@@ -68,4 +68,52 @@ test('opening an original note searches older pages beyond newer reflections', a
   const note = { ...reflection[0]!, id: 'note', kind: 'note' as const, text: 'original' };
   r.repository.writings = async (_owner, before) => before ? [note] : reflection;
   assert.equal((await findOpeningWriting(r.repository, owner, 'note', reflection))?.text, 'original');
+});
+
+test('failed save blocks switching writing until retry preserves latest text', async () => {
+  const r = rig(); r.repository.saveDraft = async () => { throw Error('fail'); };
+  r.controller.open({ kind: 'moment', id: 'm' }, 'note'); await r.controller.edit('unsaved latest');
+  const switched = r.controller.open({ kind: 'moment', id: 'other' }, 'reflection');
+  assert.equal(switched, false);
+  assert.equal(r.controller.getSnapshot().text, 'unsaved latest');
+  assert.equal(r.controller.getSnapshot().writing?.owner.id, 'm');
+});
+
+test('old discard completion cannot clear a newly opened editor', async () => {
+  const r = rig(); const removal = deferred<void>(); r.repository.discardDraft = () => removal.promise;
+  r.controller.open({ kind: 'moment', id: 'first' }, 'note'); await r.controller.edit('old');
+  const discard = r.controller.discard();
+  r.controller.open({ kind: 'moment', id: 'second' }, 'note');
+  await r.controller.edit('new'); removal.resolve(); await discard;
+  assert.equal(r.controller.getSnapshot().text, 'new');
+  assert.equal(r.controller.getSnapshot().writing?.owner.id, 'second');
+});
+
+test('Done retries failed queued save and finalises latest text once', async () => {
+  const r = rig(); const first = deferred<Writing>(); let saves = 0; let finalises = 0;
+  r.repository.saveDraft = async row => ++saves === 1 ? first.promise : row;
+  r.repository.finalise = async (id, text, revision, at) => { ++finalises; return { ...r.controller.getSnapshot().writing!, id, text, revision, finalisedAt: at }; };
+  r.controller.open({ kind: 'moment', id: 'm' }, 'note'); void r.controller.edit('latest');
+  const done = r.controller.done(); first.reject(Error('storage fail')); await done;
+  assert.equal(r.controller.getSnapshot().status, 'Finalised');
+  assert.equal(saves, 2); assert.equal(finalises, 1);
+});
+
+test('selection resolves latest persisted revision instead of stale list row', async () => {
+  const r = rig(); const owner = { kind: 'moment' as const, id: 'm' };
+  const stale: Writing = { id: 'reflection', owner, kind: 'reflection', text: 'old', createdAt: '2026-09-23T10:00:00.000Z', updatedAt: '2026-09-23T10:00:00.000Z', finalisedAt: null, revision: 1 };
+  r.repository.writings = async () => [{ ...stale, text: 'latest', revision: 2 }];
+  assert.equal((await findWritingById(r.repository, owner, stale.id))?.text, 'latest');
+});
+
+test('late original-note lookup cannot reopen an old owner', async () => {
+  const r = rig(); const oldOwner = { kind: 'moment' as const, id: 'old' }; const delayed = deferred<Writing[]>();
+  r.repository.writings = () => delayed.promise;
+  r.controller.open(oldOwner, 'note'); const version = r.controller.version();
+  const lookup = r.repository.writings(oldOwner);
+  r.controller.open({ kind: 'moment', id: 'new' }, 'note');
+  delayed.resolve([{ id: 'old-note', owner: oldOwner, kind: 'note', text: 'old', createdAt: '2026-09-23T10:00:00.000Z', updatedAt: '2026-09-23T10:00:00.000Z', finalisedAt: null, revision: 1 }]);
+  const found = (await lookup)[0];
+  assert.equal(r.controller.openIfCurrent(version, oldOwner, 'note', found), false);
+  assert.equal(r.controller.getSnapshot().writing?.owner.id, 'new');
 });

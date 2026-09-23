@@ -64,12 +64,12 @@ function JournalApp() {
   const recordingOwner = page === 'support' && state.saveStatus === 'saved' ? state.moment?.id ?? null : page === 'clips' ? clipMoment?.id ?? null : null;
   useEffect(() => { void recording.select(recordingOwner); }, [recording, recordingOwner]);
   useEffect(() => {
-    const listener = AppState.addEventListener('change', value => { void (value === 'active' ? recording.foreground() : recording.background()); });
+    const listener = AppState.addEventListener('change', value => { void (value === 'active' ? recording.foreground() : recording.background()); if (value !== 'active') void writing.background(); });
     // Fast Refresh runs effect cleanup without an Android foreground event.
     void (AppState.currentState === 'active' ? recording.foreground() : recording.background());
     const timer = setInterval(() => { void recording.poll(); }, 300);
     return () => { listener.remove(); clearInterval(timer); void recording.background(); };
-  }, [recording]);
+  }, [recording, writing]);
   const [deleteError, setDeleteError] = useState(false);
   // Keep one operation owner across page changes; the native vault also serializes calls.
   const [mediaProof] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
@@ -107,7 +107,14 @@ function JournalApp() {
     }
   }
 
-  function openWriting(owner: WritingOwner, kind: 'note' | 'reflection' = owner.kind === 'session' ? 'reflection' : 'note') { setWritingKind(kind); setWritingOwner(owner); setPage('writing'); }
+  function openWriting(owner: WritingOwner, kind: 'note' | 'reflection' = owner.kind === 'session' ? 'reflection' : 'note') {
+    const current = writing.getSnapshot();
+    if (['Saving', 'Not saved'].includes(current.status) && current.writing && (current.writing.owner.kind !== owner.kind || current.writing.owner.id !== owner.id || current.writing.kind !== kind)) {
+      setGroupError('Save or retry your current draft before opening different writing. Your text is still here.');
+      setWritingOwner(current.writing.owner); setWritingKind(current.writing.kind); setPage('writing'); return;
+    }
+    setWritingKind(kind); setWritingOwner(owner); setPage('writing');
+  }
   async function createNote() {
     if (isTemporaryJournal) return;
     const moment: Moment = { id: randomUUID(), emotionId: 'note', emotionLabel: 'Note', createdAt: new Date().toISOString(), supportText: '' };
@@ -217,7 +224,7 @@ function JournalApp() {
             {chip('Open note and reflections', () => openWriting({ kind: 'moment', id: clipMoment.id }))}
             <Text style={styles.small}>Grouped in: {momentSession ? `${momentSession.title || new Date(momentSession.startedAt).toLocaleString()}${momentSession.archivedAt ? ' · Archived' : ''}` : 'Outside session'}</Text>
             {chip('Choose session grouping', () => { void loadGrouping(); })}
-            {groupSessions.length > 0 && chip('Outside session', () => { void assignSession(null); })}
+            {chip('Outside session', () => { void assignSession(null); })}
             {groupSessions.map(row => chip(`Group in ${row.title || new Date(row.startedAt).toLocaleString()}`, () => { void assignSession(row.id); }))}
             {groupMore && chip('Older grouping choices', () => { void loadGrouping(true); })}
             {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
