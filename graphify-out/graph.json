@@ -3407,7 +3407,7 @@
       "label": "Trading session and writing repository",
       "source_file": "mobile/src/storage/tradingJournal.ts",
       "source_location": "L1",
-      "file_type": "document",
+      "file_type": "code",
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Transactional session lifecycle, explicit grouping and immutable writing finalisation."
@@ -3417,7 +3417,7 @@
       "label": "Trading schema migration",
       "source_file": "mobile/src/storage/tradingSchema.ts",
       "source_location": "L1",
-      "file_type": "document",
+      "file_type": "code",
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Schema2 to3 adds sessions, association and writings while preserving original moments/clips."
