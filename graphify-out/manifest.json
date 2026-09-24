@@ -1,8 +1,8 @@
 {
   "mobile/App.tsx": {
-    "mtime": 1789994086.6128132,
+    "mtime": 1790246207.2016985,
     "ast_hash": "16f48132fa48fde23deef473175c8a5c",
-    "semantic_hash": "70d6bab63729a05c3265186ddade87fe"
+    "semantic_hash": "f9eefff6dcdca4df58e84437eadfb29a"
   },
   "mobile/app.json": {
     "mtime": 1789911867.5519018,
@@ -85,9 +85,9 @@
     "semantic_hash": "cb733c29127faa4457bf523174252c9a"
   },
   "mobile/src/storage/types.ts": {
-    "mtime": 1789901572.4380865,
+    "mtime": 1790246173.4557066,
     "ast_hash": "560bdef56e95ecaeafc6637619e17a84",
-    "semantic_hash": "560bdef56e95ecaeafc6637619e17a84"
+    "semantic_hash": "dad33534e2eba8061386d3d21b305de8"
   },
   "mobile/src/theme.ts": {
     "mtime": 1789901954.6411054,
@@ -130,9 +130,9 @@
     "semantic_hash": "e7f5f80ec8c1bbbb4d8027f0baf46b0d"
   },
   "README.md": {
-    "mtime": 1789913880.931155,
+    "mtime": 1790247128.0100386,
     "ast_hash": "1dd5b98abb4cd34f03c05f056d911b27",
-    "semantic_hash": "1dd5b98abb4cd34f03c05f056d911b27"
+    "semantic_hash": "f59c252ec490d94355d89a4107580947"
   },
   "SECURITY-AND-PERFORMANCE.md": {
     "mtime": 1789913978.4804091,
@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790238015.5854168,
+    "mtime": 1790247128.0074866,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "5227084d8fff52a07e1458fe7feea547"
+    "semantic_hash": "66c68d70497145e633734605145d5f78"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -360,9 +360,9 @@
     "semantic_hash": "44085a6fef88c39c8b0c89cdd1346780"
   },
   "mobile/src/storage/journalSession.ts": {
-    "mtime": 1789994090.5557609,
+    "mtime": 1790246410.9875777,
     "ast_hash": "",
-    "semantic_hash": "009378eff7deaed538c4724c5518e6b8"
+    "semantic_hash": "efdfbc3b67a4878b762e5b9609bd5597"
   },
   "mobile/src/storage/nativeClipVault.ts": {
     "mtime": 1789993870.5978484,
@@ -475,9 +475,9 @@
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   },
   "docs/JOURNAL-FEATURES.md": {
-    "mtime": 1790238015.5854168,
+    "mtime": 1790247128.0089931,
     "ast_hash": "",
-    "semantic_hash": "82e0cf114bc157eb7e2714551b5aeb52"
+    "semantic_hash": "db78c25fd594327f5ddda98406ab713d"
   },
   "CONTEXT.md": {
     "mtime": 1790142414.5527272,
@@ -510,9 +510,9 @@
     "semantic_hash": "469a0a395ffb1bcc894115374ea569f3"
   },
   "docs/superpowers/plans/2026-09-23-reminders-history.md": {
-    "mtime": 1790237982.7279074,
+    "mtime": 1790247128.012037,
     "ast_hash": "",
-    "semantic_hash": "bbda286c818909bb35c389c2313a7d7f"
+    "semantic_hash": "de4379cd0df5ac407f11ad78558d53bd"
   },
   "mobile/src/storage/tradingJournal.ts": {
     "mtime": 1790143780.4969232,
@@ -525,9 +525,9 @@
     "semantic_hash": "81452d7c30db302661c0b1c24f56d34e"
   },
   "mobile/src/journal/tradingController.ts": {
-    "mtime": 1790144475.7181776,
+    "mtime": 1790246326.247439,
     "ast_hash": "",
-    "semantic_hash": "7e22b318fbfb4cca458533eb56cd2410"
+    "semantic_hash": "1737cc186c15f24050e045800d033586"
   },
   "mobile/src/journal/writingController.ts": {
     "mtime": 1790145105.431286,
@@ -535,9 +535,9 @@
     "semantic_hash": "9837fc1b04e40c345adc5d5043f6e10c"
   },
   "mobile/src/journal/TradingPanel.tsx": {
-    "mtime": 1790144475.7181776,
+    "mtime": 1790246339.9612749,
     "ast_hash": "",
-    "semantic_hash": "138c2dd49fc449f8002c522f6c04b9c2"
+    "semantic_hash": "4eabb642b44cba646dc2dc2807fbae14"
   },
   "mobile/src/journal/WritingPanel.tsx": {
     "mtime": 1790227573.289738,
@@ -550,14 +550,14 @@
     "semantic_hash": "56dbfec02ad9707d6cb90dc2eea9ef22"
   },
   "docs/reviews/2026-09-24-reminders-history.md": {
-    "mtime": 1790237982.6859453,
+    "mtime": 1790247128.0130348,
     "ast_hash": "",
-    "semantic_hash": "72952c4af46529e1391afc16b8a2364e"
+    "semantic_hash": "3b5546f6287f95c3e78f2352100a4ac5"
   },
   "docs/learning/08-personal-reminders-and-history.md": {
-    "mtime": 1790229430.1596186,
+    "mtime": 1790247128.0110362,
     "ast_hash": "",
-    "semantic_hash": "ffd16fa731e6cd71ad4e12070144f566"
+    "semantic_hash": "3816e66d6dc623dd6957d0994f0246da"
   },
   "mobile/src/reminders/nativeReminders.ts": {
     "mtime": 1790230195.6578212,
@@ -593,5 +593,20 @@
     "mtime": 1790236238.0357258,
     "ast_hash": "",
     "semantic_hash": "3ca2a162b18bf96f00a2ef47588b9f6f"
+  },
+  "mobile/src/reminders/controller.ts": {
+    "mtime": 1790246107.4935634,
+    "ast_hash": "",
+    "semantic_hash": "9bae071073ef08c6831258d3c35c9fdd"
+  },
+  "mobile/src/reminders/ReminderEditor.tsx": {
+    "mtime": 1790246124.1845183,
+    "ast_hash": "",
+    "semantic_hash": "f3412f81dc89bd13a5c05802246078c6"
+  },
+  "mobile/src/reminders/ReminderSupport.tsx": {
+    "mtime": 1790240410.6958072,
+    "ast_hash": "",
+    "semantic_hash": "5c7b0f9542ff934c8d4c91240f9adf3d"
   }
 }

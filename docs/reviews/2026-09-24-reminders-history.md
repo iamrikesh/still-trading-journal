@@ -2,6 +2,8 @@
 
 Started from published `39539cc` on `codex/android-device-setup`, after [sessions/writing acceptance](2026-09-24-sessions-acceptance.md). The [approved design](../superpowers/specs/2026-09-23-personal-reminders-history-design.md) and [implementation plan](../superpowers/plans/2026-09-23-reminders-history.md) define the remaining journal milestone. This document records observed results, not expected completion.
 
+**Current result:** all four journal deliverables are complete for the approved scope. Source `c68e85b` closes the whole-milestone review findings; task review, one final scoped re-review, bounded S20 acceptance, changed-flow checks, preservation and owned-fixture cleanup passed. Sections below preserve the evidence at each stage; earlier “not installed/verified” statements refer to that stage, not the final device checkpoint.
+
 ## Starting state
 
 - Sessions/writing source, host checks and bounded S20 acceptance are complete with the limits in their dated review. Final device baseline: exact 17 original files, 3920423-byte usage, eleven retained metadata pairs, audio idle and zero pending. The labelled Sep23/Sep24 sessions and writing remain.
@@ -62,3 +64,79 @@ Native session/API inspection showed six active starter cards, no archived cards
 Preservation comparisons passed: exact original17-file vault set and all eleven earlier duration/byte pairs. Sep23 session/note/reflection checks passed. Sep24's corrected/original boundaries, original capture time, final note, moment reflection and both session reflections remained; the second Sep24 session remained ended and empty. This restart also verified the latest finalized follow-up, which had only been draft-recovery tested before its previous finalization. No test capture or new moment was created in this migration check.
 
 The filename comparison helper initially failed on its local Python encoding spelling before comparison; correcting it to `utf-8-sig` allowed the exact17-file assertion to pass. This was not an app or migration failure. App stopped after verification to prevent intermediate UI edits from executing through Fast Refresh; owned recording UI dump removed. Fixture folder remains for full Task4 picker tests. No permission/sleep/key settings were changed.
+
+## Native-only picker probe — incomplete
+
+While Task3 prepared new files, the reviewed runtime was briefly reopened before existing App/runtime edits. Fast Refresh was disabled using the installed native development-settings API; its exact preference was verified false, its reload completed, and the loaded reminder bridge was present before App edits resumed.
+
+Calling the image picker opened Android DocumentsUI. Back returned to the app's Now screen, but Metro's inspector target list then became empty and the pending result could not be read. Filtered recent runtime logs showed no error. This establishes picker launch only, **not verified cancellation, import or decoding**; the cause of the inspector disconnect was not established. A similar debugger-loss pattern occurred during earlier device checks, but that does not prove a common cause.
+
+The app was force-stopped and owned UI dumps removed. Fast Refresh remains false pending restoration after reviewed Task3 source is ready. No reminder was saved or audio started in this probe. Complete picker acceptance through the reviewed UI, without requiring an inspector result after each background transition.
+
+## Task 3 UI/controllers — initial review and fixes
+
+Committed **a641319**: [reminder/appearance controllers](../../mobile/src/reminders/controller.ts), [manager and editor](../../mobile/src/reminders/ReminderEditor.tsx), [current support](../../mobile/src/reminders/ReminderSupport.tsx), and [App integration](../../mobile/App.tsx). The implementation connects saved cards, draft Save/Cancel and guarded navigation, imports/previews, explicit media playback, coordinated journal audio entry points, Older/Newest, deletion invalidation and persisted appearance. Independent Task3 review found two Important audio issues below; this checkpoint is not approved and has not run on the S20.
+
+Controller tests began red on the missing module. Later regressions exercised inherited audio from an earlier support card, Play racing a delayed Stop, failed initial appearance loading and duplicate pending Stop. Final focused tests passed13/13; full host suite **154/154**, TypeScript and Android Metro export (**691 modules**) passed, as did scoped whitespace checks. These are host/controller and bundle checks, not real picker/render/playback or Android persistence evidence.
+
+The worker's Git escalation stalled after its sandbox could not write the index. After interrupting that request and verifying there was no active Git process, lock or staged change, root mechanically staged and committed only the six checked source/test files. No source edits or extra validation claims were introduced by that handoff.
+
+Review probes reproduced two controller defects: repeated Play leaves the old native player running while the UI incorrectly reports idle; failed native start with retained cleanup does the same. This hides Stop and prevents status polling. Separately, a Record request waiting for reminder release can survive End session in the new wrapper and start afterward. The existing recording controller cannot cancel a request it has not received yet. Fix round1 is in progress; the passing initial suite did not cover these seams.
+
+Review confirmed that normal Android picker background deliberately retains import ownership, allowing selection to return to the same editor; navigation/discard changes that ownership, while background revokes pending audio starts. The implementation report's earlier blanket background-cancellation wording was inaccurate. Deferred Minor observations cover an unguarded stale failed audio poll and missing appearance-read failure feedback within the editor; final review must triage these alongside the earlier stale-history test observation.
+
+
+### Task 3 fix and approval checkpoint
+
+Source `a641319` plus fix `b30b2d2` is task-approved after scoped re-review. Duplicate Play is refused; a failed start requests confirmed Stop and retains cleanup controls if release fails. End and explicit Stop synchronously cancel the wrapper admission before forwarding to the recording owner. Seven new regressions failed before the fix and pass afterward; final focused 20/20, full host 161/161, TypeScript and whitespace checks passed. Reviewer independently reran 7/7 scoped regressions. Three Minor observations across Tasks 2/3 remain for whole-milestone triage. Physical UI/media acceptance is underway, not yet complete.
+
+Before that acceptance, exact owned fixture names/hashes and original 17-file vault set matched; reminder temporary was absent. Initial launch encountered a development error because USB reverse forwarding was absent. Restoring it allowed normal app launch without a reset or source change.
+
+### S20 UI/media acceptance sequence
+
+Reviewed JS through `b30b2d2`, existing reviewed native APK. Fast Refresh restored. The synthetic card **Feature test reminder Sep24** was created through the UI. Dark changed the editor without losing its entered label. Hardware Back and tab navigation showed Stay/Discard/Save; Stay retained the changed support, and Save left for history successfully. Draft background retention has not yet been verified: the development launcher intent reloaded the app, so it was not counted as an ordinary resume pass.
+
+Actual system picker cancellation returned with no image attached. Files copied by ADB initially were absent from the Downloads provider view; indexing only the eight verified owned files and switching to list view made them selectable. Tiny PNG and 12-second WAV import, preview, Save and reopen passed. Oversized 5000-pixel PNG, invalid WAV and Opus-in-MP4 were rejected with the explicit import-failed message; previous draft media remained. AAC-in-MP4 imported and explicit Play exposed Stop.
+
+The 2000x2000 PNG and exact 4194304-byte WAV imported; the PNG preview appeared and WAV playback produced a private temporary of exactly that size. Cancel removed the temporary and discarded those replacements. Subsequent repository metadata confirmed the saved 64x64/181-byte PNG and 12000ms/192044-byte WAV, combined usage192225. The ordinary WAV Play disabled duplicate Play and kept Stop reachable; Stop removed its temporary. Home during playback also removed the temporary. These are actual Android observations, separate from native fake-driver tests.
+
+Metadata-only resource snapshots before/after boundary imports: PSS349675/399778KiB, native allocated114075/129247KiB, descriptors154/165, threads53/57. This is a short, unsettled observation, not peak-memory measurement or proof of leak freedom.
+
+One UI tap captured the synthetic reminder. Editing its support afterward and saving through the leave-editor prompt changed the current card; repository comparison confirmed the one older moment retained its original support snapshot. Dark preference and small saved media were reloaded. Exact original17 media filenames remain preserved; last session probe had clip usage3920423, zero pending and native journal audio idle.
+
+History fixture preparation created51 exactly labelled equal-time moments in the ended **Feature test history Sep24** session. Native repository pages returned50 then the remaining synthetic row, disjoint with equal timestamps. Actual UI Older/Newest and final fixture cleanup are still in progress; this preparation alone is not UI acceptance. Only fixture rows01..50 may be removed after ownership and absence-of-writing/clip checks; retain00 for the learning exercise.
+
+### History and ordinary background follow-up
+
+Actual UI Older loaded **Feature test history 00** after row01 at the50-row boundary. Its Original note screen opened; `Feature test older history remains writable.` was finalised. Returning from writing showed the existing Choose session grouping, Outside session and Record controls. Cleanup prevalidated all51 exact fixture rows and no added writing/clips on01..50, deleted exactly those50 through normal repository removal, retained00 and reported pending0. The refreshed history displayed the oldest-saved-moment message and its Newest control was exercised; no real entries were removed.
+
+The synthetic reminder moved up one position, archived and restored through its card-specific UI controls. A temporary changed label survived Home and return through Recent apps. The keyboard reopened on that return; UIAutomator exposed underlying app bounds, so subsequent helper taps initially hit the keyboard. After explicitly dismissing it, Discard in the leave prompt restored the original saved card label. This was a test-helper issue; the unsaved synthetic edits were discarded. Ordinary background draft retention is now verified, replacing the earlier unverified launcher-return attempt. Attachment removal was saved and a real process cold restart has begun for persistence checks.
+
+### Final pre-review-fix device checkpoint
+
+True process cold restarts confirmed Dark, Light and System from encrypted preferences. Dark restart retained saved image removal with attachment usage192044. Reimporting the tiny PNG through the picker and saving restored usage192225; Light and System restarts retained image64x64/181bytes, WAV12000ms/192044bytes, card position5, updated current support, the older moment's original support and the finalised older-history note. The light/System and dark interfaces were inspected locally; no screenshots were published.
+
+After the last restart:24 moments,7 active/0 archived cards, no active session, original clip usage3920423, zero pending, journal audio idle and native reminder idle. All eleven earlier duration/byte metadata pairs matched; exact original17 vault files matched; no reminder temporary remained. Sep23 examples and both Sep24 synthetic sessions, adjusted/original boundaries, final note, moment reflection and two final session reflections matched the earlier checkpoint.
+
+Only the eight exact hash-verified owned picker files and their empty phone folder were removed. The two useful new app examples remain: **Feature test reminder Sep24** with its small image/WAV and captured old-text moment, and ended **Feature test history Sep24** with only row00 and its final note. Fast Refresh is verified true, stay-awake0 and timeout600000 unchanged. App force-stopped before review-fix source edits; owned UI dump removed. Metro and USB forwarding are retained for the final fix validation. An intervening phone call paused all device interaction until Rikesh explicitly confirmed it was finished; no call contents were inspected.
+
+Whole-milestone source review found one Important session-timeline owner/cursor race and four Minor observations. Those remain open for the single correction wave and scoped re-review. These device results apply to source through b30b2d2; any changed flows receive an appropriate follow-up. Physical low-space, arbitrary provider failure, call/headphone audio interruption and resource/leak investigations remain outside this bounded acceptance; failure injections above are host evidence unless explicitly described as actual Android checks.
+
+### Whole-milestone correction and scoped approval
+
+The broad review of bc3aa1c..b30b2d2 found one Important session-timeline race: switching sessions could retain the previous owner's rows and cursor while the new first page waited or failed. It also recorded four Minor findings: weak stale-Older assertions, an unguarded old rejected reminder-status poll, missing appearance-load retry in the editor and absent global history session/archive labels.
+
+One correction wave, **c68e85b**, addressed all five. Session pages now bind rows, cursor and load/retry status to an owner; initial switching clears prior rows and refuses Older until the current first page is ready. Failed Older retains only that owner's rows/cursor. Stale status failures use the audio generation guard. The editor exposes appearance load failure/retry without leaving its draft. History reads add optional current session/archive metadata with one parameter-bound join for at most50 IDs per page; saved Moment inputs and captured text stay unchanged, and temporary/legacy adapters remain compatible.
+
+Red/green: new delayed/failed timeline switch regressions, stale rejected poll and archive-metadata tests failed before their corrections. Final focused56/56, full166/166, TypeScript, Android export691modules and whitespace checks passed. The single scoped re-review independently ran56/56 plus probes for stale timeline completion, same-owner Older retry and rejected polls after Stop. It approved spec and quality, with0 open Critical/Important/Minor findings in scope. Native/schema/dependency code did not change. Changed-flow S20 smoke checks follow; prior device evidence remains separately attributed to b30b2d2.
+
+
+### Final changed-flow device check and completion
+
+Cold-launched approved `c68e85b` with the same native APK. The populated **Feature test history Sep24** session showed its retained row00; switching to empty **Feature test Sep24 audio** showed no prior row or Older control. The delayed-success/failure race itself remains covered by host regressions, not a claimed Android fault injection.
+
+Archiving only the owned history test session made its row display **Session: Feature test history Sep24 · Archived** in My moments. Restore removed the Archived suffix. The bounded metadata result reported the same session title, archived=false and unchanged captured support; its final note also remained intact.
+
+Final combined probes again matched24 moments,7 active/0 archived cards,position5, System,64x64/181-byte PNG,12000ms/192044-byte WAV,total192225; immutable old reminder snapshot and older-history final note both true. Original17 clip files/3920423 bytes/all11 retained metadata pairs matched. Sep23 and both Sep24 synthetic sessions/writings matched the prior checkpoint. No active session, zero pending, journal and reminder audio idle, no reminder temporary. Fast Refresh true, stay-awake0 and timeout600000 unchanged. App left on Now; owned UI dump removed. Metro/USB development forwarding remain for the learning exercise; toolchains/caches and ignored local handoff remain private.
+
+All four approved feature outcomes are complete. Final source166/166 host tests, TypeScript and Android export691 passed; unchanged-native79/79 evidence remains applicable. Broad review plus the single scoped correction re-review are approved, with no open findings in scope. Public docs and graph record this bounded result; nothing is merged into main, deployed or declared production ready. Shared-audio adversarial races, write/release/provider failures and explicit recovery limits remain attributed to the host/native seams unless the device sequence above states otherwise. Existing release and physical resource/interruption gates remain open.

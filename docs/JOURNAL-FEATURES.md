@@ -16,10 +16,10 @@ Started 2026-09-23 from `a873ab2` on `codex/android-device-setup`, at Rikesh's r
 
 | Increment | Scope | Required demonstration | State |
 | --- | --- | --- | --- |
-| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Implemented/reviewed; September24 bounded S20 acceptance passed; device fault-path limits recorded |
-| 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Implemented/reviewed; draft/reflection/restart S20 checks passed; write faults remain host-tested |
-| 3 | Custom emotions and personal reminders | Customize emotion buttons; edit support text; add/play personal audio and images; preserve historical captures under later edits; validate and clean up media | Native + card storage implemented/reviewed; S20 migration preserves prior data; editor/support UI and media acceptance pending |
-| 4 | Older history and theme preferences | Browse beyond the recent-history limit with bounded loading; retain chosen theme after restart; verify empty/end/error states and readable presentation | Storage/controller implemented/reviewed; UI and full device checks pending |
+| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Complete for approved scope; reviewed, bounded S20 acceptance and final preservation passed; fault-path limits recorded |
+| 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Complete for approved scope; draft/reflection/restart S20 checks and final preservation passed; write faults remain host-tested |
+| 3 | Custom emotions and personal reminders | Customize emotion buttons; edit support text; add/play personal audio and images; preserve historical captures under later edits; validate and clean up media | Complete for approved scope; editor/media/restart S20 acceptance and whole-milestone correction review passed |
+| 4 | Older history and theme preferences | Browse beyond the recent-history limit with bounded loading; retain chosen theme after restart; verify empty/end/error states and readable presentation | Complete for approved scope; tied-history paging, theme restarts, timeline ownership and archive-label checks passed |
 
 These are milestone-level outcomes, not approved detailed designs. Each increment gets a focused spec and plan once its decisions are settled. Completion requires implementation, appropriate automated checks, device evidence and updated documentation; a prototype or passing host suite alone is insufficient.
 
@@ -130,3 +130,8 @@ Audit references: `mobile/src/storage/types.ts`, `journalSession.ts`, `clipSchem
 ## Resume
 
 Read `PROJECT-STATUS.md`, this tracker and the latest approved spec/plan. Check git state before edits. Resume at the first unanswered design decision or incomplete implementation step; do not restart the completed recording work or assume this milestone is complete because one increment passes.
+
+
+## Milestone completion — 2026-09-24
+
+Reviewed source `c68e85b` completes all four deliverables above. Final host166/166, TypeScript and Android export691 passed; latest unchanged-native JUnit79/79 passed. Whole-milestone review plus one correction wave closed all findings. S20 evidence and final preservation are recorded in the [dated reminder review](reviews/2026-09-24-reminders-history.md) and [current checkpoint](PROJECT-STATUS.md). No main merge, release, private journal/media publication or production-readiness claim. App unlock, encrypted backup/restore, missing-key recovery and release validation remain separate work.

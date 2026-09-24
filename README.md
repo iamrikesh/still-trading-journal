@@ -12,14 +12,15 @@ Screenshots show the current React Native web demo with sample moments.
 
 ## Current increment
 
-- Six starter emotion/urge cards, including **Unsure**.
-- Immediate original injecting logic and an automatically timestamped moment.
-- Recent-moment history, deletion, and system/light/dark appearance.
-- Clear saving/failed/retry behavior, with bounded unsaved drafts.
-- Native SQLCipher storage implementation with a SecureStore-protected random key; refuses plaintext fallback.
+- Six editable starter emotion/urge buttons, including **Unsure**, plus custom text, images and imported reminder audio.
+- Immediate support and a timestamped moment that keeps its captured text when the reminder changes later.
+- Manual trading sessions, recoverable original-note drafts and separately dated moment/session reflections.
+- Explicit journal Record/Stop/Play and reminder Play/Stop, with recovery and shared audio ownership.
+- Bounded Older/Newest history, deletion and persisted System/Light/Dark appearance.
+- Native SQLCipher journal and encrypted clip storage, with protected keys and no plaintext fallback.
 - A browser/Expo Go demo using bounded **temporary memory only**.
 
-**Development milestone, not a production release.** The Samsung S20 now passes native save, restart persistence and deletion checks; SQLCipher rejects reads without the protected key. Broader security and lifecycle checks remain. Voice capture, personal multimedia support cards, app unlock, backup/restore, session grouping and reflections are subsequent increments. Until the release checks are met, use sample moments only. Uninstalling the native app can lose its device-bound key; there is no restore flow yet.
+**Development milestone, not a production release.** Sessions, writing, reminder media, paging and appearance have bounded S20 evidence; see [current verification and remaining work](docs/PROJECT-STATUS.md). Whole-milestone review and the final correction wave are approved. App unlock, tested encrypted backup/restore, missing-key recovery and release validation remain open. Until those checks are met, use sample moments only. Uninstalling the native app can lose its device-bound key; there is no restore flow yet.
 
 ## Try the demo
 
@@ -43,7 +44,7 @@ On macOS/Linux use `npm` and `npx` without `.cmd`. In PowerShell the `.cmd` form
 
 ## Native development build
 
-The ARM64 development APK is installed and running on the S20. It passes APK signature and SQLCipher library-packaging checks, and the basic journal flow has been verified on the phone. Windows builds on this laptop use a short `S:` project alias to avoid native build path failures without copying files. Follow [Lesson 2](docs/learning/02-android-device-build.md) for this setup and see [build evidence and limits](docs/reviews/2026-09-20-android-build-setup.md).
+The ARM64 development APK is installed on the S20. It passes APK signature and SQLCipher library-packaging checks; [current device evidence](docs/reviews/2026-09-24-reminders-history.md) records what actually ran and its limits. Windows builds on this laptop use a short `S:` project alias to avoid native build path failures without copying files. Follow [Lesson 2](docs/learning/02-android-device-build.md) for this setup.
 
 Expo Go cannot provide SQLCipher. A native build is needed to exercise encrypted persistence. With Java and the Android SDK configured, and an emulator or authorized USB device connected:
 
@@ -81,10 +82,13 @@ Start with [Lesson 1: from a tap to a saved moment](docs/learning/01-first-momen
 
 Continue with [Lesson 2: build for a real Android phone](docs/learning/02-android-device-build.md) for the Samsung S20 setup, USB development, and disk-saving habits.
 
+[Lesson 7](docs/learning/07-sessions-and-writing.md) explains capture time, sessions and hindsight. [Lesson 8](docs/learning/08-personal-reminders-and-history.md) uses the retained synthetic examples to explain reminder drafts, immutable history and audio ownership.
+
 | Location | Purpose |
 |---|---|
 | `mobile/App.tsx` | React Native screens and event wiring |
-| `mobile/src/journal/` | Starter reminders and tap/save state transitions |
+| `mobile/src/journal/` | Moment, session and writing screens/controllers |
+| `mobile/src/reminders/` | Reminder editing, selected-media adapter and explicit playback |
 | `mobile/src/storage/` | SQLite repository, native encryption initialization and temporary demo |
 | `mobile/tests/` | Behavior and real SQLite integration tests |
 | `mobile/e2e/` | Browser interaction checks |

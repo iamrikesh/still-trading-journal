@@ -1,6 +1,6 @@
 # Lesson 8 — editable reminders and preserved history
 
-This lesson describes the approved next increment. Check [project status](../PROJECT-STATUS.md) and the [dated evidence](../reviews/2026-09-24-reminders-history.md) for what is implemented and verified; the exercises below are not completion claims.
+These features are implemented and have bounded S20 evidence. Check [project status](../PROJECT-STATUS.md) and the [dated evidence](../reviews/2026-09-24-reminders-history.md) for completed review corrections and verification limits.
 
 ## A saved reminder and an editor draft are different things
 
@@ -28,9 +28,11 @@ Fetching fifty moments does not mean only fifty moments exist. An Older action a
 
 The selected appearance is another small saved value. Choosing Light or Dark can change the current screen immediately; persistence is a separate operation, so a failed save must remain visible and retryable.
 
+A page also belongs to a particular view. A session's Older cursor must come from that same session. Switching from session A to B must invalidate A's pending requests and hide its rows while B loads. A request number alone cannot protect against using a cursor from the wrong owner. Whole-milestone review exposed this case; the controller now enforces the owner and generation together, with delayed/failing-read regressions recorded in the dated review.
+
 ## Predict before trying
 
-Use only clearly labelled synthetic examples when the corresponding device checks are ready:
+Use the retained **Feature test reminder Sep24** card and **Feature test history Sep24** session for these exercises:
 
 1. Replace an image, then Cancel. Which image should appear after reopening the card? The previously saved one.
 2. Save a reminder, tap it, then change its text. Which text belongs to the earlier moment? The snapshot captured at the tap.
@@ -41,4 +43,6 @@ Use only clearly labelled synthetic examples when the corresponding device check
 
 ## Verification record
 
-Implementation and acceptance are in progress. Host fault tests, JVM media seams, Android compilation and real system-picker/playback checks establish different facts. The dated evidence keeps those results separate. App unlock, encrypted backup/restore, missing-key recovery and release validation remain separate release gates.
+On the S20, the synthetic reminder kept its original captured text after the card changed. Its small PNG/WAV survived restart; Cancel preserved them after larger replacements, and Save persisted image removal. Explicit Stop and backgrounding removed the owned playback temporary. The 51-entry paging exercise crossed the 50-row boundary; only entry00 with its finalised note remains. Dark, Light and System survived process restarts.
+
+Host fault tests, JVM media seams, Android compilation and real system-picker/playback checks establish different facts. Memory snapshots do not prove leak freedom, and a debug APK does not establish production readiness. The dated evidence records the approved correction wave and changed-flow device checks separately. App unlock, encrypted backup/restore, missing-key recovery and release validation remain separate release gates.

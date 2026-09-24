@@ -3330,7 +3330,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Tracks all four journal feature deliverables. Sessions/writing storage and UI checkpoint, review fixes, bounded device acceptance, September24 continuation and remaining feature work are tracked separately from queued reminders/history."
+      "rationale": "Tracks all four implemented journal deliverables, task and whole-milestone review, bounded S20 acceptance and remaining release gates."
     },
     {
       "id": "journal_domain_language",
@@ -3480,7 +3480,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Native implementation and review fixes; distinguishes JVM/host checks from pending Android picker, codec and persistence acceptance."
+      "rationale": "Native, storage and UI review fixes; distinguishes host/JVM checks from actual Android picker, codec, playback, persistence, paging and preservation evidence."
     },
     {
       "id": "reminders_history_lesson",
@@ -3561,6 +3561,46 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Card revisions and stable attachment identities, retain/remove/replace Save contract and appearance repository."
+    },
+    {
+      "id": "reminder_controller",
+      "label": "Reminder, appearance and audio coordination",
+      "source_file": "mobile/src/reminders/controller.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Owns editor/import/play generations, saved-card state, explicit audio release admission and ordered appearance persistence."
+    },
+    {
+      "id": "reminder_editor",
+      "label": "Reminder management and draft editor",
+      "source_file": "mobile/src/reminders/ReminderEditor.tsx",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Custom-card management, draft fields, bounded media imports and Save/Cancel controls."
+    },
+    {
+      "id": "reminder_support",
+      "label": "Current reminder support",
+      "source_file": "mobile/src/reminders/ReminderSupport.tsx",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Lazy image display and explicit audio controls for the current card, separate from historic capture text."
+    },
+    {
+      "id": "history_moment_projection",
+      "label": "Captured moment and current session metadata",
+      "source_file": "mobile/src/storage/types.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "HistoryMoment adds optional current session/archive metadata to a bounded list result without changing immutable captured Moment save inputs."
     }
   ],
   "links": [
@@ -7903,6 +7943,125 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_controller",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_editor",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_support",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "history_moment_projection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "reminder_controller",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "reminder_editor",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "reminder_support",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "reminder_native_adapter",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "trading_controller",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "trading_panel",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "writing_controller",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "writing_panel",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "reminder_repository",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "reminder_schema",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "trading_repository",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "native_clip_session",
+      "target": "history_moment_projection",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/storage/journalSession.ts"
+    },
+    {
+      "source": "mobile_src_journal_controller",
+      "target": "history_moment_projection",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/journal/controller.ts"
     }
   ],
   "hyperedges": [
