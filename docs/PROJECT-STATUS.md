@@ -1,6 +1,18 @@
 # still. — resume here
 
-## Current checkpoint (2026-09-23) — requested stop
+## Current checkpoint (2026-09-24) — sessions/writing acceptance
+
+Resumed from published `eb2d650` on **codex/android-device-setup**. Sessions/writing Tasks1/2 remain implemented; Task3 bounded S20 acceptance is now complete. See the [September24 evidence and coverage limits](reviews/2026-09-24-sessions-acceptance.md).
+
+- **Fixed:** the first saved reflection exposed a React list-key warning. Reflection buttons now use stable writing IDs. Repeated reflection creation/recovery after cold restart passed without the warning.
+- **Verified:** 123/123 host tests, TypeScript and Android Metro export (685 modules). S20 Start/Resume/End across restart, note draft recovery and finalisation after End, separate moment/session reflections and follow-up recovery, empty Done, discard/Keep, outside-session/regrouping, reversed-time rejection, adjusted cross-midnight boundaries and Archive/Restore. Safe active Record → End saved a 14117ms synthetic clip; only that clip was subsequently deleted.
+- **Preserved:** exact original 17-file / 3920423-byte media baseline and eleven retained metadata pairs. Final native idle, zero pending. Retained **Feature test Sep24** with one Note, one moment reflection and two session reflections; **Feature test Sep24 audio** is ended and empty. Sep23 examples unchanged.
+- **Environment:** existing APK reused; no native rebuild/reset/key replacement. S: alias restored; Metro IPv4 and USB8081 forwarding running for continued work. Current phone stay-awake0 and timeout600000ms were preserved (the timeout changed since yesterday). Owned UI dumps removed; private local helpers remain ignored.
+- **Next:** execute [reminders/history plan](superpowers/plans/2026-09-23-reminders-history.md) Task1 native import/shared playback, then storage, UI and integrated S20 acceptance. Custom emotions/media, general older-history paging and persisted theme are not implemented yet. Do not repeat sessions/writing implementation.
+- **Limits:** delayed permission/release and persistence-failure branches retain host-only evidence. Physical low-space, call/headphone interruptions, earlier resource investigations and release gates remain open. No production-readiness claim.
+- **Exercise:** open Sessions → Feature test Sep24. Explain why moving its Note preserved capture time and moment reflection, while its whole-session reflections stayed with the session. See [Lesson7](learning/07-sessions-and-writing.md).
+
+## Previous checkpoint (2026-09-23) — requested stop
 
 Rikesh asked to stop at the nearest logical checkpoint after the interruption. Work remains on **item 2**, but do not start another increment during this wrap-up. Branch: **codex/android-device-setup**. Reviewed source checkpoint: **2be987d**, following session/writing storage and UI implementation plus review fixes. This documentation commit closes the handoff; nothing is merged into main.
 

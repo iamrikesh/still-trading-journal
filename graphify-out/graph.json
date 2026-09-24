@@ -3330,7 +3330,7 @@
       "file_type": "document",
       "community": 1,
       "community_name": "Encrypted journal persistence",
-      "rationale": "Tracks all four journal feature deliverables. Sessions/writing storage and UI checkpoint, review fixes, bounded device evidence, requested stop and remaining acceptance are tracked separately from queued reminders/history."
+      "rationale": "Tracks all four journal feature deliverables. Sessions/writing storage and UI checkpoint, review fixes, bounded device acceptance, September24 continuation and remaining feature work are tracked separately from queued reminders/history."
     },
     {
       "id": "journal_domain_language",
@@ -3461,6 +3461,16 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "Recoverable draft editing, immutable finished writing and dated follow-ups."
+    },
+    {
+      "id": "sessions_acceptance_sep24",
+      "label": "September24 sessions and writing S20 acceptance",
+      "source_file": "docs/reviews/2026-09-24-sessions-acceptance.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "UI acceptance, reflection-key fix, original media preservation and explicit host-only fault limits."
     }
   ],
   "links": [
@@ -7730,6 +7740,13 @@
     {
       "source": "journal_features_milestone",
       "target": "writing_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "sessions_acceptance_sep24",
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/JOURNAL-FEATURES.md"

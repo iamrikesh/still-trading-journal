@@ -16,6 +16,8 @@ Consider a note started at 10:55 pm. You end the session at 11 pm, then finish w
 
 ## Verification status
 
-Session/writing storage is implemented and independently reviewed. The S20 retained an ended/adjusted synthetic session, notes and reflection across restart. A bounded UI check recovered a draft, edited it, pressed Done and verified its finished text after another restart. Broader UI and failure checks remain; use the [dated review](../reviews/2026-09-23-sessions-writing.md) for precise coverage rather than treating every example above as a completed test.
+Session/writing storage and UI are implemented and reviewed. September24 S20 checks covered session restart/Resume, draft recovery, finalisation after End, reflections/follow-ups, moving a moment, boundary corrections, Archive/Restore and End during active recording. Delayed permission/release and write-failure cases retain host-test evidence; use the [latest dated review](../reviews/2026-09-24-sessions-acceptance.md) for precise limits. A discovered reflection-list rendering warning was fixed and device-rechecked.
 
 For a retained example next time, open Sessions → Feature test Sep23. Its two moments are synthetic. The note labelled Feature test draft was subsequently finished through the UI and now reads “Feature test edited on S20.” Compare its capture time with finalisation time and the session ending.
+
+The newer **Feature test Sep24** contains one Note, a moment reflection and two session reflections. Its Note moved to another session and back without changing its original capture time. Its corrected session boundaries cross midnight; compare them with the original boundaries. The disposable recording was explicitly deleted, while the writing remains. Explain why a moment reflection follows the moment but a session reflection stays with the session.

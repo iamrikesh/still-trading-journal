@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790145286.6973293,
+    "mtime": 1790228735.4178886,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "122eec437aa607c9d4f9e0a1d7243ba6"
+    "semantic_hash": "79ca661d6c47f609e201b15d3676a7d5"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -475,9 +475,9 @@
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   },
   "docs/JOURNAL-FEATURES.md": {
-    "mtime": 1790145286.699871,
+    "mtime": 1790228739.0010476,
     "ast_hash": "",
-    "semantic_hash": "9da28155d827a069b79d4fd141676169"
+    "semantic_hash": "fbdee891c070afcb66f2c6e8e8cba91a"
   },
   "CONTEXT.md": {
     "mtime": 1790142414.5527272,
@@ -490,9 +490,9 @@
     "semantic_hash": "39fd88c503fc125a24c4cdd0a0821528"
   },
   "docs/superpowers/plans/2026-09-23-sessions-writing.md": {
-    "mtime": 1790145286.7024114,
+    "mtime": 1790228932.9735985,
     "ast_hash": "",
-    "semantic_hash": "1b79e833c2d93cf930772d5e4f798edf"
+    "semantic_hash": "14d9628f160460346c4c839d665f9b63"
   },
   "docs/reviews/2026-09-23-sessions-writing.md": {
     "mtime": 1790145286.699871,
@@ -500,9 +500,9 @@
     "semantic_hash": "3ffb42dd492ced7ec15a499fe328db1a"
   },
   "docs/learning/07-sessions-and-writing.md": {
-    "mtime": 1790144866.0491652,
+    "mtime": 1790228742.0844998,
     "ast_hash": "",
-    "semantic_hash": "8153602d2a9632b5885a8cd4cb3fdd3c"
+    "semantic_hash": "2a2836dd94d9a18ee0226823c0e821b5"
   },
   "docs/superpowers/specs/2026-09-23-personal-reminders-history-design.md": {
     "mtime": 1790143279.2551239,
@@ -540,8 +540,13 @@
     "semantic_hash": "138c2dd49fc449f8002c522f6c04b9c2"
   },
   "mobile/src/journal/WritingPanel.tsx": {
-    "mtime": 1790145105.4333153,
+    "mtime": 1790227573.289738,
     "ast_hash": "",
-    "semantic_hash": "7211f0f55de0a5f4b5e432ef309cd507"
+    "semantic_hash": "7fb79b749dd9cd54920749c6633b1e53"
+  },
+  "docs/reviews/2026-09-24-sessions-acceptance.md": {
+    "mtime": 1790228732.1327982,
+    "ast_hash": "",
+    "semantic_hash": "56dbfec02ad9707d6cb90dc2eea9ef22"
   }
 }

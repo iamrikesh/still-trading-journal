@@ -4,7 +4,7 @@ Started 2026-09-23 from `a873ab2` on `codex/android-device-setup`, at Rikesh's r
 
 ## Working agreement
 
-- Latest steering: stop at the nearest logical checkpoint after the interruption, update/commit/push progress and resume next session. This supersedes continuing through the full milestone in this sitting; the four-deliverable objective is retained.
+- Latest steering (2026-09-24): resume from the saved checkpoint. The earlier stopping request has ended; continue the approved four-deliverable milestone autonomously.
 - Continue toward all four deliverables below, with progress updates and durable handoffs between increments.
 - Use brainstorming and grilling to resolve product decisions; look up technical facts in the repository rather than asking Rikesh to supply them.
 - Record decisions as they are answered. Present concrete designs for review before implementation, then use plans, meaningful regression tests, code review and S20 verification.
@@ -16,8 +16,8 @@ Started 2026-09-23 from `a873ab2` on `codex/android-device-setup`, at Rikesh's r
 
 | Increment | Scope | Required demonstration | State |
 | --- | --- | --- | --- |
-| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Implemented/reviewed; bounded S20 check passed; broader acceptance next |
-| 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Implemented/reviewed; bounded S20 check passed; broader acceptance next |
+| 1 | Trading sessions and timelines | Start/end a session; attach and review its moments; restart without losing state; agreed handling of moments outside sessions | Implemented/reviewed; September24 bounded S20 acceptance passed; device fault-path limits recorded |
+| 2 | Typed notes and separate reflections | Capture text without mandatory recording; preserve drafts as agreed; distinguish original capture from later reflection; verify restart and failure behavior | Implemented/reviewed; draft/reflection/restart S20 checks passed; write faults remain host-tested |
 | 3 | Custom emotions and personal reminders | Customize emotion buttons; edit support text; add/play personal audio and images; preserve historical captures under later edits; validate and clean up media | Queued |
 | 4 | Older history and theme preferences | Browse beyond the recent-history limit with bounded loading; retain chosen theme after restart; verify empty/end/error states and readable presentation | Queued |
 
@@ -117,6 +117,8 @@ Rikesh approved autonomous completion on 2026-09-23, asking to be notified when 
 Audit references: `mobile/src/storage/types.ts`, `journalSession.ts`, `clipSchema.ts`, `clipJournal.ts`, `mobile/src/journal/controller.ts`, `mobile/App.tsx`, and native `ClipFileVault.kt`. Audit was read-only and did not rerun tests or operate the device.
 
 ## Current evidence and open work
+
+- September24 continuation: sessions/writing Task3 bounded S20 acceptance complete; reflection-list key defect fixed and device-rechecked. 123/123 host tests, TypeScript and Android export passed; original media baseline preserved. See [September24 review](reviews/2026-09-24-sessions-acceptance.md). Next is reminders/history Task1; the whole milestone remains incomplete. The stopping-checkpoint bullet below is historical.
 
 - Requested stopping checkpoint: reviewed source through `2be987d`; final 123/123 host tests, TypeScript and Android export passed. Sessions/writing storage and UI are implemented and task-reviewed. S20 storage restart and bounded draft edit/Done checks passed before the final UI locking fixes. Broader Task3 device acceptance remains, then the [reminders/history plan](superpowers/plans/2026-09-23-reminders-history.md). See [current status](PROJECT-STATUS.md) and [dated evidence](reviews/2026-09-23-sessions-writing.md); do not mark the whole item2 milestone complete.
 - Design checkpoint validation: local links in the tracker, glossary, status and selected evidence documents resolve; graph IDs are unique and edge endpoints valid (287 nodes / 412 edges); whitespace checks passed. This increment changes public documentation/navigation only. App tests were not rerun and the S20 was not operated.

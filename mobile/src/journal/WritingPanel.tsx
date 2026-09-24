@@ -39,7 +39,7 @@ export function WritingPanel({ controller, repository, owner, initialKind, ink, 
     } catch { if (token === request.current) setError('Writing could not load. Please try again.'); }
   }
   function discard() { const action = () => { void controller.discard().then(reload); }; if (Platform.OS === 'web') { if (window.confirm('Discard this draft? Saved text will be removed.')) action(); } else Alert.alert('Discard draft?', 'Saved draft text will be removed. The moment or session and its clips stay.', [{ text: 'Keep', style: 'cancel' }, { text: 'Discard', style: 'destructive', onPress: action }]); }
-  const button = (label: string, action: () => void, disabled = false) => <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={action} style={[styles.button, { borderColor: line, opacity: disabled ? 0.5 : 1 }]}><Text style={{ color: ink }}>{label}</Text></Pressable>;
+  const button = (label: string, action: () => void, disabled = false, key?: string) => <Pressable key={key} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={action} style={[styles.button, { borderColor: line, opacity: disabled ? 0.5 : 1 }]}><Text style={{ color: ink }}>{label}</Text></Pressable>;
   const writing = state.writing;
   return <ScrollView contentContainerStyle={styles.body}>
     {button('Back from writing', onBack)}
@@ -49,7 +49,7 @@ export function WritingPanel({ controller, repository, owner, initialKind, ink, 
     {error && button('Retry loading writing', () => { void reload(); })}
     {!loading && !error && <>
       {owner.kind === 'moment' && button('Original note', () => { void selectWriting('note'); }, state.busy)}
-      {rows.filter(row => row.kind === 'reflection').map(row => button(`${row.finalisedAt ? 'Reflection' : 'Draft reflection'} · ${new Date(row.createdAt).toLocaleString()}`, () => { void selectWriting('reflection', row.id); }, state.busy))}
+      {rows.filter(row => row.kind === 'reflection').map(row => button(`${row.finalisedAt ? 'Reflection' : 'Draft reflection'} · ${new Date(row.createdAt).toLocaleString()}`, () => { void selectWriting('reflection', row.id); }, state.busy, row.id))}
       {older && button('Older writing', () => { void loadOlder(); })}
       {button('Add follow-up reflection', () => { ++request.current; controller.open(owner, 'reflection'); }, state.busy)}
       {writing && <View style={[styles.card, { borderColor: line }]}>

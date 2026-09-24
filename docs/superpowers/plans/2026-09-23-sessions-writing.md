@@ -109,12 +109,14 @@ async function stopForSessionEnd(): Promise<boolean> {
 
 ### Task 3: S20 acceptance and checkpoint
 
+September24 bounded acceptance passed; see `docs/reviews/2026-09-24-sessions-acceptance.md` for the exact UI/native evidence and host-only failure-path limits.
+
 **Files:** `docs/reviews/2026-09-23-sessions-writing.md`, `docs/learning/07-sessions-and-writing.md`, status/tracker and Graphify public navigation.
 
 **Consumes:** reviewed Tasks1/2. **Produces:** exact device evidence and reproducible resume instructions.
 
-- [ ] Baseline device audio metadata/file set without exporting private prose/audio. Verify Metro and USB connection, cold restart existing APK to migrate, preserve all originals. No app-data reset.
-- [ ] Through UI create synthetic session/note/reflection, End, finalise draft later, restart, move moment, adjust boundaries, archive and restore. Verify timestamps and text retention using synthetic content only. Demonstrate stored read-only text and draft recovery.
-- [ ] Exercise End pending Record/active capture on the S20 only with microphone-safe conditions; otherwise report precise unrun device coverage while host fault cases remain validated. Never record unattended private conversation. Check native idle and recover pending synthetic operations.
-- [ ] Confirm original media metadata/file set unchanged except explicitly identified synthetic additions. Remove only deliberately disposable synthetic content via confirmed UI, or retain and label it for learning. Update docs with exact checks and limitations; graph refresh excludes private/local/generated output.
+- [x] Baseline device audio metadata/file set without exporting private prose/audio. Verify Metro and USB connection, cold restart existing APK to migrate, preserve all originals. No app-data reset.
+- [x] Through UI create synthetic session/note/reflection, End, finalise draft later, restart, move moment, adjust boundaries, archive and restore. Verify timestamps and text retention using synthetic content only. Demonstrate stored read-only text and draft recovery.
+- [x] Exercise End pending Record/active capture on the S20 only with microphone-safe conditions; otherwise report precise unrun device coverage while host fault cases remain validated. Never record unattended private conversation. Check native idle and recover pending synthetic operations.
+- [x] Confirm original media metadata/file set unchanged except explicitly identified synthetic additions. Remove only deliberately disposable synthetic content via confirmed UI, or retain and label it for learning. Update docs with exact checks and limitations; graph refresh excludes private/local/generated output.
 - [ ] Commit/push reviewed milestone, verify remote SHA, and continue to custom reminders/history/theme. This task completing does not complete item2.
