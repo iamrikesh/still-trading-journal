@@ -76,19 +76,19 @@ interface AppearanceRepository { get(): Promise<'system'|'light'|'dark'>; set(va
 // Existing native page size50; no global data cap. First call remains compatible.
 ```
 
-- [ ] Write failing real SQLite tests via `createJournalSession`, asserting facade presence then seed/reopen persistence. Use actual synthetic bounded base64 fixture bytes, no private media. Full content decoding is native's responsibility; repository validates canonical encoding, metadata and quotas.
-- [ ] Migrate3→4 transactionally, seed six existing definitions once, default system appearance. Admit supported0..4 in runtime, accept4 in clip/trading migration guards, retain media evidence checks for all media-capable versions. Unknown future schema fails closed.
-- [ ] Separate card metadata table from payload table. Save validates immutable ID and expected revision, updates text/attachment references and deletes replaced unreferenced payloads within the same transaction. Undefined attachment input retains, null removes, supplied value replaces with stable candidate ID. Retry identical completed Save returns stored result; stale differing Save rejects. No payloads in list queries.
+- [x] Write failing real SQLite tests via `createJournalSession`, asserting facade presence then seed/reopen persistence. Use actual synthetic bounded base64 fixture bytes, no private media. Full content decoding is native's responsibility; repository validates canonical encoding, metadata and quotas.
+- [x] Migrate3→4 transactionally, seed six existing definitions once, default system appearance. Admit supported0..4 in runtime, accept4 in clip/trading migration guards, retain media evidence checks for all media-capable versions. Unknown future schema fails closed.
+- [x] Separate card metadata table from payload table. Save validates immutable ID and expected revision, updates text/attachment references and deletes replaced unreferenced payloads within the same transaction. Undefined attachment input retains, null removes, supplied value replaces with stable candidate ID. Retry identical completed Save returns stored result; stale differing Save rejects. No payloads in list queries.
 
 ```sql
 SELECT id, label, hint, symbol, support, action, position, archived, revision, imageId, audioId
 FROM emotion_cards WHERE archived = ? ORDER BY position, id;
 ```
 
-- [ ] Validate numeric bounds, exact base64 byte counts/canonical alphabet, correct image/audio kind and IDs, at least one support format, total quota after accounting replacements. Keep last active button; reject41st definition; archive/reorder atomically with stable ID order and no historical moment mutation. Input snapshots are taken before queueing.
-- [ ] Native moment paging uses exclusive descending `(createdAt,id)` cursor and existing deletion visibility. Controller `older()` retains pages on failure, exposes loading/end/retry state, deduplicates appended IDs, ignores stale responses after refresh/delete and avoids unbounded automatic fetching. A Newest refresh resets cursor. Ensure reading older rows never deletes them. Demo still explicitly temporary; no native persistence claim.
-- [ ] Persist appearance through the same queue with input validation. Failed preference write never reports durable success.
-- [ ] Cover seed idempotency, immutable moment snapshots, move/archive, quota and replacement rollback, payload-free queries, failed/stale saves, schema rollback/evidence, >50 tied history, older failure/retry and appearance close/reopen. Run full host suite/typecheck. Commit and report.
+- [x] Validate numeric bounds, exact base64 byte counts/canonical alphabet, correct image/audio kind and IDs, at least one support format, total quota after accounting replacements. Keep last active button; reject41st definition; archive/reorder atomically with stable ID order and no historical moment mutation. Input snapshots are taken before queueing.
+- [x] Native moment paging uses exclusive descending `(createdAt,id)` cursor and existing deletion visibility. Controller `older()` retains pages on failure, exposes loading/end/retry state, deduplicates appended IDs, ignores stale responses after refresh/delete and avoids unbounded automatic fetching. A Newest refresh resets cursor. Ensure reading older rows never deletes them. Demo still explicitly temporary; no native persistence claim.
+- [x] Persist appearance through the same queue with input validation. Failed preference write never reports durable success.
+- [x] Cover seed idempotency, immutable moment snapshots, move/archive, quota and replacement rollback, payload-free queries, failed/stale saves, schema rollback/evidence, >50 tied history, older failure/retry and appearance close/reopen. Run full host suite/typecheck. Commit and report.
 
 ### Task 3: Reminder editor, playback, history and appearance UI
 

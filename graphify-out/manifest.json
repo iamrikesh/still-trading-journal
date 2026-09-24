@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790235735.0699346,
+    "mtime": 1790238015.5854168,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "4573f719ed0f01b2d270e9dd7e6a9ef0"
+    "semantic_hash": "5227084d8fff52a07e1458fe7feea547"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -475,9 +475,9 @@
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   },
   "docs/JOURNAL-FEATURES.md": {
-    "mtime": 1790235735.0776508,
+    "mtime": 1790238015.5854168,
     "ast_hash": "",
-    "semantic_hash": "b692fd25654a1001c34e85ff05fce7c4"
+    "semantic_hash": "82e0cf114bc157eb7e2714551b5aeb52"
   },
   "CONTEXT.md": {
     "mtime": 1790142414.5527272,
@@ -510,9 +510,9 @@
     "semantic_hash": "469a0a395ffb1bcc894115374ea569f3"
   },
   "docs/superpowers/plans/2026-09-23-reminders-history.md": {
-    "mtime": 1790235735.0776508,
+    "mtime": 1790237982.7279074,
     "ast_hash": "",
-    "semantic_hash": "4cebfb0a539d94d698225472965b2102"
+    "semantic_hash": "bbda286c818909bb35c389c2313a7d7f"
   },
   "mobile/src/storage/tradingJournal.ts": {
     "mtime": 1790143780.4969232,
@@ -520,9 +520,9 @@
     "semantic_hash": "e1026c407cf9949b37fd61c42c6521fe"
   },
   "mobile/src/storage/tradingSchema.ts": {
-    "mtime": 1790143636.772581,
+    "mtime": 1790236343.653963,
     "ast_hash": "",
-    "semantic_hash": "e6b586056d366a7fe9467871ed0635e0"
+    "semantic_hash": "81452d7c30db302661c0b1c24f56d34e"
   },
   "mobile/src/journal/tradingController.ts": {
     "mtime": 1790144475.7181776,
@@ -550,13 +550,48 @@
     "semantic_hash": "56dbfec02ad9707d6cb90dc2eea9ef22"
   },
   "docs/reviews/2026-09-24-reminders-history.md": {
-    "mtime": 1790235735.0448906,
+    "mtime": 1790237982.6859453,
     "ast_hash": "",
-    "semantic_hash": "8ffee7902bb348b3dd3998b5f14c0e32"
+    "semantic_hash": "72952c4af46529e1391afc16b8a2364e"
   },
   "docs/learning/08-personal-reminders-and-history.md": {
     "mtime": 1790229430.1596186,
     "ast_hash": "",
     "semantic_hash": "ffd16fa731e6cd71ad4e12070144f566"
+  },
+  "mobile/src/reminders/nativeReminders.ts": {
+    "mtime": 1790230195.6578212,
+    "ast_hash": "",
+    "semantic_hash": "94bd77de4eedb1e0bf553645d8db4e5f"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ReminderMedia.kt": {
+    "mtime": 1790233332.8013632,
+    "ast_hash": "",
+    "semantic_hash": "5fe225a3afe21d7ac9c10eba59a99a0b"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ReminderPicker.kt": {
+    "mtime": 1790231791.038824,
+    "ast_hash": "",
+    "semantic_hash": "e6fe7d1efb0088f8e31972f65c9441f5"
+  },
+  "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ReminderPlayback.kt": {
+    "mtime": 1790231591.1726472,
+    "ast_hash": "",
+    "semantic_hash": "88fb8312b7346af4604bd7651fc3c163"
+  },
+  "mobile/src/storage/reminderJournal.ts": {
+    "mtime": 1790236795.4699745,
+    "ast_hash": "",
+    "semantic_hash": "98acdb6d150db8dca611721fb6628ab0"
+  },
+  "mobile/src/storage/reminderSchema.ts": {
+    "mtime": 1790236241.9848137,
+    "ast_hash": "",
+    "semantic_hash": "c65922746a42c6d7a6e6cc7e0d7898ec"
+  },
+  "mobile/src/storage/reminderTypes.ts": {
+    "mtime": 1790236238.0357258,
+    "ast_hash": "",
+    "semantic_hash": "3ca2a162b18bf96f00a2ef47588b9f6f"
   }
 }
