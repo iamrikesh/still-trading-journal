@@ -1,13 +1,14 @@
 import type { Moment } from '../storage/types.ts';
 import type { TradingCursor, TradingRepository, TradingSession } from '../storage/tradingTypes.ts';
 
-type State = { active: TradingSession | null; sessions: TradingSession[]; archived: TradingSession[]; timeline: Moment[]; busy: boolean; error: string | null; acknowledged: boolean; moreSessions: boolean; moreArchived: boolean; moreTimeline: boolean };
+type State = { active: TradingSession | null; sessions: TradingSession[]; archived: TradingSession[]; timeline: Moment[]; timelineStatus: 'idle' | 'loading' | 'ready' | 'failed' | 'loadingOlder' | 'failedOlder'; busy: boolean; error: string | null; acknowledged: boolean; moreSessions: boolean; moreArchived: boolean; moreTimeline: boolean };
 type RecordingBoundary = { stopForSessionEnd(): Promise<boolean> };
 export function createTradingController(deps: { repository(): Promise<TradingRepository>; recording: RecordingBoundary; id(): string; now(): string }) {
-  let state: State = { active: null, sessions: [], archived: [], timeline: [], busy: false, error: null, acknowledged: false, moreSessions: false, moreArchived: false, moreTimeline: false };
+  let state: State = { active: null, sessions: [], archived: [], timeline: [], timelineStatus: 'idle', busy: false, error: null, acknowledged: false, moreSessions: false, moreArchived: false, moreTimeline: false };
   const listeners = new Set<() => void>();
   let locked = false;
   let view = 0;
+  let timelineOwner: string | null = null;
   function update(patch: Partial<State>) { state = { ...state, ...patch }; listeners.forEach(fn => fn()); }
   async function operate(work: () => Promise<void>) {
     if (locked) return;
@@ -61,12 +62,19 @@ export function createTradingController(deps: { repository(): Promise<TradingRep
     }); },
     assign(momentId: string, sessionId: string | null) { return operate(async () => { await (await deps.repository()).assign(momentId, sessionId); }); },
     async timeline(id: string, older = false) {
+      if (older && (timelineOwner !== id || !['ready', 'failedOlder'].includes(state.timelineStatus) || !state.moreTimeline)) return;
       const request = ++view;
       const last = older ? state.timeline.at(-1) : undefined;
+      if (!older) {
+        timelineOwner = id;
+        update({ timeline: [], moreTimeline: false, timelineStatus: 'loading', error: null });
+      } else update({ timelineStatus: 'loadingOlder' });
       try {
         const rows = await (await deps.repository()).timeline(id, last ? { at: last.createdAt, id: last.id } : undefined);
-        if (request === view) update({ timeline: older ? [...state.timeline, ...rows] : rows, moreTimeline: rows.length === 30 });
-      } catch { if (request === view) update({ error: 'Session moments could not load. Please try again.' }); }
+        if (request === view && timelineOwner === id) {
+          update({ timeline: older ? [...state.timeline, ...rows] : rows, moreTimeline: rows.length === 30, timelineStatus: 'ready' });
+        }
+      } catch { if (request === view && timelineOwner === id) update({ timelineStatus: older ? 'failedOlder' : 'failed' }); }
     },
   };
   return controller;

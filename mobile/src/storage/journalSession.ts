@@ -74,7 +74,21 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
               SELECT ?, id FROM trading_sessions WHERE endedAt IS NULL`, snapshot.id);
           });
         }); },
-        list: before => { const cursor = before && { ...before }; return enqueue(() => journal.list(cursor)); },
+        list: before => { const cursor = before && { ...before }; return enqueue(async () => {
+          const rows = await journal.list(cursor);
+          if (!autoAssociate || rows.length === 0) return rows;
+          if (rows.length > 50) throw failure();
+          const memberships = await db.getAllAsync<{ momentId: string; title: string; startedAt: string; archivedAt: string | null }>(`
+            SELECT trading_memberships.momentId, trading_sessions.title, trading_sessions.startedAt, trading_sessions.archivedAt
+            FROM trading_memberships JOIN trading_sessions ON trading_sessions.id = trading_memberships.sessionId
+            WHERE trading_memberships.momentId IN (${rows.map(() => '?').join(', ')})`, ...rows.map(row => row.id));
+          const byMoment = new Map(memberships.map(({ momentId, title, startedAt, archivedAt }) =>
+            [momentId, { title, startedAt, archivedAt }]));
+          return rows.map(row => {
+            const session = byMoment.get(row.id);
+            return session ? { ...row, session } : row;
+          });
+        }); },
         remove: id => enqueue(() => journal.remove(id)),
       };
     }

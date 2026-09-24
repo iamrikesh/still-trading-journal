@@ -228,7 +228,7 @@ export function createReminderController(ports: Ports) {
       if (token !== playEpoch) return;
       if (status.state === 'idle') publish({ playing: 'idle', durationMs: 0 });
       else publish({ playing: status.state, durationMs: status.durationMs });
-    } catch { publish({ playing: 'cleanup', error: 'Reminder audio state is uncertain. Press Stop again.' }); }
+    } catch { if (token === playEpoch) publish({ playing: 'cleanup', error: 'Reminder audio state is uncertain. Press Stop again.' }); }
   }
   function background() { foreground = false; void stop(); }
   function foregrounded() { foreground = true; void poll(); }

@@ -50,8 +50,12 @@ export function TradingPanel({ controller, ink, muted, line, onMoment, onReflect
       {button('Session reflections', () => onReflection(selected))}
       {selected.endedAt && button(selected.archivedAt ? 'Restore session' : 'Archive session', () => { void controller.archive(selected.id, !selected.archivedAt).then(() => setSelected(null)); }, state.busy)}
       <Text style={[styles.heading, { color: ink }]}>Grouped moments</Text>
+      {state.timelineStatus === 'loading' && <Text style={{ color: muted }}>Loading grouped moments…</Text>}
+      {state.timelineStatus === 'failed' && <View><Text accessibilityRole="alert" style={styles.error}>Grouped moments could not load.</Text>{button('Retry grouped moments', () => { void controller.timeline(selected.id); })}</View>}
       {state.timeline.map(moment => <View key={moment.id} style={[styles.card, { borderColor: line }]}><Text style={{ color: ink }}>{moment.emotionLabel} · {stamp(moment.createdAt)}</Text>{button(`Open ${moment.emotionLabel} moment`, () => onMoment(moment))}</View>)}
-      {state.moreTimeline && button('Older grouped moments', () => { void controller.timeline(selected.id, true); })}
+      {state.timelineStatus === 'loadingOlder' && <Text style={{ color: muted }}>Loading older grouped moments…</Text>}
+      {state.timelineStatus === 'failedOlder' && <Text accessibilityRole="alert" style={styles.error}>Older grouped moments could not load. Current moments are still here.</Text>}
+      {state.moreTimeline && (state.timelineStatus === 'ready' || state.timelineStatus === 'failedOlder') && button(state.timelineStatus === 'failedOlder' ? 'Retry older grouped moments' : 'Older grouped moments', () => { void controller.timeline(selected.id, true); })}
     </>}
   </ScrollView>;
 }

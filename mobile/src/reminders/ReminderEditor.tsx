@@ -39,7 +39,7 @@ export function ReminderManager({ controller, colors, onEdit, onAdd }: Base & { 
   </ScrollView>;
 }
 
-export function ReminderEditor({ controller, colors, appearance, appearanceStatus, onAppearance, onAppearanceRetry, onBack, onSaved }: Base & { appearance: Appearance; appearanceStatus: AppearanceState['status']; onAppearance(value: Appearance): void; onAppearanceRetry(): void; onBack(): void; onSaved(): void }) {
+export function ReminderEditor({ controller, colors, appearance, appearanceStatus, onAppearance, onAppearanceRetry, onAppearanceLoadRetry, onBack, onSaved }: Base & { appearance: Appearance; appearanceStatus: AppearanceState['status']; onAppearance(value: Appearance): void; onAppearanceRetry(): void; onAppearanceLoadRetry(): void; onBack(): void; onSaved(): void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const draft = state.draft;
   if (!draft) return null;
@@ -57,6 +57,7 @@ export function ReminderEditor({ controller, colors, appearance, appearanceStatu
     <Text style={{ color: colors.muted }}>Appearance · {appearance}</Text>
     <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => <Button key={mode} label={mode === appearance ? `${mode} ✓` : mode} colors={colors} onPress={() => onAppearance(mode)} />)}</View>
     {appearanceStatus === 'failed' && <View><Text accessibilityRole="alert" style={{ color: colors.error }}>Appearance not saved. Your choice remains for this run.</Text><Button label="Retry appearance" colors={colors} onPress={onAppearanceRetry} /></View>}
+    {appearanceStatus === 'loadFailed' && <View><Text accessibilityRole="alert" style={{ color: colors.error }}>Saved appearance could not load. System appearance is temporary.</Text><Button label="Retry loading appearance" colors={colors} onPress={onAppearanceLoadRetry} /></View>}
     {field('label', 'Label', 40)}{field('hint', 'Hint', 120)}{field('symbol', 'Symbol', 8)}
     {field('support', 'Support text', 4000, true)}{field('action', 'Next action', 500, true)}
     <View style={[styles.card, { borderColor: colors.line, backgroundColor: colors.surface }]}>

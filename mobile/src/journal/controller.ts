@@ -1,12 +1,12 @@
 import type { Emotion } from './emotions.ts';
-import type { JournalRepository, Moment, MomentCursor } from '../storage/types.ts';
+import type { HistoryMoment, JournalRepository, Moment, MomentCursor } from '../storage/types.ts';
 
 export type JournalState = {
   selected: Emotion | null;
   moment: Moment | null;
   saveStatus: 'idle' | 'saving' | 'saved' | 'failed';
   saveError: 'capacity' | 'capture' | 'write' | null;
-  history: Moment[];
+  history: HistoryMoment[];
   historyStatus: 'loading' | 'ready' | 'failed';
   olderStatus: 'idle' | 'loading' | 'end' | 'failed';
   failed: Moment[];

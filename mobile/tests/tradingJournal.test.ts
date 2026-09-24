@@ -30,6 +30,50 @@ test('one active session survives a rejected concurrent start', async () => {
   } finally { f.close(); }
 });
 
+test('global history returns current archived membership metadata without changing captured text or loading media', async () => {
+  const f = await fixture();
+  try {
+    const s = await createJournalSession(f.db, native(f), options);
+    await s.trading!.start({ id: 'session-a', title: 'My session', at });
+    await s.trading!.assign('moment-1', 'session-a');
+    await s.trading!.end('session-a', later);
+    await s.trading!.archive('session-a', true, later);
+    await s.journal.save({ ...moment('outside'), supportText: 'Outside snapshot.' });
+    const queries: string[] = [];
+    f.inject(sql => { queries.push(sql); });
+    const first = await s.journal.list();
+    assert.equal(first.find(row => row.id === 'moment-1')?.supportText, 'Synthetic test moment.');
+    assert.deepEqual(first.find(row => row.id === 'moment-1')?.session, { title: 'My session', startedAt: at, archivedAt: later });
+    assert.equal(first.find(row => row.id === 'outside')?.session, undefined);
+    assert.equal(queries.filter(sql => sql.includes('FROM trading_memberships JOIN trading_sessions')).length, 1);
+    assert.equal(queries.some(sql => /reminder_payloads|base64|journal_writings|clips\.data/i.test(sql)), false);
+    f.inject();
+    await s.trading!.archive('session-a', false, later);
+    assert.equal((await s.journal.list()).find(row => row.id === 'moment-1')?.session?.archivedAt, null);
+  } finally { f.close(); }
+});
+
+test('history membership lookup stays one metadata query per bounded page, including Older', async () => {
+  const f = await fixture();
+  try {
+    const s = await createJournalSession(f.db, native(f), options);
+    await s.trading!.start({ id: 'session-a', title: 'Older session', at });
+    await s.trading!.assign('moment-1', 'session-a');
+    for (let n = 0; n < 50; n++) await s.journal.save(moment(`page-${String(n).padStart(2, '0')}`));
+    const queries: string[] = [];
+    f.inject(sql => { if (sql.includes('FROM trading_memberships JOIN trading_sessions')) queries.push(sql); });
+    const first = await s.journal.list();
+    assert.equal(first.length, 50);
+    const last = first.at(-1)!;
+    const older = await s.journal.list({ createdAt: last.createdAt, id: last.id });
+    assert.deepEqual(older.map(row => row.id), ['moment-1']);
+    assert.equal(older[0]?.session?.title, 'Older session');
+    assert.equal(queries.length, 2);
+    assert.equal((queries[0]!.match(/\?/g) ?? []).length, 50);
+    assert.equal((queries[1]!.match(/\?/g) ?? []).length, 1);
+  } finally { f.close(); }
+});
+
 test('schema4 reopens with original boundaries and an active session', async () => {
   const f = await fixture();
   try {

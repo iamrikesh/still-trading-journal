@@ -135,12 +135,14 @@ test('Newest refresh and controller removal ignore stale Older responses', async
   const a = { id: 'a', emotionId: 'fomo', emotionLabel: 'FOMO', createdAt: capturedAt, supportText: 'Snapshot.' };
   const b = { ...a, id: 'b' };
   const tail = Array.from({ length: 49 }, (_, n) => ({ ...a, id: `tail-${n}` }));
+  const staleOnly = { ...a, id: 'stale-only' };
   let release!: (rows: Moment[]) => void;
   let reads = 0;
+  const olderCursors: { createdAt: string; id: string }[] = [];
   const repo: JournalRepository = {
     save: async () => {}, remove: async () => {},
     list: async before => {
-      if (before) return new Promise<Moment[]>(resolve => { release = resolve; });
+      if (before) { olderCursors.push({ ...before }); return new Promise<Moment[]>(resolve => { release = resolve; }); }
       return ++reads === 1 ? [a, ...tail] : [b, ...tail];
     },
   };
@@ -149,13 +151,22 @@ test('Newest refresh and controller removal ignore stale Older responses', async
   const pending = controller.older();
   await Promise.resolve(); await Promise.resolve();
   await controller.refresh();
-  release([a]); await pending;
-  assert.equal(controller.getSnapshot().history[0]?.id, 'b');
+  release([staleOnly]); await pending;
+  assert.deepEqual(controller.getSnapshot().history.map(row => row.id), [b.id, ...tail.map(row => row.id)]);
+  assert.equal(controller.getSnapshot().historyStatus, 'ready');
+  assert.equal(controller.getSnapshot().olderStatus, 'idle');
   const pendingDelete = controller.older();
   await Promise.resolve(); await Promise.resolve();
+  assert.deepEqual(olderCursors, [{ createdAt: capturedAt, id: 'tail-48' }, { createdAt: capturedAt, id: 'tail-48' }]);
   await controller.remove('b');
-  release([b]); await pendingDelete;
-  assert.equal(controller.getSnapshot().history[0]?.id, 'b');
+  release([staleOnly]); await pendingDelete;
+  assert.deepEqual(controller.getSnapshot().history.map(row => row.id), [b.id, ...tail.map(row => row.id)]);
+  assert.equal(controller.getSnapshot().historyStatus, 'ready');
+  assert.equal(controller.getSnapshot().olderStatus, 'idle');
+  const next = controller.older();
+  await Promise.resolve(); await Promise.resolve();
+  assert.deepEqual(olderCursors, Array.from({ length: 3 }, () => ({ createdAt: capturedAt, id: 'tail-48' })));
+  release([]); await next;
 });
 
 test('failed removal settles an invalidated refresh and keeps retained history pageable', async () => {

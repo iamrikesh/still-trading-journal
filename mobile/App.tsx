@@ -269,7 +269,7 @@ function JournalApp() {
           onEdit={card => { reminder.edit(card); navigate('editor'); }}
           onAdd={() => { if (reminder.add()) navigate('editor'); }} />}
         {page === 'editor' && <ReminderEditor controller={reminder} colors={colors} appearance={appearance} appearanceStatus={appearanceState.status}
-          onAppearance={mode => { void appearanceController.choose(mode); }} onAppearanceRetry={() => { void appearanceController.retry(); }}
+          onAppearance={mode => { void appearanceController.choose(mode); }} onAppearanceRetry={() => { void appearanceController.retry(); }} onAppearanceLoadRetry={() => { void appearanceController.load(); }}
           onBack={() => { reminder.discard(); void reminder.stop(); setPage('reminders'); }}
           onSaved={() => { void reminder.stop(); setPage('reminders'); }} />}
 
@@ -310,6 +310,7 @@ function JournalApp() {
           </View>}
           renderItem={({ item }) => <View style={styles.historyCard}>
             <View style={styles.historyHeading}><Text style={styles.emotionTitle}>{item.emotionLabel}</Text><Text style={styles.small}>{new Date(item.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</Text></View>
+            {item.session && <Text style={styles.small}>Session: {item.session.title || new Date(item.session.startedAt).toLocaleString()}{item.session.archivedAt ? ' · Archived' : ''}</Text>}
             <Text style={styles.historyText}>{item.supportText}</Text>
             {!isTemporaryJournal && chip(`Open ${item.emotionLabel} writing`, () => { setClipMoment(item); openWriting({ kind: 'moment', id: item.id }); })}
             {Platform.OS === 'android' && !isTemporaryJournal && chip('Open voice clips', () => { setClipMoment(item); navigate('clips'); })}

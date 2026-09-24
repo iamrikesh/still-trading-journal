@@ -158,6 +158,22 @@ test('repeated Play keeps the first audio active and Stop reachable', async () =
   await r.controller.stop(); assert.equal(nativePlaying, false);
 });
 
+test('failed old status poll cannot replace confirmed Stop or a newer Play', async () => {
+  const r = rig(); r.cards[0]!.audioId = 'sound-1'; r.attachments.set('sound-1', { ...audio, id: 'sound-1' });
+  let rejectOld!: (reason: Error) => void;
+  r.native.status = () => new Promise((_, reject) => { rejectOld = reject; });
+  await r.controller.refresh(); await r.controller.selectSupport(r.cards[0]!);
+  await r.controller.play();
+  const oldPoll = r.controller.poll();
+  await r.controller.stop();
+  assert.equal(r.controller.getSnapshot().playing, 'idle');
+  await r.controller.play();
+  assert.equal(r.controller.getSnapshot().playing, 'playing');
+  rejectOld(Error('old status read failed')); await oldPoll;
+  assert.equal(r.controller.getSnapshot().playing, 'playing');
+  assert.equal(r.controller.getSnapshot().error, null);
+});
+
 test('failed native start with unconfirmed release keeps cleanup reachable through retry', async () => {
   const r = rig(); r.cards[0]!.audioId = 'sound-1'; r.attachments.set('sound-1', { ...audio, id: 'sound-1' });
   let failPlay = true; let failRelease = false; let nativeState: 'idle' | 'playing' | 'cleanup' = 'idle';
