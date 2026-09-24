@@ -144,6 +144,49 @@ test('repeated Stop while native cleanup is pending shares one release', async (
   assert.equal(r.controller.getSnapshot().playing, 'idle');
 });
 
+test('repeated Play keeps the first audio active and Stop reachable', async () => {
+  const r = rig(); r.cards[0]!.audioId = 'sound-1'; r.attachments.set('sound-1', { ...audio, id: 'sound-1' });
+  let nativePlaying = false; let playCalls = 0; let statusCalls = 0;
+  r.native.play = async () => { playCalls++; if (nativePlaying) throw Error('already playing'); nativePlaying = true; };
+  r.native.stop = async () => { nativePlaying = false; };
+  r.native.status = async () => { statusCalls++; return { state: nativePlaying ? 'playing' : 'idle', durationMs: 1000 }; };
+  await r.controller.refresh(); await r.controller.selectSupport(r.cards[0]!);
+  await r.controller.play(); await r.controller.play(); await r.controller.poll();
+  assert.equal(playCalls, 1); assert.equal(statusCalls, 1);
+  assert.equal(r.controller.getSnapshot().playing, 'playing');
+  assert.equal(nativePlaying, true);
+  await r.controller.stop(); assert.equal(nativePlaying, false);
+});
+
+test('failed native start with unconfirmed release keeps cleanup reachable through retry', async () => {
+  const r = rig(); r.cards[0]!.audioId = 'sound-1'; r.attachments.set('sound-1', { ...audio, id: 'sound-1' });
+  let failPlay = true; let failRelease = false; let nativeState: 'idle' | 'playing' | 'cleanup' = 'idle';
+  r.native.play = async () => { if (failPlay) { nativeState = 'cleanup'; throw Error('private/temporary'); } nativeState = 'playing'; };
+  r.native.stop = async () => { if (failRelease) throw Error('private/release'); nativeState = 'idle'; };
+  r.native.status = async () => ({ state: nativeState, durationMs: 0 });
+  await r.controller.refresh(); await r.controller.selectSupport(r.cards[0]!);
+  failRelease = true; await r.controller.play();
+  assert.equal(r.controller.getSnapshot().playing, 'cleanup');
+  assert.match(r.controller.getSnapshot().error!, /release|Stop/i);
+  failRelease = false; await r.controller.stop();
+  assert.equal(r.controller.getSnapshot().playing, 'idle');
+  failPlay = false; await r.controller.play();
+  assert.equal(r.controller.getSnapshot().playing, 'playing');
+});
+
+test('failed native start with confirmed temporary cleanup permits an explicit retry', async () => {
+  const r = rig(); r.cards[0]!.audioId = 'sound-1'; r.attachments.set('sound-1', { ...audio, id: 'sound-1' });
+  let fails = 1; let stopCalls = 0;
+  r.native.play = async () => { if (fails-- > 0) throw Error('private/file-cleanup'); };
+  r.native.stop = async () => { stopCalls++; };
+  await r.controller.refresh(); await r.controller.selectSupport(r.cards[0]!);
+  const before = stopCalls; await r.controller.play();
+  assert.equal(stopCalls, before + 1);
+  assert.equal(r.controller.getSnapshot().playing, 'idle');
+  assert.match(r.controller.getSnapshot().error!, /could not play/i);
+  await r.controller.play(); assert.equal(r.controller.getSnapshot().playing, 'playing');
+});
+
 test('appearance latest choice survives a delayed load and ordered writes', async () => {
   const load = deferred<Appearance>(); const first = deferred<void>(); const writes: Appearance[] = [];
   const controller = createAppearanceController({ repository: async () => ({ get: () => load.promise, set: value => { writes.push(value); return value === 'light' ? first.promise : Promise.resolve(); } }) });
@@ -176,7 +219,7 @@ test('journal Record waits for confirmed reminder stop and drops stale navigatio
   let owner: string | null = 'moment-a'; let started = 0; let allow = true;
   const stop = deferred<boolean>();
   const base = { getSnapshot: () => ({ momentId: owner, phase: 'ready' }), record: async () => { started++; }, play: async (_id: string) => { started++; },
-    select: async (id: string | null) => { owner = id; }, background: async () => {} };
+    select: async (id: string | null) => { owner = id; }, background: async () => {}, stop: async () => {}, stopForSessionEnd: async () => true };
   const wrapped = createCoordinatedRecordingController(base, { stop: () => allow ? stop.promise : Promise.resolve(false) });
   const recording = wrapped.record();
   await wrapped.select(null); stop.resolve(true); await recording;
@@ -184,3 +227,22 @@ test('journal Record waits for confirmed reminder stop and drops stale navigatio
   owner = 'moment-a'; allow = false; await wrapped.play('clip-a');
   assert.equal(started, 0);
 });
+
+for (const kind of ['record', 'play'] as const) for (const cancellation of ['stop', 'stopForSessionEnd'] as const) {
+  test(`journal ${kind} waiting for reminder release is revoked by ${cancellation}`, async () => {
+    const release = deferred<boolean>(); let starts = 0; let baseEpoch = 0;
+    const base = {
+      getSnapshot: () => ({ momentId: 'moment-a', phase: 'ready' }),
+      record: async () => { const token = baseEpoch; await Promise.resolve(); if (token === baseEpoch) starts++; },
+      play: async (_id: string) => { const token = baseEpoch; await Promise.resolve(); if (token === baseEpoch) starts++; },
+      select: async (_id: string | null) => { baseEpoch++; }, background: async () => { baseEpoch++; },
+      stop: async () => { baseEpoch++; }, stopForSessionEnd: async () => { baseEpoch++; return true; },
+    };
+    const wrapped = createCoordinatedRecordingController(base, { stop: () => release.promise });
+    const starting = kind === 'record' ? wrapped.record() : wrapped.play('clip-a');
+    const cancelling = wrapped[cancellation]();
+    await cancelling;
+    release.resolve(true); await starting;
+    assert.equal(starts, 0);
+  });
+}

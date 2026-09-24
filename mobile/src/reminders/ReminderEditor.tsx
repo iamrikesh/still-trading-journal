@@ -73,7 +73,7 @@ export function ReminderEditor({ controller, colors, appearance, appearanceStatu
       {hasAudio && <Text style={{ color: colors.muted }}>Audio attached.</Text>}
       <View style={styles.row}><Button label={hasAudio ? 'Replace audio' : 'Import audio'} colors={colors} onPress={() => { void controller.importMedia('audio'); }} disabled={state.busy !== 'idle'} />
         {hasAudio && <Button label="Remove audio" colors={colors} onPress={() => controller.removeMedia('audio')} disabled={state.busy === 'saving'} />}
-      {hasAudio && <Button label="Play reminder" colors={colors} onPress={() => { void controller.play(); }} />}
+      {hasAudio && <Button label="Play reminder" colors={colors} disabled={state.playing !== 'idle'} onPress={() => { void controller.play(); }} />}
       {(state.playing === 'playing' || state.playing === 'loading' || state.playing === 'cleanup') && <Button label={state.playing === 'cleanup' ? 'Stop again' : 'Stop'} colors={colors} onPress={() => { void controller.stop(); }} />}</View>
     </View>
     {state.busy === 'importing' && <Text style={{ color: colors.muted }}>Importing selected media…</Text>}

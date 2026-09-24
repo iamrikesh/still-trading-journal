@@ -7,8 +7,9 @@ export function ReminderSupport({ controller, colors }: { controller: ReminderCo
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const card = state.selected;
   if (!card) return null;
-  const button = (label: string, onPress: () => void) => <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress}
-    style={[styles.button, { borderColor: colors.line }]}><Text style={{ color: colors.ink }}>{label}</Text></Pressable>;
+  const button = (label: string, onPress: () => void, enabled = true) => <Pressable accessibilityRole="button" accessibilityLabel={label}
+    accessibilityState={{ disabled: !enabled }} disabled={!enabled} onPress={onPress}
+    style={[styles.button, { borderColor: colors.line, opacity: enabled ? 1 : 0.45 }]}><Text style={{ color: colors.ink }}>{label}</Text></Pressable>;
   return <View style={[styles.card, { backgroundColor: colors.soft }]}>
     <Text style={[styles.label, { color: colors.muted }]}>CURRENT SUPPORT · {card.label.toUpperCase()}</Text>
     {!!card.support && <Text style={[styles.support, { color: colors.ink }]}>{card.support}</Text>}
@@ -18,7 +19,7 @@ export function ReminderSupport({ controller, colors }: { controller: ReminderCo
     {!!card.action && <><View style={[styles.rule, { backgroundColor: colors.line }]} />
       <Text style={[styles.label, { color: colors.muted }]}>ONE POSSIBLE NEXT STEP</Text>
       <Text style={{ color: colors.ink, fontSize: 15, lineHeight: 23 }}>{card.action}</Text></>}
-    {card.audioId && <View style={styles.row}>{button('Play reminder', () => { void controller.play(); })}
+    {card.audioId && <View style={styles.row}>{button('Play reminder', () => { void controller.play(); }, state.playing === 'idle')}
       {(state.playing === 'playing' || state.playing === 'loading' || state.playing === 'cleanup') &&
         button(state.playing === 'cleanup' ? 'Stop again' : 'Stop', () => { void controller.stop(); })}</View>}
     {state.playing === 'loading' && <Text style={{ color: colors.muted }}>Preparing reminder audio…</Text>}

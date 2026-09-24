@@ -194,7 +194,7 @@ export function createReminderController(ports: Ports) {
     return stopTask;
   }
   async function play() {
-    if (!foreground || !ports.native || state.playing === 'cleanup' || state.playing === 'loading') return;
+    if (!foreground || !ports.native || state.playing !== 'idle') return;
     const card = state.selected;
     const audioId = state.draft ? state.draft.audio === null ? null : state.draft.audio?.id ?? state.draft.card.audioId : card?.audioId;
     if (!audioId) return;
@@ -213,7 +213,11 @@ export function createReminderController(ports: Ports) {
       if (token !== playEpoch || !foreground) { await stop(); return; }
       publish({ playing: 'playing' });
     } catch {
-      if (token === playEpoch) publish({ playing: 'idle', error: 'Reminder audio could not play. Your saved card is unchanged.' });
+      if (token !== playEpoch) return;
+      // A rejected native start can still own a playback handle or temporary.
+      // Only confirmed Stop may restore idle; failed release keeps Stop visible.
+      const released = await stop();
+      if (released && playEpoch === token + 1) publish({ error: 'Reminder audio could not play. Your saved card is unchanged.' });
     }
   }
   async function poll() {
@@ -272,6 +276,7 @@ export function createCoordinatedRecordingController<T extends {
   getSnapshot(): { momentId: string | null; phase: string };
   record(): Promise<void>; play(id: string): Promise<void>;
   select(id: string | null): Promise<void>; background(): Promise<void>;
+  stop(): Promise<void>; stopForSessionEnd(): Promise<boolean>;
 }>(recording: T, reminder: { stop(): Promise<boolean> }): T {
   let epoch = 0;
   async function admit(work: () => Promise<void>) {
@@ -288,5 +293,7 @@ export function createCoordinatedRecordingController<T extends {
     play: (id: string) => admit(() => recording.play(id)),
     select: (id: string | null) => { ++epoch; return recording.select(id); },
     background: () => { ++epoch; return recording.background(); },
+    stop: () => { ++epoch; return recording.stop(); },
+    stopForSessionEnd: () => { ++epoch; return recording.stopForSessionEnd(); },
   };
 }
