@@ -26,6 +26,8 @@ internal class AudioOperations(
   private val playbackFile: (ClipIntent) -> File,
   private val removePlayback: (ClipIntent) -> Unit,
 ) {
+  /** Called under the same module owner lock before any capture/decrypt allocation. */
+  var reminderReleaseCheck: () -> Unit = {}
   private var owner: ClipIntent? = null
   private var handle: AudioHandle? = null
   private var playback: ClipIntent? = null
@@ -42,6 +44,7 @@ internal class AudioOperations(
 
   private fun admit(intent: ClipIntent) {
     check(!destroyed && foreground() && handle == null)
+    reminderReleaseCheck()
     intent.aad()
     requireOwner(intent)
     cleanupPlayback()
@@ -92,6 +95,8 @@ internal class AudioOperations(
   fun requireOwner(intent: ClipIntent) {
     if (owner?.id == intent.id) check(owner == intent)
   }
+
+  fun requireReleased() { check(handle == null && playback == null) }
 
   fun interrupt() = stop(false)
 

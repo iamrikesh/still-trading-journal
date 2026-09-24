@@ -7,22 +7,53 @@ import android.os.PowerManager
 import android.os.SystemClock
 import com.google.crypto.tink.integration.android.AndroidKeystore
 import expo.modules.kotlin.exception.CodedException
+import expo.modules.kotlin.activityresult.AppContextActivityResultLauncher
+import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.runInterruptible
+import kotlinx.coroutines.withTimeout
+import android.net.Uri
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.coroutineContext
 
 class StillMediaVaultModule : Module() {
   private var clips: ClipFileVault? = null
   private var audio: AudioOperations? = null
+  private var reminders: ReminderPlayback? = null
+  private val reminderPlayAdmission = ReminderPlayAdmission()
   private val foreground = AtomicBoolean(true)
+  private val importScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+  @Volatile private var importWorker: Deferred<ImportedReminder>? = null
+  @Volatile private var importTicket: Long? = null
 
   override fun definition() = ModuleDefinition {
     Name("StillMediaVault")
+    lateinit var reminderPicker: AppContextActivityResultLauncher<String, Uri?>
+    RegisterActivityContracts {
+      reminderPicker = registerForActivityResult(ReminderPicker())
+    }
     OnDestroy {
       foreground.set(false)
+      reminderPlayAdmission.revoke()
+      cancelImport()
       try {
-        CLIP_OWNER.destroy(this@StillMediaVaultModule) { audio?.destroy() }
+        CLIP_OWNER.destroy(this@StillMediaVaultModule) {
+          var failure: Exception? = null
+          try { reminders?.destroy() } catch (error: Exception) { failure = error }
+          try { audio?.destroy() } catch (error: Exception) { if (failure == null) failure = error }
+          failure?.let { throw it }
+        }
+        reminders = null
         audio = null
         clips = null
       } catch (_: Exception) {
@@ -31,7 +62,7 @@ class StillMediaVaultModule : Module() {
     }
     OnActivityEntersForeground { foreground.set(true) }
     OnActivityEntersBackground { interruptAudio() }
-    OnActivityDestroys { interruptAudio() }
+    OnActivityDestroys { interruptAudio(); cancelImport() }
     AsyncFunction("initializeClips") { allowCreate: Boolean ->
       clipErrors {
         CLIP_OWNER.initialize(this@StillMediaVaultModule) {
@@ -52,6 +83,15 @@ class StillMediaVaultModule : Module() {
                   try { callback() } catch (_: Exception) { /* Status retains failed cleanup. */ }
                 }
               }, opened::captureFile, opened::playbackFile, opened::removePlayback)
+            val temp = File(context.noBackupFilesDir.canonicalFile, "still-reminder-playback-v1.tmp")
+            reminders = ReminderPlayback(AndroidAudioDriver(context), ::isForeground, SystemClock::elapsedRealtime,
+              { callback ->
+                CLIP_OWNER.callback(this@StillMediaVaultModule) {
+                  try { callback() } catch (_: Exception) { /* Status retains cleanup obligation. */ }
+                }
+              }, temp) { checkNotNull(audio).requireReleased() }
+            reminders!!.removeStartupOrphan()
+            audio!!.reminderReleaseCheck = { checkNotNull(reminders).requireReleased() }
             clips = opened
           }
         }
@@ -90,6 +130,77 @@ class StillMediaVaultModule : Module() {
     AsyncFunction("stopPlayback") { clipOperation { checkNotNull(audio).stopPlayback() } }
     AsyncFunction("audioStatus") { clipOperation { checkNotNull(audio).status() } }
     AsyncFunction("audioUsage") { clipOperation { it.usageBytes() } }
+    AsyncFunction("pickReminder") Coroutine { kind: String ->
+      val ticket = reminderErrors {
+        require(kind == "image" || kind == "audio")
+        REMINDER_PICK_GATE.begin()
+      }
+      importTicket = ticket
+      var handedOff = false
+      try {
+        reminderErrors { CLIP_OWNER.run(this@StillMediaVaultModule) { checkNotNull(clips) } }
+        val uri = try { reminderPicker.launch(kind) } catch (error: CancellationException) { throw error }
+          catch (_: Exception) { throw CodedException("ERR_REMINDER_MEDIA", "The selection could not complete.", null) }
+        if (uri == null) null else {
+          val context = reminderErrors { checkNotNull(appContext.reactContext) }
+          val worker = importScope.async {
+            try {
+              val jobContext = coroutineContext
+              runInterruptible {
+                val stream = context.contentResolver.openInputStream(uri) ?: error("Unreadable media")
+                REMINDER_PICK_GATE.attach(ticket, stream)
+                stream.use {
+                  val bytes = readBounded(it, if (kind == "image") MAX_IMAGE_BYTES else MAX_AUDIO_BYTES) {
+                    jobContext.ensureActive()
+                  }
+                  jobContext.ensureActive()
+                  inspectReminder(bytes, kind, context.contentResolver.getType(uri), AndroidReminderDecoder::inspect)
+                }
+              }
+            } finally {
+              REMINDER_PICK_GATE.finish(ticket)
+            }
+          }
+          // Also releases admission if async was cancelled before its body started.
+          worker.invokeOnCompletion { REMINDER_PICK_GATE.finish(ticket) }
+          handedOff = true
+          importWorker = worker
+          val imported = try { withTimeout(15000) { worker.await() } }
+            catch (error: Exception) {
+              REMINDER_PICK_GATE.cancel(ticket) // Close an acquired stream from this caller's thread.
+              worker.cancel() // runInterruptible also interrupts a blocking provider call.
+              if (error is CancellationException && error !is TimeoutCancellationException) throw error
+              throw CodedException("ERR_REMINDER_MEDIA", "The selected media could not be imported.", null)
+            }
+          finally {
+            if (importWorker === worker) importWorker = null
+            if (importTicket == ticket) importTicket = null
+          }
+          reminderErrors { CLIP_OWNER.run(this@StillMediaVaultModule) { checkNotNull(clips) } }
+          imported.toMap()
+        }
+      } finally {
+        if (!handedOff) REMINDER_PICK_GATE.finish(ticket)
+        if (importTicket == ticket && !handedOff) importTicket = null
+      }
+    }
+    AsyncFunction("playReminder") { base64: String ->
+      val ticket = reminderPlayAdmission.ticket()
+      val media = reminderErrors {
+        val bytes = decodeReminderBase64(base64)
+        val selected = inspectReminder(bytes, "audio", null, AndroidReminderDecoder::inspect)
+        bytes to requireNotNull(selected.durationMs)
+      }
+      reminderOperation {
+        reminderPlayAdmission.requireCurrent(ticket)
+        it.play(media.first, media.second)
+      }
+    }
+    AsyncFunction("stopReminder") {
+      reminderPlayAdmission.revoke()
+      reminderOperation { it.stop() }
+    }
+    AsyncFunction("reminderStatus") { reminderOperation { it.status() } }
     AsyncFunction("prepareClipFixture") { id: String, momentId: String, createdAt: String ->
       clipOperation { requireDebug(); it.prepareFixture(ClipIntent(id, momentId, createdAt)) }
     }
@@ -116,9 +227,16 @@ class StillMediaVaultModule : Module() {
   private fun interruptAudio() {
     // Revoke admission before waiting for an in-progress encryption/prepare operation.
     foreground.set(false)
+    reminderPlayAdmission.revoke()
     CLIP_OWNER.callback(this) {
       try { audio?.interrupt() } catch (_: Exception) { /* Preserve failed cleanup for retry. */ }
+      try { reminders?.stop() } catch (_: Exception) { /* Preserve failed cleanup for retry. */ }
     }
+  }
+
+  private fun cancelImport() {
+    importTicket?.let { REMINDER_PICK_GATE.cancel(it) }
+    importWorker?.cancel()
   }
 
   private fun stopAffected(intent: ClipIntent) {
@@ -140,6 +258,16 @@ class StillMediaVaultModule : Module() {
 
   private fun <T> clipOperation(operation: (ClipFileVault) -> T): T = clipErrors {
     CLIP_OWNER.run(this) { operation(checkNotNull(clips)) }
+  }
+
+  private fun <T> reminderErrors(operation: () -> T): T = try {
+    operation()
+  } catch (_: Exception) {
+    throw CodedException("ERR_REMINDER_MEDIA", "Reminder media could not complete.", null)
+  }
+
+  private fun <T> reminderOperation(operation: (ReminderPlayback) -> T): T = reminderErrors {
+    CLIP_OWNER.run(this) { checkNotNull(clips); operation(checkNotNull(reminders)) }
   }
 
   private class AndroidClipWrappingKey : WrappingKey {
@@ -192,5 +320,6 @@ class StillMediaVaultModule : Module() {
     // One owner even across React reloads/module instances. Lifecycle callbacks share this lock.
     private val PROOF_LOCK = Any()
     private val CLIP_OWNER = ClipOwnership()
+    private val REMINDER_PICK_GATE = ReminderImportGate()
   }
 }

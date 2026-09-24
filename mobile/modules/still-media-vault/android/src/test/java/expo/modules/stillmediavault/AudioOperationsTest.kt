@@ -119,4 +119,16 @@ class AudioOperationsTest {
     assertThrows(Exception::class.java) { f.audio.startCapture(intent.copy(momentId = "other")) }
     f.audio.requireOwner(intent)
   }
+
+  @Test fun reminderOwnershipBlocksJournalStartsBeforeFileCreation() {
+    val f = Fixture()
+    var reminderReleased = false
+    f.audio.reminderReleaseCheck = { check(reminderReleased) }
+    assertThrows(Exception::class.java) { f.audio.startCapture(intent) }
+    assertThrows(Exception::class.java) { f.audio.startPlayback(intent) }
+    assertTrue(f.events.isEmpty())
+    reminderReleased = true
+    f.audio.startCapture(intent)
+    f.audio.stopCapture(intent.id)
+  }
 }
