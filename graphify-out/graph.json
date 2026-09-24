@@ -3471,6 +3471,66 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "UI acceptance, reflection-key fix, original media preservation and explicit host-only fault limits."
+    },
+    {
+      "id": "reminders_history_evidence",
+      "label": "September24 reminders, history and appearance evidence",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Native implementation and review fixes; distinguishes JVM/host checks from pending Android picker, codec and persistence acceptance."
+    },
+    {
+      "id": "reminders_history_lesson",
+      "label": "Lesson8 editable reminders and preserved history",
+      "source_file": "docs/learning/08-personal-reminders-and-history.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Saved card versus draft, immutable capture snapshots, shared audio ownership, bounded history pages and persistent appearance."
+    },
+    {
+      "id": "reminder_native_adapter",
+      "label": "Reminder bridge and pure payload validation",
+      "source_file": "mobile/src/reminders/nativeReminders.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Sanitizes the native boundary and validates canonical bounded payload metadata for callers and storage."
+    },
+    {
+      "id": "reminder_media_validation",
+      "label": "Captured reminder media validation",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ReminderMedia.kt",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Bounded byte reads and captured-byte image/audio validation including MP4 AAC tracks."
+    },
+    {
+      "id": "reminder_picker",
+      "label": "Temporary-grant reminder picker",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ReminderPicker.kt",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Single admitted import worker and retained cancellation-close obligation, outside shared audio ownership."
+    },
+    {
+      "id": "reminder_playback",
+      "label": "Reminder playback ownership",
+      "source_file": "mobile/modules/still-media-vault/android/src/main/java/expo/modules/stillmediavault/ReminderPlayback.kt",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 1,
+      "community_name": "Encrypted journal persistence",
+      "rationale": "Explicit playback, revoked delayed starts, reciprocal audio admission and retained cleanup obligations."
     }
   ],
   "links": [
@@ -7750,6 +7810,48 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "reminders_history_evidence",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "journal_features_milestone",
+      "target": "reminders_history_lesson",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/JOURNAL-FEATURES.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_native_adapter",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_media_validation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_picker",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
+    },
+    {
+      "source": "reminders_history_evidence",
+      "target": "reminder_playback",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-reminders-history.md"
     }
   ],
   "hyperedges": [

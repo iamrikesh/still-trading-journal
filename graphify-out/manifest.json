@@ -140,9 +140,9 @@
     "semantic_hash": "07bce5c307f78bf1ca6b7786a7673966"
   },
   "docs/PROJECT-STATUS.md": {
-    "mtime": 1790228735.4178886,
+    "mtime": 1790235735.0699346,
     "ast_hash": "65bf65dcc094cf94ab3a75b7c5bf9679",
-    "semantic_hash": "79ca661d6c47f609e201b15d3676a7d5"
+    "semantic_hash": "4573f719ed0f01b2d270e9dd7e6a9ef0"
   },
   "docs/ci/checks.yml": {
     "mtime": 1789903055.7063572,
@@ -475,9 +475,9 @@
     "semantic_hash": "36c9444c60510dbff15e4325cb36e435"
   },
   "docs/JOURNAL-FEATURES.md": {
-    "mtime": 1790228739.0010476,
+    "mtime": 1790235735.0776508,
     "ast_hash": "",
-    "semantic_hash": "fbdee891c070afcb66f2c6e8e8cba91a"
+    "semantic_hash": "b692fd25654a1001c34e85ff05fce7c4"
   },
   "CONTEXT.md": {
     "mtime": 1790142414.5527272,
@@ -490,9 +490,9 @@
     "semantic_hash": "39fd88c503fc125a24c4cdd0a0821528"
   },
   "docs/superpowers/plans/2026-09-23-sessions-writing.md": {
-    "mtime": 1790228932.9735985,
+    "mtime": 1790229218.4834888,
     "ast_hash": "",
-    "semantic_hash": "14d9628f160460346c4c839d665f9b63"
+    "semantic_hash": "dff8ebe1b1e9f94a4b5cd65366c1f32b"
   },
   "docs/reviews/2026-09-23-sessions-writing.md": {
     "mtime": 1790145286.699871,
@@ -510,9 +510,9 @@
     "semantic_hash": "469a0a395ffb1bcc894115374ea569f3"
   },
   "docs/superpowers/plans/2026-09-23-reminders-history.md": {
-    "mtime": 1790143231.3256843,
+    "mtime": 1790235735.0776508,
     "ast_hash": "",
-    "semantic_hash": "cc38915a9b5562ba82d3465e8a88731e"
+    "semantic_hash": "4cebfb0a539d94d698225472965b2102"
   },
   "mobile/src/storage/tradingJournal.ts": {
     "mtime": 1790143780.4969232,
@@ -548,5 +548,15 @@
     "mtime": 1790228732.1327982,
     "ast_hash": "",
     "semantic_hash": "56dbfec02ad9707d6cb90dc2eea9ef22"
+  },
+  "docs/reviews/2026-09-24-reminders-history.md": {
+    "mtime": 1790235735.0448906,
+    "ast_hash": "",
+    "semantic_hash": "8ffee7902bb348b3dd3998b5f14c0e32"
+  },
+  "docs/learning/08-personal-reminders-and-history.md": {
+    "mtime": 1790229430.1596186,
+    "ast_hash": "",
+    "semantic_hash": "ffd16fa731e6cd71ad4e12070144f566"
   }
 }
