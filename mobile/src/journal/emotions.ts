@@ -7,7 +7,7 @@ export type Emotion = {
   action: string;
 };
 
-// Original starter copy. Personal support cards will become editable in a later increment.
+// Starter copy seeds saved cards once and supports the explicitly temporary demo.
 export const emotions: readonly Emotion[] = [
   { id: 'fomo', label: 'FOMO', hint: 'The urge to chase', symbol: '↗', support: 'A moving price is not an instruction. I can let this move go.', action: 'Return to my entry checklist.' },
   { id: 'hesitation', label: 'Hesitation', hint: 'Looking for certainty', symbol: '◌', support: 'I can follow a well-defined process without knowing the outcome of this trade.', action: 'Check the setup against my own rules.' },

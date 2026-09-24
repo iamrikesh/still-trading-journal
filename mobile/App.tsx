@@ -20,6 +20,10 @@ import { createTradingController } from './src/journal/tradingController';
 import { createWritingController } from './src/journal/writingController';
 import { TradingPanel } from './src/journal/TradingPanel';
 import { WritingPanel } from './src/journal/WritingPanel';
+import { createNativeReminders } from './src/reminders/nativeReminders';
+import { createAppearanceController, createCoordinatedRecordingController, createReminderController } from './src/reminders/controller';
+import { ReminderEditor, ReminderManager } from './src/reminders/ReminderEditor';
+import { ReminderSupport } from './src/reminders/ReminderSupport';
 
 async function tradingRepository(): Promise<TradingRepository> {
   const trading = (await openJournalSession()).trading;
@@ -33,7 +37,9 @@ export default function App() {
 
 function JournalApp() {
   const systemTheme = useColorScheme();
-  const [appearance, setAppearance] = useState<Appearance>('system');
+  const [appearanceController] = useState(() => createAppearanceController({ repository: async () => (await openJournalSession()).appearance ?? null }));
+  const appearanceState = useSyncExternalStore(appearanceController.subscribe, appearanceController.getSnapshot);
+  const appearance: Appearance = appearanceState.value;
   const dark = (appearance === 'system' ? systemTheme : appearance) === 'dark';
   const colors = palettes[dark ? 'dark' : 'light'];
   const styles = makeStyles(colors);
@@ -47,9 +53,17 @@ function JournalApp() {
     });
   });
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
-  const [page, setPage] = useState<'now' | 'support' | 'history' | 'clips' | 'sessions' | 'writing'>('now');
+  type Page = 'now' | 'support' | 'history' | 'clips' | 'sessions' | 'writing' | 'reminders' | 'editor';
+  const [page, setPage] = useState<Page>('now');
   const [clipMoment, setClipMoment] = useState<Moment | null>(null);
-  const [recording] = useState(createAppRecordingController);
+  const [baseRecording] = useState(createAppRecordingController);
+  const [reminder] = useState(() => createReminderController({
+    repository: async () => (await openJournalSession()).reminders ?? null,
+    native: Platform.OS === 'android' && !isTemporaryJournal ? createNativeReminders(requireOptionalNativeModule('StillMediaVault')) : null,
+    recording: baseRecording, id: randomUUID,
+  }));
+  const reminderState = useSyncExternalStore(reminder.subscribe, reminder.getSnapshot);
+  const [recording] = useState(() => createCoordinatedRecordingController(baseRecording, reminder));
   const [trading] = useState(() => createTradingController({ repository: tradingRepository, recording, id: randomUUID, now: () => new Date().toISOString() }));
   const tradingState = useSyncExternalStore(trading.subscribe, trading.getSnapshot);
   const [writing] = useState(() => createWritingController({ repository: tradingRepository, id: randomUUID, now: () => new Date().toISOString() }));
@@ -64,12 +78,13 @@ function JournalApp() {
   const recordingOwner = page === 'support' && state.saveStatus === 'saved' ? state.moment?.id ?? null : page === 'clips' ? clipMoment?.id ?? null : null;
   useEffect(() => { void recording.select(recordingOwner); }, [recording, recordingOwner]);
   useEffect(() => {
-    const listener = AppState.addEventListener('change', value => { void (value === 'active' ? recording.foreground() : recording.background()); if (value !== 'active') void writing.background(); });
+    const listener = AppState.addEventListener('change', value => { if (value === 'active') reminder.foreground(); else reminder.background(); void (value === 'active' ? recording.foreground() : recording.background()); if (value !== 'active') void writing.background(); });
     // Fast Refresh runs effect cleanup without an Android foreground event.
+    if (AppState.currentState === 'active') reminder.foreground(); else reminder.background();
     void (AppState.currentState === 'active' ? recording.foreground() : recording.background());
-    const timer = setInterval(() => { void recording.poll(); }, 300);
-    return () => { listener.remove(); clearInterval(timer); void recording.background(); };
-  }, [recording, writing]);
+    const timer = setInterval(() => { void recording.poll(); void reminder.poll(); }, 300);
+    return () => { listener.remove(); clearInterval(timer); reminder.background(); void recording.background(); };
+  }, [recording, reminder, writing]);
   const [deleteError, setDeleteError] = useState(false);
   // Keep one operation owner across page changes; the native vault also serializes calls.
   const [mediaProof] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
@@ -77,25 +92,48 @@ function JournalApp() {
   const [clipExercise] = useState(() => __DEV__ && Platform.OS === 'android' && !isTemporaryJournal
     ? createClipRecoveryExercise(openJournalSession) : null);
 
-  useEffect(() => { void controller.refresh(); if (!isTemporaryJournal) void trading.refresh(); }, [controller, trading]);
+  useEffect(() => { void controller.refresh(); void reminder.refresh(); void appearanceController.load(); if (!isTemporaryJournal) void trading.refresh(); }, [controller, trading, reminder, appearanceController]);
   useEffect(() => { if (page !== 'writing') void writing.background(); }, [page, writing]);
   useEffect(() => { if (clipMoment && page === 'clips' && !isTemporaryJournal) { void tradingRepository().then(repo => repo.membership(clipMoment.id)).then(setMomentSession).catch(() => setGroupError('Grouping could not load.')); } }, [clipMoment, page]);
   // Read existing state only: startup session recovery has already run. Never
   // automatically prepare fixtures or delete a moment on mounting this panel.
   useEffect(() => { if (clipExercise) void clipExercise.check(); }, [clipExercise]);
+  function navigate(target: Page, after?: () => void) {
+    if (target !== page && page === 'support') reminder.leaveSupport();
+    else if (target !== page && page === 'editor') void reminder.stop();
+    const finish = () => {
+      if (page === 'editor' && target !== 'editor' && !reminder.discard()) return;
+      after?.();
+      setPage(target);
+      if (target === 'history' && page !== 'history') void controller.refresh();
+    };
+    const draft = reminder.getSnapshot();
+    if (page !== 'editor' || target === 'editor' || !draft.draft || !draft.dirty) { finish(); return; }
+    const saveAndLeave = () => { void reminder.save().then(saved => { if (saved) finish(); }); };
+    if (Platform.OS === 'web') {
+      if (window.confirm('Save your reminder edits before leaving?')) saveAndLeave();
+      else if (window.confirm('Discard your reminder edits?')) finish();
+      return;
+    }
+    Alert.alert('Leave reminder editor?', 'Save your changes or discard this draft before leaving.', [
+      { text: 'Stay', style: 'cancel' },
+      { text: 'Discard', style: 'destructive', onPress: finish },
+      { text: 'Save', onPress: saveAndLeave },
+    ]);
+  }
   useEffect(() => {
     const back = BackHandler.addEventListener('hardwareBackPress', () => {
       if (page === 'now') return false;
-      setPage('now');
+      navigate('now');
       return true;
     });
     return () => back.remove();
-  }, [page]);
+  }, [page, reminder, controller]);
 
   function removeMoment(id: string) {
     const remove = async () => {
       setDeleteError(false);
-      try { await (await openJournal()).remove(id); await controller.refresh(); }
+      try { await controller.remove(id); }
       catch { setDeleteError(true); }
     };
     if (Platform.OS === 'web') {
@@ -111,9 +149,9 @@ function JournalApp() {
     const current = writing.getSnapshot();
     if (!writing.canSwitch(owner, kind) && current.writing) {
       writing.open(owner, kind);
-      setWritingOwner(current.writing.owner); setWritingKind(current.writing.kind); setPage('writing'); return;
+      setWritingOwner(current.writing.owner); setWritingKind(current.writing.kind); navigate('writing'); return;
     }
-    setWritingKind(kind); setWritingOwner(owner); setPage('writing');
+    setWritingKind(kind); setWritingOwner(owner); navigate('writing');
   }
   async function createNote() {
     if (isTemporaryJournal) return;
@@ -163,15 +201,21 @@ function JournalApp() {
           <Text style={styles.eyebrow}>A MOMENT FOR YOU</Text>
           <Text style={styles.title}>What’s coming{ '\n' }up right now?</Text>
           <Text style={styles.subtitle}>Notice it. Give yourself a little space.{ '\n' }One tap opens your reminder and logs the moment.</Text>
+          {reminderState.loadStatus === 'loading' && !isTemporaryJournal && <Text style={styles.small}>Loading your saved buttons…</Text>}
+          {reminderState.loadStatus === 'failed' && !isTemporaryJournal && <View style={styles.notice}>
+            <Text accessibilityRole="alert" style={styles.error}>Saved buttons could not load.</Text>
+            {chip('Retry saved buttons', () => { void reminder.refresh(); })}
+          </View>}
           <View style={styles.grid}>
-            {emotions.map(emotion => <Pressable key={emotion.id} accessibilityRole="button" accessibilityLabel={emotion.label}
-              onPress={() => { void controller.tap(emotion); setPage('support'); }}
+            {(reminderState.loadStatus === 'ready' ? reminderState.active : isTemporaryJournal || reminderState.loadStatus === 'unavailable' ? emotions : []).map(emotion => <Pressable key={emotion.id} accessibilityRole="button" accessibilityLabel={emotion.label}
+              onPress={() => { void controller.tap(emotion); const saved = reminderState.active.find(card => card.id === emotion.id); if (saved) void reminder.selectSupport(saved); navigate('support'); }}
               style={({ pressed }) => [styles.emotion, pressed && styles.pressed]}>
               <Text style={styles.symbol} accessible={false}>{emotion.symbol}</Text>
               <Text style={styles.emotionTitle}>{emotion.label}</Text>
               <Text style={styles.small}>{emotion.hint}</Text>
             </Pressable>)}
           </View>
+          {!isTemporaryJournal && reminderState.loadStatus === 'ready' && chip('Manage reminder buttons', () => navigate('reminders'))}
           {isTemporaryJournal ? <Text style={styles.small}>Sessions, notes and reflections need the Android development build. Demo moments reset on reload.</Text> : <>
             {!tradingState.active && <>
               <TextInput accessibilityLabel="Optional session title" placeholder="Optional session title" placeholderTextColor={colors.muted} value={startTitle} onChangeText={setStartTitle} style={[styles.historyCard, { color: colors.ink }]} />
@@ -182,23 +226,29 @@ function JournalApp() {
             {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
           </>}
           <Text style={styles.sectionLabel}>MAKE YOURSELF AT HOME</Text>
-          <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => chip(mode.charAt(0).toUpperCase() + mode.slice(1), () => setAppearance(mode), appearance === mode))}</View>
+          <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => chip(mode.charAt(0).toUpperCase() + mode.slice(1), () => { void appearanceController.choose(mode); }, appearance === mode))}</View>
+          {appearanceState.status === 'saving' && <Text style={styles.small}>Saving appearance…</Text>}
+          {appearanceState.status === 'failed' && <View style={styles.notice}><Text accessibilityRole="alert" style={styles.error}>Appearance not saved. Your choice remains for this run.</Text>
+            {chip('Retry appearance', () => { void appearanceController.retry(); })}</View>}
+          {appearanceState.status === 'loadFailed' && <View style={styles.notice}><Text accessibilityRole="alert" style={styles.error}>Saved appearance could not load. System appearance is temporary.</Text>
+            {chip('Retry loading appearance', () => { void appearanceController.load(); })}</View>}
+          {appearanceState.status === 'unavailable' && <Text style={styles.small}>Appearance is temporary in this demo.</Text>}
           <Text style={styles.footnote}>There is no perfect label. “Unsure” is a place to start.</Text>
           {mediaProof && <MediaVaultProofPanel proof={mediaProof} ink={colors.ink} muted={colors.muted} line={colors.line} />}
           {clipExercise && <ClipRecoveryPanel exercise={clipExercise} ink={colors.ink} muted={colors.muted} line={colors.line} />}
         </ScrollView>}
 
         {page === 'support' && state.selected && <ScrollView contentContainerStyle={styles.body}>
-          <Pressable accessibilityRole="button" onPress={() => setPage('now')} style={styles.back}><Text style={styles.link}>← All emotions</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => navigate('now')} style={styles.back}><Text style={styles.link}>← All emotions</Text></Pressable>
           <Text style={styles.eyebrow}>{state.selected.label.toUpperCase()}</Text>
           <Text style={styles.title}>A little space.{ '\n' }A clearer choice.</Text>
-          <View style={styles.supportCard}>
-            <Text style={styles.sectionLabel}>YOUR INJECTING LOGIC</Text>
+          {reminderState.selected ? <ReminderSupport controller={reminder} colors={colors} /> : <View style={styles.supportCard}>
+            <Text style={styles.sectionLabel}>YOUR REMINDER</Text>
             <Text style={styles.supportText}>{state.selected.support}</Text>
             <View style={styles.rule} />
             <Text style={styles.small}>ONE POSSIBLE NEXT STEP</Text>
             <Text style={styles.action}>{state.selected.action}</Text>
-          </View>
+          </View>}
           <View accessibilityLiveRegion="polite">
             <Text style={[styles.saveStatus, state.saveStatus === 'failed' && styles.error]}>
               {state.saveStatus === 'saving' ? 'Saving your moment…' : state.saveStatus === 'failed' ? state.saveError === 'capacity' ? 'Not logged: 50 moments are awaiting save. Retry those first. Your reminder is still here.' : state.saveError === 'capture' ? 'Could not log this tap. Your reminder is still here. Please try another tap.' : 'Not saved. Your reminder is still here.' : isTemporaryJournal ? '✓ Moment added to temporary demo history' : '✓ Moment saved on this device'}
@@ -210,13 +260,21 @@ function JournalApp() {
             {chip('Add moment reflection', () => openWriting({ kind: 'moment', id: state.moment!.id }, 'reflection'))}
           </>}
           <Text style={styles.footnote}>No explanation needed. Your emotion and the time are enough for this moment.</Text>
-          {chip('See my moments', () => setPage('history'))}
-          {Platform.OS === 'android' && !isTemporaryJournal && state.saveStatus === 'saved' && <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); setPage('clips'); }} />}
-          <Text style={styles.footnote}>Original starter reminder · personal editing comes in a later increment.</Text>
+          {chip('See my moments', () => navigate('history'))}
+          {Platform.OS === 'android' && !isTemporaryJournal && state.saveStatus === 'saved' && <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); navigate('clips'); }} />}
+          {!isTemporaryJournal && reminderState.loadStatus === 'ready' && chip('Manage reminder buttons', () => navigate('reminders'))}
         </ScrollView>}
 
+        {page === 'reminders' && <ReminderManager controller={reminder} colors={colors}
+          onEdit={card => { reminder.edit(card); navigate('editor'); }}
+          onAdd={() => { if (reminder.add()) navigate('editor'); }} />}
+        {page === 'editor' && <ReminderEditor controller={reminder} colors={colors} appearance={appearance} appearanceStatus={appearanceState.status}
+          onAppearance={mode => { void appearanceController.choose(mode); }} onAppearanceRetry={() => { void appearanceController.retry(); }}
+          onBack={() => { reminder.discard(); void reminder.stop(); setPage('reminders'); }}
+          onSaved={() => { void reminder.stop(); setPage('reminders'); }} />}
+
         {page === 'clips' && clipMoment && <ScrollView contentContainerStyle={styles.body}>
-          {chip('← My moments', () => setPage('history'))}
+          {chip('← My moments', () => navigate('history'))}
           <Text style={styles.eyebrow}>{clipMoment.emotionLabel.toUpperCase()}</Text>
           <Text style={styles.small}>{new Date(clipMoment.createdAt).toLocaleString()}</Text>
           <Text style={styles.supportText}>{clipMoment.supportText}</Text>
@@ -229,11 +287,11 @@ function JournalApp() {
             {groupMore && chip('Older grouping choices', () => { void loadGrouping(true); })}
             {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
           </>}
-          <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); setPage('clips'); }} />
+          <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); navigate('clips'); }} />
         </ScrollView>}
 
-        {page === 'sessions' && !isTemporaryJournal && <TradingPanel controller={trading} ink={colors.ink} muted={colors.muted} line={colors.line} onMoment={moment => { setClipMoment(moment); setPage('clips'); }} onReflection={session => openWriting({ kind: 'session', id: session.id })} />}
-        {page === 'writing' && writingOwner && !isTemporaryJournal && <WritingPanel controller={writing} repository={tradingRepository} owner={writingOwner} initialKind={writingKind} ink={colors.ink} muted={colors.muted} line={colors.line} onBack={() => setPage(writingOwner.kind === 'session' ? 'sessions' : 'clips')} />}
+        {page === 'sessions' && !isTemporaryJournal && <TradingPanel controller={trading} ink={colors.ink} muted={colors.muted} line={colors.line} onMoment={moment => { setClipMoment(moment); navigate('clips'); }} onReflection={session => openWriting({ kind: 'session', id: session.id })} />}
+        {page === 'writing' && writingOwner && !isTemporaryJournal && <WritingPanel controller={writing} repository={tradingRepository} owner={writingOwner} initialKind={writingKind} ink={colors.ink} muted={colors.muted} line={colors.line} onBack={() => navigate(writingOwner.kind === 'session' ? 'sessions' : 'clips')} />}
 
         {page === 'history' && <FlatList data={state.history} keyExtractor={item => item.id}
           contentContainerStyle={styles.body} initialNumToRender={10} windowSize={5}
@@ -241,21 +299,30 @@ function JournalApp() {
             <Text style={styles.eyebrow}>YOUR RECENT MOMENTS</Text>
             <Text style={styles.title}>See it with{ '\n' }fresh eyes.</Text>
             <Text style={styles.subtitle}>A record of what you noticed.{ '\n' }Nothing to judge. Something to learn.</Text>
-            <Text style={styles.small}>Showing up to 50 recent moments. Session grouping comes next.</Text>
+            <Text style={styles.small}>Browse saved moments from newest to oldest. Each keeps its captured words and time.</Text>
             {state.historyStatus === 'failed' && <View style={styles.notice}><Text style={styles.error}>History couldn’t load. Saved moments have not been deleted.</Text>{chip('Try loading again', () => { void controller.refresh(); })}</View>}
             {deleteError && <Text accessibilityRole="alert" style={styles.error}>That moment could not be deleted. Please try again.</Text>}
           </>}
           ListEmptyComponent={<View style={styles.empty}>
             <Text style={styles.emotionTitle}>{state.historyStatus === 'loading' ? 'Opening your journal…' : state.historyStatus === 'failed' ? 'History is unavailable' : 'Your first moment starts with a tap.'}</Text>
             <Text style={styles.subtitle}>Choose an emotion whenever something comes up.</Text>
-            {chip('Notice a moment', () => setPage('now'))}
+            {chip('Notice a moment', () => navigate('now'))}
           </View>}
           renderItem={({ item }) => <View style={styles.historyCard}>
             <View style={styles.historyHeading}><Text style={styles.emotionTitle}>{item.emotionLabel}</Text><Text style={styles.small}>{new Date(item.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</Text></View>
             <Text style={styles.historyText}>{item.supportText}</Text>
             {!isTemporaryJournal && chip(`Open ${item.emotionLabel} writing`, () => { setClipMoment(item); openWriting({ kind: 'moment', id: item.id }); })}
-            {Platform.OS === 'android' && !isTemporaryJournal && chip('Open voice clips', () => { setClipMoment(item); setPage('clips'); })}
+            {Platform.OS === 'android' && !isTemporaryJournal && chip('Open voice clips', () => { setClipMoment(item); navigate('clips'); })}
             <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${item.emotionLabel} moment`} onPress={() => removeMoment(item.id)} style={styles.delete}><Text style={styles.small}>Delete moment</Text></Pressable>
+          </View>}
+          ListFooterComponent={<View style={styles.notice}>
+            {state.historyStatus === 'ready' && <View style={styles.row}>
+              {chip('Newest', () => { void controller.refresh(); })}
+              {state.olderStatus !== 'end' && state.olderStatus !== 'loading' && chip(state.olderStatus === 'failed' ? 'Retry Older' : 'Older', () => { void controller.older(); })}
+            </View>}
+            {state.olderStatus === 'loading' && <Text style={styles.small}>Loading older moments…</Text>}
+            {state.olderStatus === 'end' && state.history.length > 0 && <Text style={styles.small}>You have reached the oldest saved moment.</Text>}
+            {state.olderStatus === 'failed' && <Text accessibilityRole="alert" style={styles.error}>Older moments could not load. Your current page is still here.</Text>}
           </View>}
         />}
 
@@ -263,19 +330,23 @@ function JournalApp() {
           <Text accessibilityRole="alert" style={styles.error}>{audioState.message}</Text>
           {chip('Stop again', () => { void recording.stop(); })}
         </View>}
+        {reminderState.playing === 'cleanup' && <View style={styles.failureBar}>
+          <Text accessibilityRole="alert" style={styles.error}>Reminder audio release is not confirmed. Stop again before other audio.</Text>
+          {chip('Stop reminder again', () => { void reminder.stop(); })}
+        </View>}
         {audioState.pending > 0 && <View style={styles.failureBar}>
           <Text style={styles.error}>{audioState.pending} clip operation(s) need attention.</Text>
           {chip('Retry pending clips', () => { void recording.recover(); })}
-          {audioState.pendingOwners.map(owner => chip(`Open pending ${owner.emotionLabel} moment`, () => { setClipMoment(owner); setPage('clips'); }))}
+          {audioState.pendingOwners.map(owner => chip(`Open pending ${owner.emotionLabel} moment`, () => navigate('clips', () => setClipMoment(owner))))}
         </View>}
         {state.failed.length > 0 && <View style={styles.failureBar}>
           <Text style={styles.error}>{state.failed.length} moment{state.failed.length > 1 ? 's' : ''} not saved. Retry before closing.</Text>
           {chip('Retry unsaved moments', () => { for (const moment of state.failed) void controller.retry(moment.id); })}
         </View>}
         <View style={styles.tabs}>
-          {chip('Now', () => setPage('now'), page === 'now')}
-          {chip('My moments', () => { setPage('history'); void controller.refresh(); }, page === 'history')}
-          {!isTemporaryJournal && chip('Sessions', () => setPage('sessions'), page === 'sessions')}
+          {chip('Now', () => navigate('now'), page === 'now')}
+          {chip('My moments', () => navigate('history'), page === 'history')}
+          {!isTemporaryJournal && chip('Sessions', () => navigate('sessions'), page === 'sessions')}
         </View>
       </View>
     </SafeAreaView>
