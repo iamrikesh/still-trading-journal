@@ -3,6 +3,8 @@ package expo.modules.stillmediavault
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicLong
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** Stop/lifecycle revokes Play work even while base64 validation runs outside the audio lock. */
 internal class ReminderPlayAdmission {
@@ -10,6 +12,11 @@ internal class ReminderPlayAdmission {
   fun ticket(): Long = epoch.get()
   fun revoke() { epoch.incrementAndGet() }
   fun requireCurrent(ticket: Long) { check(epoch.get() == ticket) }
+  suspend fun <T> validateOffQueue(validate: () -> T, start: (Long, T) -> Unit) {
+    val ticket = ticket()
+    val value = withContext(Dispatchers.IO) { validate() }
+    start(ticket, value) // Caller checks ticket inside the serialized native audio lock.
+  }
 }
 
 /** All methods and driver callbacks are serialized by the module's ClipOwnership lock. */

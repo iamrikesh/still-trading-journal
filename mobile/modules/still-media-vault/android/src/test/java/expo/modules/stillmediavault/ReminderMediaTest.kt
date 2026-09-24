@@ -44,4 +44,23 @@ class ReminderMediaTest {
       inspectReminder(mp3, "audio", "audio/mpeg") { _, _ -> facts }
     }
   }
+
+  @Test fun mp4WithoutProvenAacTrackIsRejected() {
+    val mp4 = byteArrayOf(0, 0, 0, 12, 'f'.code.toByte(), 't'.code.toByte(),
+      'y'.code.toByte(), 'p'.code.toByte(), 'M'.code.toByte(), '4'.code.toByte(),
+      'A'.code.toByte(), ' '.code.toByte())
+    assertThrows(Exception::class.java) {
+      inspectReminder(mp4, "audio", "audio/mp4") { _, _ ->
+        MediaFacts("audio/mp4", null, null, 1200, false)
+      }
+    }
+    assertThrows(Exception::class.java) {
+      inspectReminder(mp4, "audio", "audio/mp4") { _, _ ->
+        MediaFacts("audio/mp4", null, null, 1200, false, audioTrackMime = "audio/opus")
+      }
+    }
+    assertEquals("audio/mp4", inspectReminder(mp4, "audio", "audio/mp4") { _, _ ->
+      MediaFacts("audio/mp4", null, null, 1200, false, audioTrackMime = "audio/mp4a-latm")
+    }.mime)
+  }
 }

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import expo.modules.kotlin.activityresult.AppContextActivityResultContract
 import java.io.Closeable
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 /** One temporary-grant selection. The source URI is never returned across the bridge. */
 internal class ReminderPicker : AppContextActivityResultContract<String, Uri?> {
@@ -32,10 +34,11 @@ internal class ReminderPicker : AppContextActivityResultContract<String, Uri?> {
 }
 
 /** Cancellation closes an acquired stream without waiting for a hostile provider read. */
-internal class ReminderImportGate {
+internal class ReminderImportGate(private val closeExecutor: Executor = CLOSE_EXECUTOR) {
   private var active = false
   private var cancelled = false
-  private var finishing = false
+  private var workerFinished = false
+  private var closePending = false
   private var generation = 0L
   private var stream: Closeable? = null
 
@@ -43,7 +46,8 @@ internal class ReminderImportGate {
     check(!active)
     active = true
     cancelled = false
-    finishing = false
+    workerFinished = false
+    closePending = false
     generation++
     return generation
   }
@@ -62,32 +66,46 @@ internal class ReminderImportGate {
     val closing = synchronized(this) {
       if (!active || generation != ticket) null else {
         cancelled = true
-        stream.also { stream = null }
+        stream.also {
+          stream = null
+          if (it != null) closePending = true
+        }
       }
     }
-    closeQuietly(closing)
+    if (closing != null) {
+      try {
+        closeExecutor.execute {
+          try { closeQuietly(closing) } finally { closeFinished(ticket) }
+        }
+      } catch (_: Exception) {
+        // Keep the admission obligation if the bounded closer could not accept work.
+      }
+    }
   }
 
   private fun closeQuietly(closing: Closeable?) {
     try { closing?.close() } catch (_: Exception) { /* Worker still owns its final close. */ }
   }
 
-  /** The guard remains set until the actual worker, not just its caller, exits. */
-  fun finish(ticket: Long) {
-    val closing = synchronized(this) {
-      if (!active || generation != ticket || finishing) return
-      finishing = true
-      stream.also { stream = null }
+  private fun closeFinished(ticket: Long) = synchronized(this) {
+    if (active && generation == ticket) {
+      closePending = false
+      if (workerFinished) active = false
     }
-    try {
-      closeQuietly(closing)
-    } finally {
-      synchronized(this) {
-        if (generation == ticket) {
-          active = false
-          finishing = false
-        }
-      }
+  }
+
+  /** Worker owns its normal stream close; cancellation close can finish independently. */
+  @Synchronized fun finish(ticket: Long) {
+    if (!active || generation != ticket) return
+    workerFinished = true
+    stream = null
+    if (!closePending) active = false
+  }
+
+  companion object {
+    // Admission permits one stream and at most one submitted close at a time.
+    private val CLOSE_EXECUTOR = Executors.newSingleThreadExecutor { task ->
+      Thread(task, "still-reminder-provider-close").apply { isDaemon = true }
     }
   }
 }

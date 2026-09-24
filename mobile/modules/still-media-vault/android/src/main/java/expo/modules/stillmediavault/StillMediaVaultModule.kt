@@ -184,17 +184,22 @@ class StillMediaVaultModule : Module() {
         if (importTicket == ticket && !handedOff) importTicket = null
       }
     }
-    AsyncFunction("playReminder") { base64: String ->
-      val ticket = reminderPlayAdmission.ticket()
-      val media = reminderErrors {
-        val bytes = decodeReminderBase64(base64)
-        val selected = inspectReminder(bytes, "audio", null, AndroidReminderDecoder::inspect)
-        bytes to requireNotNull(selected.durationMs)
-      }
-      reminderOperation {
-        reminderPlayAdmission.requireCurrent(ticket)
-        it.play(media.first, media.second)
-      }
+    AsyncFunction("playReminder") Coroutine { base64: String ->
+      reminderPlayAdmission.validateOffQueue(
+        validate = {
+          reminderErrors {
+            val bytes = decodeReminderBase64(base64)
+            val selected = inspectReminder(bytes, "audio", null, AndroidReminderDecoder::inspect)
+            bytes to requireNotNull(selected.durationMs)
+          }
+        },
+        start = { ticket, media ->
+          reminderOperation {
+            reminderPlayAdmission.requireCurrent(ticket)
+            it.play(media.first, media.second)
+          }
+        },
+      )
     }
     AsyncFunction("stopReminder") {
       reminderPlayAdmission.revoke()

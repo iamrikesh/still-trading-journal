@@ -2,6 +2,8 @@ package expo.modules.stillmediavault
 
 import android.graphics.BitmapFactory
 import android.media.MediaDataSource
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -10,9 +12,11 @@ internal const val MAX_IMAGE_BYTES = 2097152
 internal const val MAX_AUDIO_BYTES = 4194304
 private const val MAX_IMAGE_PIXELS = 4000000L
 private const val MAX_IMAGE_SIDE = 4096
+private const val AAC_TRACK_MIME = "audio/mp4a-latm"
 
 internal data class MediaFacts(
   val mime: String, val width: Int?, val height: Int?, val durationMs: Int?, val hasVideo: Boolean,
+  val audioTrackMime: String? = null,
 )
 
 internal data class ImportedReminder(
@@ -118,6 +122,7 @@ internal fun inspectReminder(
     require(facts.durationMs == null)
   } else {
     require(facts.width == null && facts.height == null && requireNotNull(facts.durationMs) in 1..240000)
+    if (mime == "audio/mp4") require(facts.audioTrackMime == AAC_TRACK_MIME)
   }
   return ImportedReminder(kind, mime, bytes.size, encodeReminderBase64(bytes),
     facts.width, facts.height, facts.durationMs)
@@ -140,16 +145,7 @@ internal object AndroidReminderDecoder {
   }
 
   private fun audio(bytes: ByteArray, mime: String): MediaFacts {
-    val source = object : MediaDataSource() {
-      override fun getSize(): Long = bytes.size.toLong()
-      override fun readAt(position: Long, buffer: ByteArray, offset: Int, size: Int): Int {
-        if (position < 0 || position >= bytes.size) return -1
-        val count = minOf(size, bytes.size - position.toInt())
-        System.arraycopy(bytes, position.toInt(), buffer, offset, count)
-        return count
-      }
-      override fun close() {}
-    }
+    val source = memorySource(bytes)
     val retriever = MediaMetadataRetriever()
     try {
       retriever.setDataSource(source)
@@ -162,10 +158,45 @@ internal object AndroidReminderDecoder {
       }
       val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
       require(duration != null && duration in 1..240000)
-      val video = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) == "yes"
-      return MediaFacts(normalized ?: "", null, null, duration.toInt(), video)
+      val retrieverVideo = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) == "yes"
+      val tracks = if (mime == "audio/mp4") mp4Tracks(bytes) else null
+      return MediaFacts(normalized ?: "", null, null, duration.toInt(),
+        retrieverVideo || tracks?.second == true, tracks?.first)
     } finally {
       try { retriever.release() } finally { source.close() }
+    }
+  }
+
+  private fun memorySource(bytes: ByteArray): MediaDataSource = object : MediaDataSource() {
+      override fun getSize(): Long = bytes.size.toLong()
+      override fun readAt(position: Long, buffer: ByteArray, offset: Int, size: Int): Int {
+        if (position < 0 || position >= bytes.size) return -1
+        val count = minOf(size, bytes.size - position.toInt())
+        System.arraycopy(bytes, position.toInt(), buffer, offset, count)
+        return count
+      }
+      override fun close() {}
+    }
+
+  /** Track inspection uses the already captured byte array; no URI reopen or temp file. */
+  private fun mp4Tracks(bytes: ByteArray): Pair<String?, Boolean> {
+    val source = memorySource(bytes)
+    val extractor = MediaExtractor()
+    try {
+      extractor.setDataSource(source)
+      var audioTrack: String? = null
+      var hasVideo = false
+      for (index in 0 until extractor.trackCount) {
+        val trackMime = extractor.getTrackFormat(index).getString(MediaFormat.KEY_MIME) ?: continue
+        if (trackMime.startsWith("video/")) hasVideo = true
+        if (trackMime.startsWith("audio/")) {
+          // Multiple audio tracks have ambiguous playback selection; reject them.
+          audioTrack = if (audioTrack == null) trackMime else "multiple"
+        }
+      }
+      return audioTrack to hasVideo
+    } finally {
+      try { extractor.release() } finally { source.close() }
     }
   }
 }
