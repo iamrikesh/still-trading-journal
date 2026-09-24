@@ -157,3 +157,52 @@ test('Newest refresh and controller removal ignore stale Older responses', async
   release([b]); await pendingDelete;
   assert.equal(controller.getSnapshot().history[0]?.id, 'b');
 });
+
+test('failed removal settles an invalidated refresh and keeps retained history pageable', async () => {
+  const rows: Moment[] = Array.from({ length: 50 }, (_, n) => ({
+    id: String(50 - n).padStart(2, '0'), emotionId: 'fomo', emotionLabel: 'FOMO',
+    createdAt: capturedAt, supportText: 'Snapshot.',
+  }));
+  let finishOldRefresh!: (rows: Moment[]) => void;
+  let reads = 0;
+  const repo: JournalRepository = {
+    save: async () => {},
+    remove: async () => { throw Error('delete failed'); },
+    list: async before => {
+      if (before) return [{ ...rows.at(-1)!, id: 'older' }];
+      return ++reads === 1 ? rows : new Promise<Moment[]>(resolve => { finishOldRefresh = resolve; });
+    },
+  };
+  const controller = createJournalController({ repository: async () => repo, now: () => capturedAt, id: () => 'new' });
+  await controller.refresh();
+  const oldRefresh = controller.refresh();
+  await Promise.resolve(); await Promise.resolve();
+  await assert.rejects(controller.remove(rows[0]!.id));
+  finishOldRefresh([]); await oldRefresh;
+  assert.equal(controller.getSnapshot().historyStatus, 'ready');
+  assert.deepEqual(controller.getSnapshot().history, rows);
+  await controller.older();
+  assert.equal(controller.getSnapshot().history.length, 51);
+  assert.equal(controller.getSnapshot().olderStatus, 'end');
+});
+
+test('delayed removal failure cannot overwrite a newer successful refresh', async () => {
+  const initial: Moment = { id: 'initial', emotionId: 'fomo', emotionLabel: 'FOMO', createdAt: capturedAt, supportText: 'Snapshot.' };
+  const latest = { ...initial, id: 'latest' };
+  let failDelete!: (reason: Error) => void;
+  let reads = 0;
+  const repo: JournalRepository = {
+    save: async () => {},
+    remove: () => new Promise<void>((_, reject) => { failDelete = reject; }),
+    list: async () => ++reads === 1 ? [initial] : [latest],
+  };
+  const controller = createJournalController({ repository: async () => repo, now: () => capturedAt, id: () => 'new' });
+  await controller.refresh();
+  const deleting = controller.remove('initial');
+  await Promise.resolve(); await Promise.resolve();
+  await controller.refresh();
+  failDelete(Error('delete failed'));
+  await assert.rejects(deleting);
+  assert.equal(controller.getSnapshot().historyStatus, 'ready');
+  assert.deepEqual(controller.getSnapshot().history, [latest]);
+});

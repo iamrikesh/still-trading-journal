@@ -21,6 +21,7 @@ export function createJournalController(deps: {
   const listeners = new Set<() => void>();
   let latestRead = 0;
   let cursor: MomentCursor | null = null;
+  let historyKnown = false;
   const saving = new Set<string>();
   function update(patch: Partial<JournalState>) {
     state = { ...state, ...patch };
@@ -35,6 +36,7 @@ export function createJournalController(deps: {
       if (request === latestRead) {
         const last = history.at(-1);
         cursor = last ? { createdAt: last.createdAt, id: last.id } : null;
+        historyKnown = true;
         update({ history, historyStatus: 'ready', olderStatus: history.length < 50 ? 'end' : 'idle' });
       }
     } catch {
@@ -60,10 +62,20 @@ export function createJournalController(deps: {
     }
   }
   async function remove(id: string): Promise<void> {
-    ++latestRead;
+    const request = ++latestRead;
+    const previousHistoryStatus = state.historyStatus;
+    const previousOlderStatus = state.olderStatus;
     update({ olderStatus: 'idle' });
-    const repository = await deps.repository();
-    await repository.remove(id);
+    try {
+      const repository = await deps.repository();
+      await repository.remove(id);
+    } catch (error) {
+      if (request === latestRead) update({
+        historyStatus: previousHistoryStatus === 'loading' ? (historyKnown ? 'ready' : 'failed') : previousHistoryStatus,
+        olderStatus: previousOlderStatus === 'loading' ? 'idle' : previousOlderStatus,
+      });
+      throw error;
+    }
     update({ history: state.history.filter(row => row.id !== id) });
     await refresh();
   }
