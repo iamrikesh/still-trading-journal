@@ -37,7 +37,7 @@ test('migration failure rolls back tables/version and unknown versions remain un
     assert.equal(f.sqlite.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name = 'clips'").get()?.n, 0);
     assert.deepEqual(await f.legacy.list(), [moment()]);
     f.inject();
-    for (const version of [0, 4]) {
+    for (const version of [0, 5]) {
       f.sqlite.exec(`PRAGMA user_version = ${version}`);
       await assert.rejects(createClipJournal(f.db, f.vault));
       assert.equal(f.sqlite.prepare('PRAGMA user_version').get()?.user_version, version);

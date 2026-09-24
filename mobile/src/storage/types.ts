@@ -6,8 +6,10 @@ export type Moment = {
   supportText: string;
 };
 
+export type MomentCursor = Pick<Moment, 'createdAt' | 'id'>;
+
 export interface JournalRepository {
   save(moment: Moment): Promise<void>;
-  list(): Promise<Moment[]>;
+  list(before?: MomentCursor): Promise<Moment[]>;
   remove(id: string): Promise<void>;
 }

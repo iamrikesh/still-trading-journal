@@ -128,9 +128,11 @@ async function initialize(db: JournalDatabase, vault: ClipVault): Promise<ClipJo
           snapshot.id, snapshot.emotionId, snapshot.emotionLabel, snapshot.createdAt, snapshot.supportText);
         });
       },
-      list: () => enqueue(() => db.getAllAsync<Moment>(`SELECT id, emotionId, emotionLabel, createdAt, supportText FROM moments
+      list: before => { const cursor = before && { ...before }; return enqueue(() => db.getAllAsync<Moment>(`SELECT id, emotionId, emotionLabel, createdAt, supportText FROM moments
         WHERE NOT EXISTS (SELECT 1 FROM moment_deletions WHERE moment_deletions.id = moments.id)
-        ORDER BY createdAt DESC, id DESC LIMIT 50`)),
+        ${cursor ? 'AND (createdAt < ? OR (createdAt = ? AND id < ?))' : ''}
+        ORDER BY createdAt DESC, id DESC LIMIT 50`,
+      ...(cursor ? [cursor.createdAt, cursor.createdAt, cursor.id] : []))); },
       remove: id => enqueue(() => deleteMoment(id)),
     },
     begin(intent) {

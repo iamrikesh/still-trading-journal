@@ -3,7 +3,7 @@ import type { JournalDatabase } from './sqlJournal.ts';
 
 export async function migrateTradingSchema(db: JournalDatabase): Promise<void> {
   const [version] = await db.getAllAsync<{ user_version: number }>('PRAGMA user_version');
-  if (version?.user_version === 3) return;
+  if (version?.user_version === 3 || version?.user_version === 4) return;
   if (version?.user_version !== 2) throw new Error('Unsupported trading schema.');
   await clipTransaction(db, async () => {
     await db.execAsync(`

@@ -2,6 +2,9 @@ import { createClipJournal } from './clipJournal.ts';
 import { clipTransaction, requireUsableClipDatabase } from './clipSchema.ts';
 import { migrateTradingSchema } from './tradingSchema.ts';
 import { createTradingRepository } from './tradingJournal.ts';
+import { migrateReminderSchema } from './reminderSchema.ts';
+import { createAppearanceRepository, createReminderRepository } from './reminderJournal.ts';
+import type { AppearanceRepository, ReminderRepository } from './reminderTypes.ts';
 import type { TradingRepository } from './tradingTypes.ts';
 import type { ClipJournal } from './clipTypes.ts';
 import type { NativeClipVault } from './nativeClipVault.ts';
@@ -29,6 +32,8 @@ export interface JournalSession {
   recovery(): Promise<{ pending: number }>;
   audio?: SessionAudio | null;
   trading?: TradingRepository;
+  reminders?: ReminderRepository;
+  appearance?: AppearanceRepository;
 }
 const failure = () => new Error('Journal session unavailable. Existing data has not been reset.');
 
@@ -48,7 +53,7 @@ export function runtimeSession<T>(host: object, factory: () => Promise<T>): () =
 export async function createJournalSession(db: JournalDatabase, vault: NativeClipVault | null, options: SessionOptions): Promise<JournalSession> {
   try {
     const [version] = await db.getAllAsync<{ user_version: number }>('PRAGMA user_version');
-    if (!version || ![0, 1, 2, 3].includes(version.user_version)) throw failure();
+    if (!version || ![0, 1, 2, 3, 4].includes(version.user_version)) throw failure();
     if (!vault && version.user_version >= 2) throw failure();
     let legacy: JournalRepository | undefined;
     if (version.user_version < 2) legacy = await createSqlJournal(db);
@@ -69,7 +74,8 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
               SELECT ?, id FROM trading_sessions WHERE endedAt IS NULL`, snapshot.id);
           });
         }); },
-        list: () => enqueue(() => journal.list()), remove: id => enqueue(() => journal.remove(id)),
+        list: before => { const cursor = before && { ...before }; return enqueue(() => journal.list(cursor)); },
+        remove: id => enqueue(() => journal.remove(id)),
       };
     }
     if (!vault) return { journal: wrap(legacy!), clips: null, exercise: null, recovery: () => enqueue(async () => ({ pending: 0 })) };
@@ -85,7 +91,29 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
     const core = await createClipJournal(db, vault);
     await core.recover();
     await migrateTradingSchema(db);
+    await migrateReminderSchema(db);
     const tradingCore = createTradingRepository(db);
+    const reminderCore = createReminderRepository(db);
+    const appearanceCore = createAppearanceRepository(db);
+    const reminders: ReminderRepository = {
+      list: archived => enqueue(() => reminderCore.list(archived)),
+      save: input => {
+        const snapshot = {
+          card: { ...input.card },
+          image: input.image && { ...input.image },
+          audio: input.audio && { ...input.audio },
+        };
+        return enqueue(() => reminderCore.save(snapshot));
+      },
+      move: (id, direction) => enqueue(() => reminderCore.move(id, direction)),
+      archive: (id, archived) => enqueue(() => reminderCore.archive(id, archived)),
+      attachment: id => enqueue(() => reminderCore.attachment(id)),
+      usage: () => enqueue(() => reminderCore.usage()),
+    };
+    const appearance: AppearanceRepository = {
+      get: () => enqueue(() => appearanceCore.get()),
+      set: value => enqueue(() => appearanceCore.set(value)),
+    };
     const trading: TradingRepository = {
       active: () => enqueue(() => tradingCore.active()),
       start: input => { const snapshot = { ...input }; return enqueue(() => tradingCore.start(snapshot)); },
@@ -113,6 +141,8 @@ export async function createJournalSession(db: JournalDatabase, vault: NativeCli
     return {
       journal: wrap(core.journal, true),
       trading,
+      reminders,
+      appearance,
       clips: {
         begin: intent => { const snapshot = { ...intent }; return enqueue(async () => { if (await pending()) throw failure(); await core.begin(snapshot); }); },
         finish: id => enqueue(() => core.finish(id)),

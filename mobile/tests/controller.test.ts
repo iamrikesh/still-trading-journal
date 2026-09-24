@@ -103,3 +103,57 @@ test('a capture ID failure still opens support and reports that nothing was logg
   assert.equal(controller.getSnapshot().moment, null);
   assert.equal(controller.getSnapshot().saveError, 'capture');
 });
+
+test('Older keeps displayed pages after failure, retries the same cursor and ends explicitly', async () => {
+  const rows: Moment[] = Array.from({ length: 55 }, (_, n) => ({
+    id: String(55 - n).padStart(2, '0'), emotionId: 'fomo', emotionLabel: 'FOMO',
+    createdAt: capturedAt, supportText: 'Snapshot.',
+  }));
+  let failOlder = true;
+  const repo: JournalRepository = {
+    save: async () => {}, remove: async () => {},
+    list: async before => {
+      if (before && failOlder) throw Error('offline');
+      const start = before ? rows.findIndex(row => row.id === before.id) + 1 : 0;
+      return rows.slice(start, start + 50);
+    },
+  };
+  const controller = createJournalController({ repository: async () => repo, now: () => capturedAt, id: () => 'new' });
+  await controller.refresh();
+  assert.equal(controller.getSnapshot().history.length, 50);
+  await controller.older();
+  assert.equal(controller.getSnapshot().olderStatus, 'failed');
+  assert.equal(controller.getSnapshot().history.length, 50);
+  failOlder = false;
+  await controller.older();
+  assert.equal(controller.getSnapshot().history.length, 55);
+  assert.equal(controller.getSnapshot().olderStatus, 'end');
+  assert.equal(new Set(controller.getSnapshot().history.map(row => row.id)).size, 55);
+});
+
+test('Newest refresh and controller removal ignore stale Older responses', async () => {
+  const a = { id: 'a', emotionId: 'fomo', emotionLabel: 'FOMO', createdAt: capturedAt, supportText: 'Snapshot.' };
+  const b = { ...a, id: 'b' };
+  const tail = Array.from({ length: 49 }, (_, n) => ({ ...a, id: `tail-${n}` }));
+  let release!: (rows: Moment[]) => void;
+  let reads = 0;
+  const repo: JournalRepository = {
+    save: async () => {}, remove: async () => {},
+    list: async before => {
+      if (before) return new Promise<Moment[]>(resolve => { release = resolve; });
+      return ++reads === 1 ? [a, ...tail] : [b, ...tail];
+    },
+  };
+  const controller = createJournalController({ repository: async () => repo, now: () => capturedAt, id: () => 'new' });
+  await controller.refresh();
+  const pending = controller.older();
+  await Promise.resolve(); await Promise.resolve();
+  await controller.refresh();
+  release([a]); await pending;
+  assert.equal(controller.getSnapshot().history[0]?.id, 'b');
+  const pendingDelete = controller.older();
+  await Promise.resolve(); await Promise.resolve();
+  await controller.remove('b');
+  release([b]); await pendingDelete;
+  assert.equal(controller.getSnapshot().history[0]?.id, 'b');
+});

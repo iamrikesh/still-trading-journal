@@ -109,6 +109,7 @@ test('demo storage is bounded, isolated between instances, and protects saved sn
   for (let index = 0; index < 55; index++) await journal.save(moment(`m${String(index).padStart(2, '0')}`));
   assert.equal((await journal.list()).length, 50);
   assert.equal((await journal.list())[1]?.id, 'm54');
+  assert.deepEqual(await journal.list((await journal.list())[49]), []);
   await journal.remove('original');
   assert.equal((await journal.list()).length, 49);
   assert.deepEqual(await createMemoryJournal().list(), []);

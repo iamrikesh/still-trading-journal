@@ -39,9 +39,12 @@ export async function createSqlJournal(db: JournalDatabase): Promise<JournalRepo
         moment.id, moment.emotionId, moment.emotionLabel, moment.createdAt, moment.supportText,
       );
     },
-    async list() {
+    async list(before) {
       return db.getAllAsync<Moment>(
-        'SELECT id, emotionId, emotionLabel, createdAt, supportText FROM moments ORDER BY createdAt DESC, id DESC LIMIT 50',
+        `SELECT id, emotionId, emotionLabel, createdAt, supportText FROM moments
+         ${before ? 'WHERE createdAt < ? OR (createdAt = ? AND id < ?)' : ''}
+         ORDER BY createdAt DESC, id DESC LIMIT 50`,
+        ...(before ? [before.createdAt, before.createdAt, before.id] : []),
       );
     },
     async remove(id) {

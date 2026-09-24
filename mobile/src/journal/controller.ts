@@ -1,5 +1,5 @@
 import type { Emotion } from './emotions.ts';
-import type { JournalRepository, Moment } from '../storage/types.ts';
+import type { JournalRepository, Moment, MomentCursor } from '../storage/types.ts';
 
 export type JournalState = {
   selected: Emotion | null;
@@ -8,6 +8,7 @@ export type JournalState = {
   saveError: 'capacity' | 'capture' | 'write' | null;
   history: Moment[];
   historyStatus: 'loading' | 'ready' | 'failed';
+  olderStatus: 'idle' | 'loading' | 'end' | 'failed';
   failed: Moment[];
 };
 
@@ -16,9 +17,10 @@ export function createJournalController(deps: {
   now: () => string;
   id: () => string;
 }) {
-  let state: JournalState = { selected: null, moment: null, saveStatus: 'idle', saveError: null, history: [], historyStatus: 'loading', failed: [] };
+  let state: JournalState = { selected: null, moment: null, saveStatus: 'idle', saveError: null, history: [], historyStatus: 'loading', olderStatus: 'idle', failed: [] };
   const listeners = new Set<() => void>();
   let latestRead = 0;
+  let cursor: MomentCursor | null = null;
   const saving = new Set<string>();
   function update(patch: Partial<JournalState>) {
     state = { ...state, ...patch };
@@ -26,13 +28,44 @@ export function createJournalController(deps: {
   }
   async function refresh() {
     const request = ++latestRead;
+    update({ historyStatus: 'loading', olderStatus: 'idle' });
     try {
       const repository = await deps.repository();
       const history = await repository.list();
-      if (request === latestRead) update({ history, historyStatus: 'ready' });
+      if (request === latestRead) {
+        const last = history.at(-1);
+        cursor = last ? { createdAt: last.createdAt, id: last.id } : null;
+        update({ history, historyStatus: 'ready', olderStatus: history.length < 50 ? 'end' : 'idle' });
+      }
     } catch {
       if (request === latestRead) update({ historyStatus: 'failed' });
     }
+  }
+  async function older() {
+    if (state.historyStatus !== 'ready' || state.olderStatus === 'loading' || state.olderStatus === 'end' || !cursor) return;
+    const request = latestRead;
+    const before = { ...cursor };
+    update({ olderStatus: 'loading' });
+    try {
+      const repository = await deps.repository();
+      const page = await repository.list(before);
+      if (request !== latestRead) return;
+      const seen = new Set(state.history.map(row => row.id));
+      const appended = page.filter(row => { if (seen.has(row.id)) return false; seen.add(row.id); return true; });
+      const last = page.at(-1);
+      if (last) cursor = { createdAt: last.createdAt, id: last.id };
+      update({ history: [...state.history, ...appended], olderStatus: page.length < 50 ? 'end' : 'idle' });
+    } catch {
+      if (request === latestRead) update({ olderStatus: 'failed' });
+    }
+  }
+  async function remove(id: string): Promise<void> {
+    ++latestRead;
+    update({ olderStatus: 'idle' });
+    const repository = await deps.repository();
+    await repository.remove(id);
+    update({ history: state.history.filter(row => row.id !== id) });
+    await refresh();
   }
   async function persist(moment: Moment) {
     if (saving.has(moment.id)) return;
@@ -58,6 +91,8 @@ export function createJournalController(deps: {
   return {
     getSnapshot: () => state,
     refresh,
+    older,
+    remove,
     subscribe: (listener: () => void) => {
       listeners.add(listener);
       return () => { listeners.delete(listener); };

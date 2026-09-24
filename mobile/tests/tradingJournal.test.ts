@@ -30,12 +30,12 @@ test('one active session survives a rejected concurrent start', async () => {
   } finally { f.close(); }
 });
 
-test('schema3 reopens with original boundaries and an active session', async () => {
+test('schema4 reopens with original boundaries and an active session', async () => {
   const f = await fixture();
   try {
     let s = await createJournalSession(f.db, native(f), options);
     await s.trading!.start({ id: 'session-a', title: '', at });
-    assert.equal(f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 3);
+    assert.equal(f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 4);
     f.reopen(); s = await createJournalSession(f.db, native(f), options);
     assert.equal((await s.trading!.active())?.id, 'session-a');
     await s.trading!.end('session-a', later);
@@ -213,7 +213,7 @@ test('failed schema2 upgrade rolls back tables and version, then reopens', async
   const f = await fixture();
   try {
     await createJournalSession(f.db, native(f), options);
-    f.sqlite.exec('DROP TABLE journal_writings; DROP TABLE trading_memberships; DROP TABLE trading_sessions; PRAGMA user_version = 2');
+    f.sqlite.exec('DROP TABLE emotion_cards; DROP TABLE reminder_payloads; DROP TABLE appearance_preference; DROP TABLE journal_writings; DROP TABLE trading_memberships; DROP TABLE trading_sessions; PRAGMA user_version = 2');
     f.sqlite.exec("INSERT INTO clip_tombstones(id) VALUES ('old-media')");
     f.reopen();
     let reachedMutatedSchema = false;
@@ -243,11 +243,11 @@ test('unknown schema and prior media evidence do not create another key', async 
   const f = await fixture();
   try {
     await createJournalSession(f.db, native(f), options);
-    f.sqlite.exec('PRAGMA user_version = 4');
+    f.sqlite.exec('PRAGMA user_version = 5');
     f.reopen();
     await assert.rejects(createJournalSession(f.db, native(f), options));
-    assert.equal(f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 4);
-    f.sqlite.exec("PRAGMA user_version = 3; INSERT INTO moment_tombstones(id) VALUES ('old-owner')");
+    assert.equal(f.sqlite.prepare('PRAGMA user_version').get()!.user_version, 5);
+    f.sqlite.exec("PRAGMA user_version = 4; INSERT INTO moment_tombstones(id) VALUES ('old-owner')");
     f.reopen();
     const vault = native(f);
     vault.initialize = async allow => { assert.equal(allow, false); throw Error('missing key'); };

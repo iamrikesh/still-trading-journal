@@ -10,7 +10,10 @@ export function createMemoryJournal(): JournalRepository {
         return left.id === right.id ? 0 : left.id > right.id ? -1 : 1;
       }).slice(0, 50);
     },
-    async list() { return moments.map((moment) => ({ ...moment })); },
+    async list(before) {
+      return moments.filter(moment => !before || moment.createdAt < before.createdAt ||
+        (moment.createdAt === before.createdAt && moment.id < before.id)).map(moment => ({ ...moment }));
+    },
     async remove(id) { moments = moments.filter((moment) => moment.id !== id); },
   };
 }
