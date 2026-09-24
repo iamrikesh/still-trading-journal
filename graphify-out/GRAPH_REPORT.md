@@ -226,3 +226,13 @@ Targeted refresh of reviewed public source/document relationships: **285 nodes /
 ## Journal features design milestone (2026-09-23)
 
 Targeted public source/document refresh: **313 nodes / 451 edges**. Added approved specs, plans, storage entry points, evidence and learning links. Current source/reviews distinguish implementation from pending validation. Existing communities and historical centrality retained; no full structural extraction or private/dependency/native-output scan. No external model API call; host token cost unavailable.
+
+
+## UI UX discovery (2026-09-24)
+
+Targeted public-document navigation refresh: 314 nodes / 456 edges. Added the discovery note, current-priority reference and inspected screen links. Layout choices remain proposals. Existing communities and historical centrality retained; no dependency, private-data or generated-native scan. No external model API call; host token cost unavailable.
+
+
+## Calm UI first pass (2026-09-24)
+
+Targeted public-source/document refresh: 319 nodes / 465 edges. Added UI evidence, shared action control, contextual navigation/test links and Lesson9. Session wrap-up records source fcb761a and stopped development services. Existing communities/centrality retained. No private data, dependencies, local tools or generated native scan. No external model API call; host token cost unavailable.

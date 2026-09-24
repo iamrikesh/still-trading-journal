@@ -8,7 +8,7 @@ An Android-first trading reflection app, built with React Native, Expo and TypeS
 
 <p><img src="docs/images/first-moment.png" width="280" alt="Still emotion selection screen" /> <img src="docs/images/injecting-logic.png" width="280" alt="FOMO injecting logic and saved moment" /></p>
 
-Screenshots show the current React Native web demo with sample moments.
+Screenshots show an earlier React Native web demo with sample moments. The current Android layout has a more compact Now screen and separate Settings.
 
 ## Current increment
 
@@ -17,6 +17,7 @@ Screenshots show the current React Native web demo with sample moments.
 - Manual trading sessions, recoverable original-note drafts and separately dated moment/session reflections.
 - Explicit journal Record/Stop/Play and reminder Play/Stop, with recovery and shared audio ownership.
 - Bounded Older/Newest history, deletion and persisted System/Light/Dark appearance.
+- Calm daily-use layout: visible note/session actions, separate Settings, and keyboard-reachable writing controls. See [the first UI pass](docs/reviews/2026-09-24-calm-ui-first-pass.md).
 - Native SQLCipher journal and encrypted clip storage, with protected keys and no plaintext fallback.
 - A browser/Expo Go demo using bounded **temporary memory only**.
 
@@ -83,6 +84,8 @@ Start with [Lesson 1: from a tap to a saved moment](docs/learning/01-first-momen
 Continue with [Lesson 2: build for a real Android phone](docs/learning/02-android-device-build.md) for the Samsung S20 setup, USB development, and disk-saving habits.
 
 [Lesson 7](docs/learning/07-sessions-and-writing.md) explains capture time, sessions and hindsight. [Lesson 8](docs/learning/08-personal-reminders-and-history.md) uses the retained synthetic examples to explain reminder drafts, immutable history and audio ownership.
+
+[Lesson 9](docs/learning/09-calm-ui-and-task-flow.md) explains visual hierarchy, keyboard reachability and returning to the right screen.
 
 | Location | Purpose |
 |---|---|

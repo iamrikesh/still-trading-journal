@@ -2376,7 +2376,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "rationale": "Start here for verified recording baseline, user-requested journal feature milestone, settled decisions, open work and resume instructions. Current source and dated reviews supersede historical status.",
+      "rationale": "Requested session closure: UI source fcb761a committed, app/Metro stopped, USB8081 removed; next session starts with session-detail design.",
       "id": "docs_project_status_current_checkpoint",
       "community": 0,
       "community_name": "Project status and roadmap",
@@ -3601,6 +3601,66 @@
       "community": 1,
       "community_name": "Encrypted journal persistence",
       "rationale": "HistoryMoment adds optional current session/archive metadata to a bounded list result without changing immutable captured Moment save inputs."
+    },
+    {
+      "id": "ui_ux_discovery_sep24",
+      "label": "UI UX discovery and calm minimal direction",
+      "source_file": "docs/reviews/2026-09-24-ui-ux-discovery.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 0,
+      "community_name": "Project status and roadmap",
+      "rationale": "Research checkpoint: user chose calm minimal; Expo and Impeccable recommended, not installed; source and retained screenshot inspected; detailed layout remains proposed."
+    },
+    {
+      "id": "calm_ui_first_pass",
+      "label": "Calm UI first pass and S20 evidence",
+      "source_file": "docs/reviews/2026-09-24-calm-ui-first-pass.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 5,
+      "community_name": "Emotion UI and state",
+      "rationale": "Reviewed source fcb761a;169 host tests, bounded S20 UI evidence and requested shutdown; remaining UI and release work stated."
+    },
+    {
+      "id": "journal_ui_navigation",
+      "label": "Journal contextual Back and reminder restoration",
+      "source_file": "mobile/src/journal/navigation.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 5,
+      "community_name": "Emotion UI and state",
+      "rationale": "Maps Back to task entry points and restores support media without recapture or autoplay."
+    },
+    {
+      "id": "shared_action_button",
+      "label": "Shared accessible action button",
+      "source_file": "mobile/src/components/ActionButton.tsx",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 5,
+      "community_name": "Emotion UI and state",
+      "rationale": "Uses theme tokens, primary and selected appearance, pressed feedback and 48dp minimum height."
+    },
+    {
+      "id": "journal_ui_navigation_tests",
+      "label": "Contextual navigation tests",
+      "source_file": "mobile/tests/navigation.test.ts",
+      "source_location": "L1",
+      "file_type": "code",
+      "community": 5,
+      "community_name": "Emotion UI and state",
+      "rationale": "Tests writing entry destinations and editor/settings parent destinations."
+    },
+    {
+      "id": "calm_ui_learning",
+      "label": "Lesson9 visual hierarchy and task flow",
+      "source_file": "docs/learning/09-calm-ui-and-task-flow.md",
+      "source_location": "L1",
+      "file_type": "document",
+      "community": 5,
+      "community_name": "Emotion UI and state",
+      "rationale": "Explains action hierarchy, real-device keyboard evidence and contextual Back; includes a session-detail design exercise."
     }
   ],
   "links": [
@@ -8062,6 +8122,104 @@
       "relation": "uses",
       "confidence": "EXTRACTED",
       "source_file": "mobile/src/journal/controller.ts"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "ui_ux_discovery_sep24",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "ui_ux_discovery_sep24",
+      "target": "mobile_app_tsx_mobile_app",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-ui-ux-discovery.md"
+    },
+    {
+      "source": "ui_ux_discovery_sep24",
+      "target": "trading_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-ui-ux-discovery.md"
+    },
+    {
+      "source": "ui_ux_discovery_sep24",
+      "target": "writing_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-ui-ux-discovery.md"
+    },
+    {
+      "source": "ui_ux_discovery_sep24",
+      "target": "reminder_editor",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-ui-ux-discovery.md"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "calm_ui_first_pass",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "calm_ui_first_pass",
+      "target": "ui_ux_discovery_sep24",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-calm-ui-first-pass.md"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "journal_ui_navigation",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "mobile_app_tsx_mobile_app",
+      "target": "shared_action_button",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/App.tsx"
+    },
+    {
+      "source": "writing_panel",
+      "target": "shared_action_button",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/src/journal/WritingPanel.tsx"
+    },
+    {
+      "source": "journal_ui_navigation_tests",
+      "target": "journal_ui_navigation",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "mobile/tests/navigation.test.ts"
+    },
+    {
+      "source": "docs_project_status_current_checkpoint",
+      "target": "calm_ui_learning",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PROJECT-STATUS.md"
+    },
+    {
+      "source": "calm_ui_first_pass",
+      "target": "calm_ui_learning",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/reviews/2026-09-24-calm-ui-first-pass.md"
+    },
+    {
+      "source": "calm_ui_learning",
+      "target": "calm_ui_first_pass",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/learning/09-calm-ui-and-task-flow.md"
     }
   ],
   "hyperedges": [
