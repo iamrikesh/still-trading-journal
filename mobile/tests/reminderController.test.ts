@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { restoreSupport } from '../src/journal/navigation.ts';
 import { createAppearanceController, createCoordinatedRecordingController, createReminderController } from '../src/reminders/controller.ts';
 import type { ImportedReminder, NativeReminders } from '../src/reminders/nativeReminders.ts';
 import type { Appearance, EmotionCard, ReminderAttachment, ReminderRepository } from '../src/storage/reminderTypes.ts';
@@ -51,6 +52,22 @@ function rig() {
   const controller = createReminderController({ repository: async () => repository, native, recording: { stopForSessionEnd: async () => release }, id: () => `id-${++counter}` });
   return { controller, cards, attachments, saves, plays, repository, native, pick: (value: Promise<ImportedReminder | null>) => { picked = value; }, failSave: (value: boolean) => { failSave = value; }, failPick: (value: boolean) => { failPick = value; }, release: (value: boolean) => { release = value; }, stops: () => stopCount };
 }
+
+test('returning from writing restores reminder attachments without another capture or autoplay', async () => {
+  const r = rig();
+  r.cards[0]!.imageId = 'image'; r.cards[0]!.audioId = 'audio';
+  r.attachments.set('image', { ...image, id: 'image' });
+  r.attachments.set('audio', { ...audio, id: 'audio' });
+  await r.controller.refresh();
+  await r.controller.selectSupport(r.cards[0]!);
+  r.controller.leaveSupport();
+  assert.equal(r.controller.getSnapshot().selected, null);
+  await restoreSupport(r.controller, 'one');
+  assert.equal(r.controller.getSnapshot().selected?.audioId, 'audio');
+  assert.equal(r.controller.getSnapshot().supportImage?.id, 'image');
+  assert.equal(r.saves.length, 0);
+  assert.equal(r.plays.length, 0);
+});
 
 test('editor Cancel keeps the saved card, while Save publishes complete draft', async () => {
   const r = rig(); await r.controller.refresh();

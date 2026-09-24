@@ -1,8 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { EmotionCard } from '../storage/reminderTypes.ts';
-import type { Appearance } from '../storage/reminderTypes.ts';
-import type { AppearanceState, ReminderController } from './controller.ts';
+import type { ReminderController } from './controller.ts';
 
 type Colors = { ink: string; muted: string; line: string; surface: string; soft: string; accent: string; error: string };
 type Base = { controller: ReminderController; colors: Colors };
@@ -25,7 +24,7 @@ export function ReminderManager({ controller, colors, onEdit, onAdd }: Base & { 
       <Button label={archived ? 'Restore' : 'Archive'} accessibilityLabel={`${archived ? 'Restore' : 'Archive'} ${card.label}`} colors={colors} onPress={() => { void controller.archive(card.id, !archived); }} />
     </View>
   </View>);
-  return <ScrollView contentContainerStyle={styles.body}>
+  return <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
     <Text style={[styles.title, { color: colors.ink }]}>Your reminder buttons</Text>
     <Text style={{ color: colors.muted }}>Choose the words and media that help you pause. Older moments keep what was captured then.</Text>
     <View style={styles.row}><Button label="Add button" colors={colors} onPress={onAdd} disabled={state.active.length + state.archived.length >= 40} />
@@ -39,7 +38,7 @@ export function ReminderManager({ controller, colors, onEdit, onAdd }: Base & { 
   </ScrollView>;
 }
 
-export function ReminderEditor({ controller, colors, appearance, appearanceStatus, onAppearance, onAppearanceRetry, onAppearanceLoadRetry, onBack, onSaved }: Base & { appearance: Appearance; appearanceStatus: AppearanceState['status']; onAppearance(value: Appearance): void; onAppearanceRetry(): void; onAppearanceLoadRetry(): void; onBack(): void; onSaved(): void }) {
+export function ReminderEditor({ controller, colors, onBack, onSaved }: Base & { onBack(): void; onSaved(): void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const draft = state.draft;
   if (!draft) return null;
@@ -51,13 +50,9 @@ export function ReminderEditor({ controller, colors, appearance, appearanceStatu
   </View>;
   const hasImage = !!(draft.image?.id ?? (draft.image !== null && draft.card.imageId));
   const hasAudio = !!(draft.audio?.id ?? (draft.audio !== null && draft.card.audioId));
-  return <ScrollView contentContainerStyle={styles.body}>
+  return <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
     <Text style={[styles.title, { color: colors.ink }]}>{draft.card.label ? `Edit ${draft.card.label}` : 'New reminder button'}</Text>
     <Text style={{ color: colors.muted }}>Edits stay here until Save. Label up to 40, hint 120, symbol 8, support 4000 and next action 500 characters. Include text, an image or audio.</Text>
-    <Text style={{ color: colors.muted }}>Appearance · {appearance}</Text>
-    <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => <Button key={mode} label={mode === appearance ? `${mode} ✓` : mode} colors={colors} onPress={() => onAppearance(mode)} />)}</View>
-    {appearanceStatus === 'failed' && <View><Text accessibilityRole="alert" style={{ color: colors.error }}>Appearance not saved. Your choice remains for this run.</Text><Button label="Retry appearance" colors={colors} onPress={onAppearanceRetry} /></View>}
-    {appearanceStatus === 'loadFailed' && <View><Text accessibilityRole="alert" style={{ color: colors.error }}>Saved appearance could not load. System appearance is temporary.</Text><Button label="Retry loading appearance" colors={colors} onPress={onAppearanceLoadRetry} /></View>}
     {field('label', 'Label', 40)}{field('hint', 'Hint', 120)}{field('symbol', 'Symbol', 8)}
     {field('support', 'Support text', 4000, true)}{field('action', 'Next action', 500, true)}
     <View style={[styles.card, { borderColor: colors.line, backgroundColor: colors.surface }]}>

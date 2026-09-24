@@ -1,13 +1,15 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { Alert, AppState, BackHandler, FlatList, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, AppState, BackHandler, FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { randomUUID } from 'expo-crypto';
 import { requireOptionalNativeModule } from 'expo-modules-core';
 import { createJournalController } from './src/journal/controller';
 import { emotions } from './src/journal/emotions';
 import { openJournal, openJournalSession, isTemporaryJournal } from './src/storage/openJournal';
-import { palettes, type Appearance } from './src/theme';
+import { palettes, radius, spacing, typography, type Appearance } from './src/theme';
+import { ActionButton } from './src/components/ActionButton';
+import { backDestination, restoreSupport, type Page } from './src/journal/navigation';
 import { MediaVaultProofPanel } from './src/development/MediaVaultProofPanel';
 import { createMediaVaultProof, type MediaVaultProofNative } from './src/development/mediaVaultProof';
 import { createClipRecoveryExercise } from './src/development/clipRecoveryExercise';
@@ -36,6 +38,7 @@ export default function App() {
 }
 
 function JournalApp() {
+  const insets = useSafeAreaInsets();
   const systemTheme = useColorScheme();
   const [appearanceController] = useState(() => createAppearanceController({ repository: async () => (await openJournalSession()).appearance ?? null }));
   const appearanceState = useSyncExternalStore(appearanceController.subscribe, appearanceController.getSnapshot);
@@ -53,8 +56,10 @@ function JournalApp() {
     });
   });
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
-  type Page = 'now' | 'support' | 'history' | 'clips' | 'sessions' | 'writing' | 'reminders' | 'editor';
   const [page, setPage] = useState<Page>('now');
+  const [writingOrigin, setWritingOrigin] = useState<Page>('now');
+  const [showSessionStart, setShowSessionStart] = useState(false);
+  const [showDevelopment, setShowDevelopment] = useState(false);
   const [clipMoment, setClipMoment] = useState<Moment | null>(null);
   const [baseRecording] = useState(createAppRecordingController);
   const [reminder] = useState(() => createReminderController({
@@ -104,8 +109,9 @@ function JournalApp() {
     const finish = () => {
       if (page === 'editor' && target !== 'editor' && !reminder.discard()) return;
       after?.();
+      if (target === 'support' && page === 'writing' && state.selected) void restoreSupport(reminder, state.selected.id);
       setPage(target);
-      if (target === 'history' && page !== 'history') void controller.refresh();
+      if (target === 'history' && page !== 'history' && page !== 'writing') void controller.refresh();
     };
     const draft = reminder.getSnapshot();
     if (page !== 'editor' || target === 'editor' || !draft.draft || !draft.dirty) { finish(); return; }
@@ -123,12 +129,13 @@ function JournalApp() {
   }
   useEffect(() => {
     const back = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (page === 'now') return false;
-      navigate('now');
+      const destination = backDestination(page, writingOrigin);
+      if (!destination) return false;
+      navigate(destination);
       return true;
     });
     return () => back.remove();
-  }, [page, reminder, controller]);
+  }, [page, writingOrigin, reminder, controller]);
 
   function removeMoment(id: string) {
     const remove = async () => {
@@ -146,6 +153,7 @@ function JournalApp() {
   }
 
   function openWriting(owner: WritingOwner, kind: 'note' | 'reflection' = owner.kind === 'session' ? 'reflection' : 'note') {
+    if (page !== 'writing') setWritingOrigin(page);
     const current = writing.getSnapshot();
     if (!writing.canSwitch(owner, kind) && current.writing) {
       writing.open(owner, kind);
@@ -169,23 +177,19 @@ function JournalApp() {
     catch { setGroupError('Grouping could not be saved. Please try again.'); }
   }
 
-  const chip = (label: string, onPress: () => void, selected = false) => (
-    <Pressable key={label} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected }}
-      style={({ pressed }) => [styles.chip, selected && styles.chipSelected, pressed && styles.pressed]}>
-      <Text style={styles.chipText}>{label}</Text>
-    </Pressable>
-  );
+  const chip = (label: string, onPress: () => void, selected = false) =>
+    <ActionButton key={label} label={label} onPress={onPress} selected={selected} colors={colors} />;
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style={dark ? 'light' : 'dark'} />
-      <View style={styles.frame}>
+      <KeyboardAvoidingView style={styles.frame} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={insets.top}>
         <View style={styles.header}>
           <Text style={styles.brand}>still<Text style={styles.brandDot}>.</Text></Text>
-          <Text style={styles.eyebrow}>SPACE BEFORE ACTION</Text>
+          {chip(page === 'settings' ? 'Back to Now' : 'Settings', () => navigate(page === 'settings' ? 'now' : 'settings'))}
         </View>
         <View style={styles.demoBanner}>
-          <Text style={styles.small}>{isTemporaryJournal ? 'Temporary demo · history resets when you reload' : 'Development build · use sample moments for now'}</Text>
+          <Text style={styles.small}>{isTemporaryJournal ? 'Temporary demo · history resets on reload' : 'Development build · sample moments only'}</Text>
         </View>
         {!isTemporaryJournal && tradingState.active && <View style={styles.failureBar}>
           <Text style={styles.emotionTitle}>Open session: {tradingState.active.title || new Date(tradingState.active.startedAt).toLocaleString()}</Text>
@@ -197,10 +201,21 @@ function JournalApp() {
           {tradingState.error && <Text accessibilityRole="alert" style={styles.error}>{tradingState.error}</Text>}
         </View>}
 
-        {page === 'now' && <ScrollView contentContainerStyle={styles.body}>
-          <Text style={styles.eyebrow}>A MOMENT FOR YOU</Text>
-          <Text style={styles.title}>What’s coming{ '\n' }up right now?</Text>
-          <Text style={styles.subtitle}>Notice it. Give yourself a little space.{ '\n' }One tap opens your reminder and logs the moment.</Text>
+        {page === 'now' && <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
+          <Text style={styles.title}>How are you feeling?</Text>
+          <Text style={styles.subtitle}>Tap a reminder to pause and save the moment.</Text>
+          {!isTemporaryJournal && <View style={styles.quickActions}>
+            <ActionButton label="Write note" onPress={() => { void createNote(); }} colors={colors} primary style={styles.quickAction} />
+            {!tradingState.active && <ActionButton label={showSessionStart ? 'Cancel session setup' : 'Start session'} onPress={() => setShowSessionStart(!showSessionStart)} colors={colors} style={styles.quickAction} />}
+          </View>}
+          {!isTemporaryJournal && !tradingState.active && showSessionStart && <View style={styles.sessionSetup}>
+            <Text style={styles.emotionTitle}>Start a trading session</Text>
+            <Text style={styles.small}>New moments will be grouped in this session.</Text>
+            <TextInput accessibilityLabel="Optional session title" placeholder="Session title (optional)" placeholderTextColor={colors.muted} value={startTitle} onChangeText={setStartTitle} style={styles.input} />
+            <ActionButton label="Begin session" disabled={tradingState.busy} colors={colors} primary onPress={() => { void trading.start(startTitle).then(() => { if (trading.getSnapshot().active) { setShowSessionStart(false); setStartTitle(''); } }); }} />
+          </View>}
+          {tradingState.error && <Text accessibilityRole="alert" style={styles.error}>{tradingState.error}</Text>}
+          {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
           {reminderState.loadStatus === 'loading' && !isTemporaryJournal && <Text style={styles.small}>Loading your saved buttons…</Text>}
           {reminderState.loadStatus === 'failed' && !isTemporaryJournal && <View style={styles.notice}>
             <Text accessibilityRole="alert" style={styles.error}>Saved buttons could not load.</Text>
@@ -210,22 +225,18 @@ function JournalApp() {
             {(reminderState.loadStatus === 'ready' ? reminderState.active : isTemporaryJournal || reminderState.loadStatus === 'unavailable' ? emotions : []).map(emotion => <Pressable key={emotion.id} accessibilityRole="button" accessibilityLabel={emotion.label}
               onPress={() => { void controller.tap(emotion); const saved = reminderState.active.find(card => card.id === emotion.id); if (saved) void reminder.selectSupport(saved); navigate('support'); }}
               style={({ pressed }) => [styles.emotion, pressed && styles.pressed]}>
-              <Text style={styles.symbol} accessible={false}>{emotion.symbol}</Text>
-              <Text style={styles.emotionTitle}>{emotion.label}</Text>
+              <Text style={styles.emotionTitle}>{emotion.symbol ? `${emotion.symbol}  ` : ''}{emotion.label}</Text>
               <Text style={styles.small}>{emotion.hint}</Text>
             </Pressable>)}
           </View>
+          <Text style={styles.footnote}>No perfect label needed. Unsure is a place to start.</Text>
+        </ScrollView>}
+
+        {page === 'settings' && <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
+          <Text style={styles.title}>Settings</Text>
+          <Text style={styles.subtitle}>Make this space your own.</Text>
           {!isTemporaryJournal && reminderState.loadStatus === 'ready' && chip('Manage reminder buttons', () => navigate('reminders'))}
-          {isTemporaryJournal ? <Text style={styles.small}>Sessions, notes and reflections need the Android development build. Demo moments reset on reload.</Text> : <>
-            {!tradingState.active && <>
-              <TextInput accessibilityLabel="Optional session title" placeholder="Optional session title" placeholderTextColor={colors.muted} value={startTitle} onChangeText={setStartTitle} style={[styles.historyCard, { color: colors.ink }]} />
-              {chip('Start session', () => { void trading.start(startTitle); })}
-            </>}
-            {tradingState.error && <Text accessibilityRole="alert" style={styles.error}>{tradingState.error}</Text>}
-            {chip('Write note', () => { void createNote(); })}
-            {groupError && <Text accessibilityRole="alert" style={styles.error}>{groupError}</Text>}
-          </>}
-          <Text style={styles.sectionLabel}>MAKE YOURSELF AT HOME</Text>
+          <Text style={styles.sectionLabel}>Appearance</Text>
           <View style={styles.row}>{(['system', 'light', 'dark'] as const).map(mode => chip(mode.charAt(0).toUpperCase() + mode.slice(1), () => { void appearanceController.choose(mode); }, appearance === mode))}</View>
           {appearanceState.status === 'saving' && <Text style={styles.small}>Saving appearance…</Text>}
           {appearanceState.status === 'failed' && <View style={styles.notice}><Text accessibilityRole="alert" style={styles.error}>Appearance not saved. Your choice remains for this run.</Text>
@@ -233,15 +244,20 @@ function JournalApp() {
           {appearanceState.status === 'loadFailed' && <View style={styles.notice}><Text accessibilityRole="alert" style={styles.error}>Saved appearance could not load. System appearance is temporary.</Text>
             {chip('Retry loading appearance', () => { void appearanceController.load(); })}</View>}
           {appearanceState.status === 'unavailable' && <Text style={styles.small}>Appearance is temporary in this demo.</Text>}
-          <Text style={styles.footnote}>There is no perfect label. “Unsure” is a place to start.</Text>
-          {mediaProof && <MediaVaultProofPanel proof={mediaProof} ink={colors.ink} muted={colors.muted} line={colors.line} />}
-          {clipExercise && <ClipRecoveryPanel exercise={clipExercise} ink={colors.ink} muted={colors.muted} line={colors.line} />}
+
+          {isTemporaryJournal && <Text style={styles.footnote}>Sessions, notes and reflections need the Android development build.</Text>}
+          {(mediaProof || clipExercise) && <View style={styles.notice}>
+            {chip(showDevelopment ? 'Hide development tools' : 'Development tools', () => setShowDevelopment(!showDevelopment))}
+            {showDevelopment && <>
+              {mediaProof && <MediaVaultProofPanel proof={mediaProof} ink={colors.ink} muted={colors.muted} line={colors.line} />}
+              {clipExercise && <ClipRecoveryPanel exercise={clipExercise} ink={colors.ink} muted={colors.muted} line={colors.line} />}
+            </>}
+          </View>}
         </ScrollView>}
 
         {page === 'support' && state.selected && <ScrollView contentContainerStyle={styles.body}>
           <Pressable accessibilityRole="button" onPress={() => navigate('now')} style={styles.back}><Text style={styles.link}>← All emotions</Text></Pressable>
-          <Text style={styles.eyebrow}>{state.selected.label.toUpperCase()}</Text>
-          <Text style={styles.title}>A little space.{ '\n' }A clearer choice.</Text>
+          <Text style={styles.title}>{state.selected.label}</Text>
           {reminderState.selected ? <ReminderSupport controller={reminder} colors={colors} /> : <View style={styles.supportCard}>
             <Text style={styles.sectionLabel}>YOUR REMINDER</Text>
             <Text style={styles.supportText}>{state.selected.support}</Text>
@@ -262,14 +278,12 @@ function JournalApp() {
           <Text style={styles.footnote}>No explanation needed. Your emotion and the time are enough for this moment.</Text>
           {chip('See my moments', () => navigate('history'))}
           {Platform.OS === 'android' && !isTemporaryJournal && state.saveStatus === 'saved' && <RecordingPanel controller={recording} ink={colors.ink} muted={colors.muted} line={colors.line} onOpenMoment={moment => { setClipMoment(moment); navigate('clips'); }} />}
-          {!isTemporaryJournal && reminderState.loadStatus === 'ready' && chip('Manage reminder buttons', () => navigate('reminders'))}
         </ScrollView>}
 
         {page === 'reminders' && <ReminderManager controller={reminder} colors={colors}
           onEdit={card => { reminder.edit(card); navigate('editor'); }}
           onAdd={() => { if (reminder.add()) navigate('editor'); }} />}
-        {page === 'editor' && <ReminderEditor controller={reminder} colors={colors} appearance={appearance} appearanceStatus={appearanceState.status}
-          onAppearance={mode => { void appearanceController.choose(mode); }} onAppearanceRetry={() => { void appearanceController.retry(); }} onAppearanceLoadRetry={() => { void appearanceController.load(); }}
+        {page === 'editor' && <ReminderEditor controller={reminder} colors={colors}
           onBack={() => { reminder.discard(); void reminder.stop(); setPage('reminders'); }}
           onSaved={() => { void reminder.stop(); setPage('reminders'); }} />}
 
@@ -291,15 +305,13 @@ function JournalApp() {
         </ScrollView>}
 
         {page === 'sessions' && !isTemporaryJournal && <TradingPanel controller={trading} ink={colors.ink} muted={colors.muted} line={colors.line} onMoment={moment => { setClipMoment(moment); navigate('clips'); }} onReflection={session => openWriting({ kind: 'session', id: session.id })} />}
-        {page === 'writing' && writingOwner && !isTemporaryJournal && <WritingPanel controller={writing} repository={tradingRepository} owner={writingOwner} initialKind={writingKind} ink={colors.ink} muted={colors.muted} line={colors.line} onBack={() => navigate(writingOwner.kind === 'session' ? 'sessions' : 'clips')} />}
+        {page === 'writing' && writingOwner && !isTemporaryJournal && <WritingPanel controller={writing} repository={tradingRepository} owner={writingOwner} initialKind={writingKind} colors={colors} onBack={() => navigate(writingOrigin)} />}
 
         {page === 'history' && <FlatList data={state.history} keyExtractor={item => item.id}
           contentContainerStyle={styles.body} initialNumToRender={10} windowSize={5}
           ListHeaderComponent={<>
-            <Text style={styles.eyebrow}>YOUR RECENT MOMENTS</Text>
-            <Text style={styles.title}>See it with{ '\n' }fresh eyes.</Text>
-            <Text style={styles.subtitle}>A record of what you noticed.{ '\n' }Nothing to judge. Something to learn.</Text>
-            <Text style={styles.small}>Browse saved moments from newest to oldest. Each keeps its captured words and time.</Text>
+            <Text style={styles.title}>My moments</Text>
+            <Text style={styles.subtitle}>What you noticed, in your own time.</Text>
             {state.historyStatus === 'failed' && <View style={styles.notice}><Text style={styles.error}>History couldn’t load. Saved moments have not been deleted.</Text>{chip('Try loading again', () => { void controller.refresh(); })}</View>}
             {deleteError && <Text accessibilityRole="alert" style={styles.error}>That moment could not be deleted. Please try again.</Text>}
           </>}
@@ -344,12 +356,12 @@ function JournalApp() {
           <Text style={styles.error}>{state.failed.length} moment{state.failed.length > 1 ? 's' : ''} not saved. Retry before closing.</Text>
           {chip('Retry unsaved moments', () => { for (const moment of state.failed) void controller.retry(moment.id); })}
         </View>}
-        <View style={styles.tabs}>
+        {page !== 'writing' && <View style={styles.tabs}>
           {chip('Now', () => navigate('now'), page === 'now')}
           {chip('My moments', () => navigate('history'), page === 'history')}
           {!isTemporaryJournal && chip('Sessions', () => navigate('sessions'), page === 'sessions')}
-        </View>
-      </View>
+        </View>}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -358,27 +370,31 @@ function makeStyles(c: typeof palettes.light) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.background },
     frame: { flex: 1, width: '100%', maxWidth: 600, alignSelf: 'center' },
-    header: { paddingHorizontal: 24, paddingTop: 14, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-    brand: { fontSize: 32, fontWeight: '700', letterSpacing: -2, color: c.ink }, brandDot: { color: c.accent },
+    header: { paddingHorizontal: spacing.xl, paddingVertical: spacing.xs, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
+    brand: { fontSize: 28, fontWeight: '700', letterSpacing: -1, color: c.ink }, brandDot: { color: c.accent },
     eyebrow: { fontSize: 10, fontWeight: '700', letterSpacing: 1.6, color: c.muted, flexShrink: 1 },
-    demoBanner: { paddingVertical: 9, paddingHorizontal: 24, borderTopWidth: 1, borderBottomWidth: 1, borderColor: c.line },
-    body: { padding: 24, paddingBottom: 32 },
-    title: { fontSize: 37, fontWeight: '500', letterSpacing: -1.2, color: c.ink, lineHeight: 44, marginTop: 14, marginBottom: 14, fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' },
-    subtitle: { fontSize: 14, color: c.muted, lineHeight: 23, marginBottom: 20 },
-    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 8, marginBottom: 30 },
-    emotion: { width: '47.5%', flexGrow: 1, minHeight: 136, padding: 18, borderWidth: 1, borderColor: c.line, borderRadius: 22, backgroundColor: c.surface, justifyContent: 'space-between' },
+    demoBanner: { paddingVertical: spacing.xs, paddingHorizontal: spacing.xl, borderBottomWidth: 1, borderColor: c.line },
+    body: { padding: spacing.xl, paddingBottom: spacing.section },
+    title: { ...typography.title, color: c.ink, marginBottom: spacing.sm },
+    subtitle: { ...typography.body, color: c.muted, marginBottom: spacing.xl },
+    quickActions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xxl },
+    quickAction: { flexGrow: 1, flexBasis: 140 },
+    sessionSetup: { gap: spacing.md, marginBottom: spacing.xxl },
+    input: { ...typography.body, minHeight: 48, borderWidth: 1, borderColor: c.line, borderRadius: radius.control, padding: spacing.md, color: c.ink, backgroundColor: c.surface },
+    grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+    emotion: { flexBasis: 145, flexGrow: 1, minHeight: 92, padding: spacing.lg, borderWidth: 1, borderColor: c.line, borderRadius: radius.surface, backgroundColor: c.surface, justifyContent: 'center' },
     symbol: { fontSize: 29, color: c.accent, marginBottom: 18 },
-    emotionTitle: { fontSize: 16, color: c.ink, fontWeight: '600', marginBottom: 6 },
-    small: { fontSize: 12, color: c.muted, lineHeight: 18 },
-    sectionLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: c.muted, marginBottom: 14 },
+    emotionTitle: { ...typography.label, fontSize: 16, color: c.ink, marginBottom: spacing.xs },
+    small: { ...typography.caption, color: c.muted },
+    sectionLabel: { ...typography.heading, color: c.ink, marginTop: spacing.xxl, marginBottom: spacing.md },
     row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     chip: { minHeight: 46, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 24, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' },
     chipSelected: { backgroundColor: c.soft, borderColor: c.accent },
     chipText: { fontSize: 13, color: c.ink, fontWeight: '600' }, pressed: { opacity: 0.65 },
     footnote: { fontSize: 12, color: c.muted, lineHeight: 20, marginTop: 20, marginBottom: 16 },
-    back: { paddingVertical: 8, minHeight: 44, marginBottom: 18 }, link: { fontSize: 14, color: c.accent },
-    supportCard: { backgroundColor: c.soft, borderRadius: 26, padding: 26, marginTop: 12 },
-    supportText: { fontSize: 26, lineHeight: 36, color: c.ink, fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' },
+    back: { paddingVertical: spacing.md, minHeight: 48, marginBottom: spacing.sm }, link: { ...typography.label, color: c.accent },
+    supportCard: { backgroundColor: c.soft, borderRadius: radius.surface, padding: spacing.xl, marginTop: spacing.md },
+    supportText: { fontSize: 22, lineHeight: 32, color: c.ink },
     rule: { height: 1, backgroundColor: c.line, marginVertical: 24 },
     action: { fontSize: 15, color: c.ink, lineHeight: 23, marginTop: 9 },
     saveStatus: { fontSize: 12, color: c.accent, lineHeight: 20, marginTop: 22, marginBottom: 10 },
@@ -389,6 +405,6 @@ function makeStyles(c: typeof palettes.light) {
     empty: { borderWidth: 1, borderStyle: 'dashed', borderColor: c.line, borderRadius: 22, padding: 24, marginTop: 24 },
     error: { color: c.error, fontSize: 12, lineHeight: 19 }, notice: { marginTop: 16, gap: 12 },
     failureBar: { borderTopWidth: 1, borderColor: c.line, padding: 12, gap: 8 },
-    tabs: { padding: 14, borderTopWidth: 1, borderColor: c.line, flexDirection: 'row', justifyContent: 'center', gap: 12 },
+    tabs: { padding: spacing.sm, borderTopWidth: 1, borderColor: c.line, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
   });
 }

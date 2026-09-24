@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { findOpeningWriting, findWritingById, type WritingController } from './writingController';
+import { ActionButton } from '../components/ActionButton';
+import { radius, spacing, typography, type Palette } from '../theme';
 import type { TradingRepository, Writing, WritingOwner } from '../storage/tradingTypes';
 
-export function WritingPanel({ controller, repository, owner, initialKind, ink, muted, line, onBack }: {
+export function WritingPanel({ controller, repository, owner, initialKind, colors, onBack }: {
   controller: WritingController; repository(): Promise<TradingRepository>; owner: WritingOwner;
   initialKind: Writing['kind'];
-  ink: string; muted: string; line: string; onBack(): void;
+  colors: Palette; onBack(): void;
 }) {
+  const { ink, muted, line } = colors;
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
   const [rows, setRows] = useState<Writing[]>([]);
   const [older, setOlder] = useState(false);
@@ -39,28 +42,42 @@ export function WritingPanel({ controller, repository, owner, initialKind, ink, 
     } catch { if (token === request.current) setError('Writing could not load. Please try again.'); }
   }
   function discard() { const action = () => { void controller.discard().then(reload); }; if (Platform.OS === 'web') { if (window.confirm('Discard this draft? Saved text will be removed.')) action(); } else Alert.alert('Discard draft?', 'Saved draft text will be removed. The moment or session and its clips stay.', [{ text: 'Keep', style: 'cancel' }, { text: 'Discard', style: 'destructive', onPress: action }]); }
-  const button = (label: string, action: () => void, disabled = false, key?: string) => <Pressable key={key} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={action} style={[styles.button, { borderColor: line, opacity: disabled ? 0.5 : 1 }]}><Text style={{ color: ink }}>{label}</Text></Pressable>;
+  const button = (label: string, action: () => void, disabled = false, key?: string) => <ActionButton key={key} label={label} onPress={action} disabled={disabled} colors={colors} />;
   const writing = state.writing;
-  return <ScrollView contentContainerStyle={styles.body}>
+  return <View style={{ flex: 1 }}>
+    <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={styles.body}>
     {button('Back from writing', onBack)}
-    <Text style={[styles.heading, { color: ink }]}>{owner.kind === 'moment' ? 'Moment writing' : 'Session reflections'}</Text>
+    <Text style={[styles.heading, { color: ink }]}>{owner.kind === 'moment' ? 'Your note & reflections' : 'Session reflections'}</Text>
     {loading && <Text style={{ color: muted }}>Opening saved writing…</Text>}
-    {error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
+    {error && <Text accessibilityRole="alert" style={{ color: colors.error }}>{error}</Text>}
     {error && button('Retry loading writing', () => { void reload(); })}
     {!loading && !error && <>
+      {writing && <View style={[styles.card, { borderColor: line }]}>
+        <Text style={[typography.heading, { color: ink }]}>{writing.kind === 'note' ? 'Original note' : 'Reflection'}</Text>
+        <Text style={[typography.caption, { color: muted }]}>{new Date(writing.createdAt).toLocaleString()}</Text>
+        {writing.finalisedAt && <Text style={{ color: muted }}>Finalised {new Date(writing.finalisedAt).toLocaleString()}</Text>}
+        {writing.finalisedAt ? <Text selectable style={{ color: ink }}>{writing.text}</Text> : <TextInput accessibilityLabel={writing.kind === 'note' ? 'Original note text' : 'Reflection text'} editable={!state.busy} multiline value={state.text} onChangeText={text => { void controller.edit(text); }} placeholder="Write what you noticed" placeholderTextColor={muted} style={[styles.input, { borderColor: line, color: ink }]} />}
+        <Text accessibilityLiveRegion="polite" style={{ color: state.status === 'Not saved' ? colors.error : muted }}>{state.status}</Text>
+        {state.error && <Text accessibilityRole="alert" style={{ color: colors.error }}>{state.error}</Text>}
+        {!writing.finalisedAt && <View style={styles.row}>{state.status === 'Not saved' && button('Retry saving draft', () => { void controller.retry(); }, state.busy)}{button('Discard draft', discard, state.busy)}</View>}
+      </View>}
+      <Text style={[typography.heading, { color: ink, marginTop: spacing.xl }]}>Explore this writing</Text>
       {owner.kind === 'moment' && button('Original note', () => { void selectWriting('note'); }, state.busy)}
       {rows.filter(row => row.kind === 'reflection').map(row => button(`${row.finalisedAt ? 'Reflection' : 'Draft reflection'} · ${new Date(row.createdAt).toLocaleString()}`, () => { void selectWriting('reflection', row.id); }, state.busy, row.id))}
       {older && button('Older writing', () => { void loadOlder(); })}
       {button('Add follow-up reflection', () => { ++request.current; controller.open(owner, 'reflection'); }, state.busy)}
-      {writing && <View style={[styles.card, { borderColor: line }]}>
-        <Text style={{ color: ink }}>{writing.kind === 'note' ? 'Original note' : 'Reflection'} · captured {new Date(writing.createdAt).toLocaleString()}</Text>
-        {writing.finalisedAt && <Text style={{ color: muted }}>Finalised {new Date(writing.finalisedAt).toLocaleString()}</Text>}
-        {writing.finalisedAt ? <Text selectable style={{ color: ink }}>{writing.text}</Text> : <TextInput accessibilityLabel={writing.kind === 'note' ? 'Original note text' : 'Reflection text'} editable={!state.busy} multiline value={state.text} onChangeText={text => { void controller.edit(text); }} placeholder="Write what you noticed" placeholderTextColor={muted} style={[styles.input, { borderColor: line, color: ink }]} />}
-        <Text accessibilityLiveRegion="polite" style={{ color: state.status === 'Not saved' ? '#b32318' : muted }}>{state.status}</Text>
-        {state.error && <Text accessibilityRole="alert" style={styles.error}>{state.error}</Text>}
-        {!writing.finalisedAt && <View style={styles.row}>{button('Done writing', () => { void controller.done().then(reload); }, state.busy)}{state.status === 'Not saved' && button('Retry saving draft', () => { void controller.retry(); }, state.busy)}{button('Discard draft', discard, state.busy)}</View>}
-      </View>}
     </>}
-  </ScrollView>;
+    </ScrollView>
+    {!loading && !error && writing && !writing.finalisedAt && <View style={[styles.toolbar, { borderColor: line, backgroundColor: colors.background }]}>
+      <ActionButton label="Done writing" primary colors={colors} disabled={state.busy} onPress={() => { void controller.done().then(reload); }} />
+    </View>}
+  </View>;
 }
-const styles = StyleSheet.create({ body: { padding: 24, paddingBottom: 40, gap: 14 }, heading: { fontSize: 27 }, card: { borderWidth: 1, borderRadius: 18, padding: 16, gap: 10 }, button: { borderWidth: 1, borderRadius: 16, padding: 12, alignSelf: 'flex-start' }, input: { borderWidth: 1, borderRadius: 12, minHeight: 150, padding: 12, textAlignVertical: 'top' }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, error: { color: '#b32318' } });
+const styles = StyleSheet.create({
+  body: { padding: spacing.xl, paddingBottom: spacing.xxl, gap: spacing.md },
+  heading: typography.title,
+  card: { gap: spacing.md },
+  input: { ...typography.body, borderWidth: 1, borderRadius: radius.control, minHeight: 180, padding: spacing.lg, textAlignVertical: 'top' },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  toolbar: { padding: spacing.md, borderTopWidth: 1 },
+});

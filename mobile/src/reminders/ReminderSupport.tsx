@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { radius, spacing, typography } from '../theme';
 import type { ReminderController } from './controller.ts';
 
 type Colors = { ink: string; muted: string; line: string; soft: string; error: string };
@@ -17,7 +18,7 @@ export function ReminderSupport({ controller, colors }: { controller: ReminderCo
       source={{ uri: `data:${state.supportImage.mime};base64,${state.supportImage.base64}` }} style={styles.image} />}
     {card.imageId && !state.supportImage && !state.error && <Text style={{ color: colors.muted }}>Loading current image…</Text>}
     {!!card.action && <><View style={[styles.rule, { backgroundColor: colors.line }]} />
-      <Text style={[styles.label, { color: colors.muted }]}>ONE POSSIBLE NEXT STEP</Text>
+      <Text style={[styles.label, { color: colors.muted }]}>One next step</Text>
       <Text style={{ color: colors.ink, fontSize: 15, lineHeight: 23 }}>{card.action}</Text></>}
     {card.audioId && <View style={styles.row}>{button('Play reminder', () => { void controller.play(); }, state.playing === 'idle')}
       {(state.playing === 'playing' || state.playing === 'loading' || state.playing === 'cleanup') &&
@@ -28,8 +29,8 @@ export function ReminderSupport({ controller, colors }: { controller: ReminderCo
   </View>;
 }
 const styles = StyleSheet.create({
-  card: { borderRadius: 26, padding: 26, marginTop: 12, gap: 12 }, label: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5 },
-  support: { fontSize: 26, lineHeight: 36, fontFamily: 'serif' }, image: { width: '100%', height: 240 },
+  card: { borderRadius: radius.surface, padding: spacing.xl, marginTop: spacing.md, gap: spacing.md }, label: typography.label,
+  support: { fontSize: 22, lineHeight: 32 }, image: { width: '100%', height: 240 },
   rule: { height: 1, marginVertical: 8 }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  button: { borderWidth: 1, borderRadius: 22, minHeight: 44, justifyContent: 'center', paddingHorizontal: 16 },
+  button: { borderWidth: 1, borderRadius: radius.control, minHeight: 48, justifyContent: 'center', paddingHorizontal: 16 },
 });
